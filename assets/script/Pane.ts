@@ -1,4 +1,4 @@
-import { _decorator, Component, Graphics, EventTouch, Node, UITransform } from 'cc';
+import { _decorator, Component, Graphics, EventTouch, Node, UITransform, Vec3, Camera, v3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('Pane')
@@ -17,7 +17,7 @@ export class Pane extends Component {
     }
 
     start() {
-        this.draw();
+        this.drawPane();
         // 监听触摸结束事件
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
     }
@@ -27,11 +27,12 @@ export class Pane extends Component {
     }
     
 
-    draw() {
+    drawPane() {
         // 获取节点的宽度和高度
         const uiTransform = this.node.getComponent(UITransform);
         const cwidth = uiTransform.width;
         const cheight = uiTransform.height;
+        console.log(`pane size: (${cwidth}, ${cheight})`);
 
         this.cellWidth = cwidth / this.cols;
         this.cellHeight = cheight / this.rows;
@@ -59,9 +60,28 @@ export class Pane extends Component {
     }
 
     onTouchEnd(event: EventTouch) {
-        let touchLocation = event.getLocationInView();
-        let screenLoc = event.getLocation(); 
-        console.log(`Touch location: (${screenLoc.x}, ${screenLoc.y})`);
+        let uiLoc = event.getUILocation();
+
+        const uiPosVec3 = new Vec3(uiLoc.x, uiLoc.y, 0);
+        let localPos = this.node.getComponent(UITransform).convertToNodeSpaceAR(uiPosVec3);
+        console.log(`Touch local location: (${localPos.x}, ${localPos.y})`);
+
+        let x = Math.floor(localPos.x / this.cellWidth);
+        let y = Math.floor(localPos.y / this.cellHeight);
+        x = (x+0.5)*this.cellWidth
+        y = (y+0.5)*this.cellHeight
+        console.log(`Touch location: (${x}, ${y})`);
+        this.drawPieces(x, y);
+    }
+
+    drawPieces(x: number, y: number) {
+        let graphics = this.node.getComponent(Graphics);
+        graphics.fillColor.fromHEX('#000000');
+        const radius = 40;
+        // 绘制圆形路径
+        graphics.arc(x, y, radius, 0, 2 * Math.PI, false);
+        // 填充圆形
+        graphics.fill();
     }
 }
 
