@@ -1,4 +1,5 @@
-import { _decorator, Component, Graphics, EventTouch, Node, UITransform, Vec3, Camera, v3 } from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame, Graphics, EventTouch, Node, UITransform, Vec3, v2, Vec2} from 'cc';
+import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
 @ccclass('Pane')
@@ -11,21 +12,58 @@ export class Pane extends Component {
     cellWidth: number = 80;
     // 每个格子的高度
     cellHeight: number = 80;
+    
+    logic: Logic;
+
+    pieces: Node[][]= [
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null,null],
+    ];
+
+    @property(SpriteFrame)
+    private blackSprite: SpriteFrame | null = null;
+
+    @property(SpriteFrame)
+    private whiteSprite: SpriteFrame | null = null;
 
     onLoad () {
-        
+        // resources.load('imgs/black_piece', SpriteFrame, (err, spriteFrame: SpriteFrame) => {
+        //     if (err) {
+        //         console.error('Failed to load sprite frame:', err);
+        //         return;
+        //     }
+        //     // 将加载好的 SpriteFrame 存储在类的属性中
+        //     this.blackSprite = spriteFrame;
+        // });
     }
 
     start() {
-        this.drawPane();
+        this.initGame();
         // 监听触摸结束事件
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
     }
 
     update(deltaTime: number) {
-        
+        this.logic.changes.forEach((p) => {
+            this.drawPieces(p[0], p[1], p[2]);
+        });
+        this.logic.changes = [];
     }
     
+    initGame() {
+        this.drawPane();
+        this.logic = new Logic();
+        this.placePieces(3, 3, PiecesType.BLACK);
+        this.placePieces(3, 4, PiecesType.WHITE);
+        this.placePieces(4, 3, PiecesType.WHITE);
+        this.placePieces(4, 4, PiecesType.BLACK);
+    }
 
     drawPane() {
         // 获取节点的宽度和高度
@@ -59,25 +97,70 @@ export class Pane extends Component {
         graphics.stroke();
     }
 
-    onTouchEnd(event: EventTouch) {
-        let uiLoc = event.getUILocation();
-
-        const uiPosVec3 = new Vec3(uiLoc.x, uiLoc.y, 0);
-        let localPos = this.node.getComponent(UITransform).convertToNodeSpaceAR(uiPosVec3);
-        console.log(`Touch local location: (${localPos.x}, ${localPos.y})`);
-
-        let x = Math.floor(localPos.x / this.cellWidth);
-        let y = Math.floor(localPos.y / this.cellHeight);
-        x = (x+0.5)*this.cellWidth
-        y = (y+0.5)*this.cellHeight
-        console.log(`Touch location: (${x}, ${y})`);
-        this.drawPieces(x, y);
+    // i:row[0,7], j:col[0,7]
+    placePieces(i: number, j: number, t: PiecesType) {
+        let x = (j - 4 + 0.5) * this.cellWidth
+        let y = (3 - i + 0.5) * this.cellHeight
+        let name = `pieces_${i}_${j}`
+        let node: Node = new Node(name);
+        node.setPosition(x, y);
+        let sprite = node.addComponent(Sprite);
+        switch (t) {
+            case PiecesType.BLACK:
+                sprite.spriteFrame = this.blackSprite;
+                break;
+            case PiecesType.WHITE:
+                sprite.spriteFrame = this.whiteSprite;
+                break;
+            default:
+                return;
+        }
+        let ui =  node.getComponent(UITransform)
+        ui.width = 80
+        ui.height = 80
+        this.node.addChild(node);
+        this.pieces[i][j] = node
+        this.logic.chesses[i][j] = t
     }
 
-    drawPieces(x: number, y: number) {
+    onTouchEnd(event: EventTouch) {
+        const loc = this.getInput(event);
+        const i = loc.x
+        const j = loc.y
+        if (this.logic.chesses[i][j] != PiecesType.NONE) {
+            return;
+        }
+        this.placePieces(i, j, PiecesType.BLACK);
+    }
+
+    getInput(event: EventTouch): Vec2 {
+        let uiLoc = event.getUILocation();
+        const uiPosVec3 = new Vec3(uiLoc.x, uiLoc.y, 0);
+        let localPos = this.node.getComponent(UITransform).convertToNodeSpaceAR(uiPosVec3);
+        //console.log(`Touch local location: (${localPos.x}, ${localPos.y})`);
+        let x = Math.floor(localPos.x / this.cellWidth);
+        let y = Math.floor(localPos.y / this.cellHeight); 
+        let i = 3-y
+        let j = 4+x
+        // console.log(`Touch index location: (${x}, ${y})`);
+        // console.log(`place index location: (${i}, ${j})`);
+        return v2(i, j);
+    }
+
+    // i:row[0,7], j:col[0,7]
+    drawPieces(i: number, j: number, type: PiecesType) {
+        let x = (j-4+0.5)*this.cellWidth
+        let y = (3-i+0.5)*this.cellHeight
         let graphics = this.node.getComponent(Graphics);
-        graphics.fillColor.fromHEX('#000000');
-        const radius = 40;
+       switch (type) {
+            case PiecesType.BLACK:
+                graphics.fillColor.fromHEX('#000000'); break;
+            case PiecesType.WHITE:
+                graphics.fillColor.fromHEX('#ffffff'); break;
+            default:
+                graphics.fillColor.fromHEX('#C2914A7A'); break;
+       }
+        const radius = 32;
         // 绘制圆形路径
         graphics.arc(x, y, radius, 0, 2 * Math.PI, false);
         // 填充圆形

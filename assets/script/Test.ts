@@ -17,7 +17,7 @@ export class Test extends Component {
     }
 
     start() {
-        this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        //this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
     }
 
     update(deltaTime: number) {
