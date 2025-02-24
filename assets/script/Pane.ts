@@ -50,10 +50,6 @@ export class Pane extends Component {
     }
 
     update(deltaTime: number) {
-        this.logic.changes.forEach((p) => {
-            this.drawPieces(p[0], p[1], p[2]);
-        });
-        this.logic.changes = [];
     }
     
     initGame() {
@@ -120,7 +116,7 @@ export class Pane extends Component {
         ui.height = 80
         this.node.addChild(node);
         this.pieces[i][j] = node
-        this.logic.placePiece(i, j, t)
+        this.logic.addPiece(i, j, t)
     }
 
     onTouchEnd(event: EventTouch) {
@@ -132,35 +128,38 @@ export class Pane extends Component {
         }
 
 
-        if (!this.logic.canPlacePiece(i, j, PiecesType.BLACK) || !this.logic.isOperator(PiecesType.BLACK)) {
+        if (!this.logic.isOperator(PiecesType.BLACK) ||
+            !this.logic.canPlacePiece(i, j, PiecesType.BLACK)) {
             return;
         }
         this.logic.changeOperator()
 
-        this.placePiece(i, j, PiecesType.BLACK);
-        this.logic.reverse(i, j, PiecesType.BLACK)
-        this.logic.changes.forEach(element => {
-            this.reversePiece(element.i, element.j, element.t);
-        });
-        // 判断是否结束
-        if (this.checkGameEnd()) {
+        if (this.putPiece(i, j, PiecesType.BLACK)) {
             return;
         }
 
         // 机器人
         loc = this.logic.getBestLocation(PiecesType.WHITE)
         if (loc) {
-            this.logic.placePiece(loc.x, loc.y, PiecesType.WHITE);
-            this.logic.reverse(i, j, PiecesType.WHITE)
-            this.logic.changes.forEach(element => {
-                this.reversePiece(element.i, element.j, element.t);
-            });
-            // 判断是否结束
-            if (this.checkGameEnd()) {
-                return;
-            }
+            console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
+            this.scheduleOnce(function () {
+                if (this.putPiece(loc.x, loc.y, PiecesType.WHITE)) {
+                    return;
+                }
+                this.logic.changeOperator()
+            }, 1.5);
         }
         
+    }
+
+    putPiece(i: number, j: number, t: PiecesType): boolean {
+        this.placePiece(i, j, t);
+        this.logic.reverse(i, j, t)
+        this.logic.changes.forEach(element => {
+            this.reversePiece(element.i, element.j, element.t);
+        });
+        this.logic.changes = [];
+        return this.checkGameEnd();
     }
 
     reversePiece(i: number, j: number, t: PiecesType) {
@@ -197,7 +196,7 @@ export class Pane extends Component {
         let uiLoc = event.getUILocation();
         const uiPosVec3 = new Vec3(uiLoc.x, uiLoc.y, 0);
         let localPos = this.node.getComponent(UITransform).convertToNodeSpaceAR(uiPosVec3);
-        console.log(`Touch local location: (${localPos.x}, ${localPos.y})`);
+        //console.log(`Touch local location: (${localPos.x}, ${localPos.y})`);
         let x = Math.floor(localPos.x / this.cellWidth);
         let y = Math.floor(localPos.y / this.cellHeight); 
         let i = 3-y

@@ -59,7 +59,8 @@ export class Logic {
         this.changes = [];
     }
 
-    placePiece(i: number, j: number, t: PiecesType) {
+    addPiece(i: number, j: number, t: PiecesType) {
+        console.log(`addPiece ${t} : (${i}, ${j})`);
         this.chesses[i][j] = t
         this.addPieceCount(t, 1)
     }
@@ -116,11 +117,10 @@ export class Logic {
                     x += di;
                     y += dj;
                 } else {
-                    if (x == i+di && y == j+dj) {
-                        break;
-                    } else {
+                    if (!(x == i+di && y == j+dj)) {
                         total += getNum;
                     }
+                    break;
                 }
             }
         }
@@ -170,12 +170,11 @@ export class Logic {
         for (let i = 0; i < Logic.rowSize; i++) {
             for (let j = 0; j < Logic.colSize; j++) {
                 let num = this.getCanPlacePieceCount(i, j, t)
-                console.log(`getCanPlacePieceCount ${maxCount}: (${loc.x}, ${loc.y})`);
                 if (num > maxCount) {
                     maxCount = num
                     loc.x = i
                     loc.y = j
-                    console.log(`max ${maxCount}: (${loc.x}, ${loc.y})`);
+                    //console.log(`max ${maxCount}: (${loc.x}, ${loc.y})`);
                 }
             }
         }
