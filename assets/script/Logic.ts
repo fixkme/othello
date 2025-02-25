@@ -30,22 +30,22 @@ export class Logic {
     ];
     static readonly weights: number[][] = [
         [  8,  1,  5,  1,  1,  5,  1,  8],
-        [  1,  1,  1,  1,  1,  1,  1,  1],
+        [  1, -5,  1,  1,  1,  1, -5,  1],
         [  5,  1,  5,  2,  2,  5,  1,  5],
         [  1,  1,  2,  1,  1,  2,  1,  1],
         [  1,  1,  2,  1,  1,  2,  1,  1],
         [  5,  1,  5,  2,  2,  5,  1,  5],
-        [  1,  1,  1,  1,  1,  1,  1,  1],
+        [  1, -5,  1,  1,  1,  1, -5,  1],
         [  8,  1,  5,  1,  1,  5,  1,  8]
     ];
 
     chesses: PiecesType[][];
     previous: PiecesType[][];
-    //changes: Pieces[];
 
     blackCount: number = 0;
     whiteCount: number = 0;
     operator: PiecesType = PiecesType.BLACK;
+
     constructor( ) {
         this.chesses = [
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -57,16 +57,17 @@ export class Logic {
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0]
         ];
-        this.previous = [
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0]
-        ];
+    }
+
+    reset() {
+        for (let i = 0; i < Logic.rowSize; i++) {
+            for (let j = 0; j < Logic.colSize; j++) {
+                this.chesses[i][j] = PiecesType.NONE
+            }
+        }
+        this.blackCount = 0
+        this.whiteCount = 0
+        this.operator = PiecesType.BLACK
     }
 
     addPiece(i: number, j: number, t: PiecesType) {
@@ -220,6 +221,10 @@ export class Logic {
         this.operator = this.operator == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
     }
 
+    setOperator(t: PiecesType) {
+        return this.operator == t;
+    }
+
     isOperator(t: PiecesType): boolean {
         return this.operator == t;
     }
@@ -270,22 +275,47 @@ export class Logic {
     }
 
     record() {
-        this.previous = [];
+        this.previous = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]
+        ];
         for (let i = 0; i < Logic.rowSize; i++) {
-            this.previous[i] = [];
             for (let j = 0; j < Logic.colSize; j++) {
                 this.previous[i][j] = this.chesses[i][j];
             }
         }
     }
 
-    undo() {
+    undo(): {removes: Pieces[], changes: Pieces[]} {
+        if (!this.previous || this.previous.length == 0) {
+            return {removes: [], changes: []};
+        }
+        let {removes, changes} = {  removes: [], changes: []};
+        this.blackCount = 0;
+        this.whiteCount = 0;
         for (let i = 0; i < Logic.rowSize; i++) {
             for (let j = 0; j < Logic.colSize; j++) {
+                if (this.chesses[i][j] != PiecesType.NONE && this.previous[i][j] == PiecesType.NONE) {
+                    removes.push(new Pieces(i, j, this.chesses[i][j]));
+                } else {
+                    changes.push(new Pieces(i, j, this.previous[i][j]))
+                }
                 this.chesses[i][j] = this.previous[i][j];
+                if (this.chesses[i][j] == PiecesType.BLACK) {
+                    this.blackCount++;
+                } else if (this.chesses[i][j] == PiecesType.WHITE) {
+                    this.whiteCount++;
+                }
             }
         }
-        this.changeOperator();
+        this.previous = [];
+        return {removes, changes}
     }
      
 }

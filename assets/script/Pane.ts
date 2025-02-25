@@ -1,4 +1,5 @@
-import { _decorator, Component, Sprite, SpriteFrame, Graphics, EventTouch, Node, UITransform, Vec3, v2, Vec2, Label} from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
+    EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
@@ -14,7 +15,6 @@ export class Pane extends Component {
     cellHeight: number = 80;
     
     logic: Logic;
-
     pieces: Node[][]= [
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
@@ -25,7 +25,6 @@ export class Pane extends Component {
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
     ];
-
     robotContinue = false;
 
     @property(SpriteFrame)
@@ -37,6 +36,11 @@ export class Pane extends Component {
     private blackScore: Label | null = null;
     @property(Label)
     private whiteScore: Label | null = null;
+
+    @property(Button)
+    private buttonRenew: Button = null!;
+    @property(Button)
+    private buttonRetract: Button = null!;
 
     onLoad () {
         // resources.load('imgs/black_piece', SpriteFrame, (err, spriteFrame: SpriteFrame) => {
@@ -51,8 +55,10 @@ export class Pane extends Component {
 
     start() {
         this.initGame();
-        // 监听触摸结束事件
+        // 绑定事件
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        this.buttonRenew.node.on(Button.EventType.CLICK, this.onButtonRenewClick, this);
+        this.buttonRetract.node.on(Button.EventType.CLICK, this.onButtonRetractClick, this);
     }
 
     update(deltaTime: number) {
@@ -134,10 +140,6 @@ export class Pane extends Component {
         let loc = this.getInput(event);
         const i = loc.x
         const j = loc.y
-        if (this.logic.chesses[i][j] != PiecesType.NONE) {
-            return;
-        }
-
 
         if (!this.logic.isOperator(PiecesType.BLACK) ||
             !this.logic.canPlacePiece(i, j, PiecesType.BLACK)) {
@@ -145,6 +147,7 @@ export class Pane extends Component {
         }
         this.logic.changeOperator()
 
+        this.logic.record();
         if (this.putPiece(i, j, PiecesType.BLACK)) {
             return;
         }
@@ -179,14 +182,14 @@ export class Pane extends Component {
         this.placePiece(i, j, t);
         const list = this.logic.reverse(i, j, t)
         list.forEach(element => {
-            this.reversePiece(element.i, element.j, element.t);
+            this.changePieceSprite(element.i, element.j, element.t);
         });
         this.blackScore.string = this.logic.blackCount.toString()
         this.whiteScore.string = this.logic.whiteCount.toString()
         return this.checkGameEnd();
     }
 
-    reversePiece(i: number, j: number, t: PiecesType) {
+    changePieceSprite(i: number, j: number, t: PiecesType) {
         let node = this.pieces[i][j];
         switch (t) {
             case PiecesType.BLACK:
@@ -228,6 +231,45 @@ export class Pane extends Component {
         // console.log(`Touch index location: (${x}, ${y})`);
         // console.log(`place index location: (${i}, ${j})`);
         return v2(i, j);
+    }
+
+    // 重来
+    onButtonRenewClick() {
+        this.unscheduleAllCallbacks();
+        this.robotContinue = false;
+        for (let i = 0; i < Logic.rowSize; i++) {
+            for (let j = 0; j < Logic.colSize; j++) {
+                if (this.pieces[i][j]) {
+                    this.node.removeChild(this.pieces[i][j]);
+                    this.pieces[i][j] = null;
+                }
+            }
+        }
+        this.logic.reset();
+        this.placePiece(3, 3, PiecesType.BLACK);
+        this.placePiece(3, 4, PiecesType.WHITE);
+        this.placePiece(4, 3, PiecesType.WHITE);
+        this.placePiece(4, 4, PiecesType.BLACK);
+        this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+    }
+
+    // 悔棋
+    onButtonRetractClick() {
+        this.unscheduleAllCallbacks();
+        this.robotContinue = false;
+        const {removes, changes} = this.logic.undo();
+        removes.forEach(item => {
+            let node = this.pieces[item.i][item.j]
+            if (node) {
+                this.node.removeChild(node);
+            }
+        });
+        changes.forEach(item => {
+            this.changePieceSprite(item.i, item.j, item.t);
+        });
+        this.blackScore.string = this.logic.blackCount.toString()
+        this.whiteScore.string = this.logic.whiteCount.toString()
+        this.logic.setOperator(PiecesType.BLACK)
     }
 
     // i:row[0,7], j:col[0,7]
