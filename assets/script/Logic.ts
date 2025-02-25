@@ -28,9 +28,20 @@ export class Logic {
         [-1, -1], [1, 1], //左斜
         [1, -1], [-1, 1], //右斜
     ];
+    static readonly weights: number[][] = [
+        [  8,  1,  5,  1,  1,  5,  1,  8],
+        [  1,  1,  1,  1,  1,  1,  1,  1],
+        [  5,  1,  5,  2,  2,  5,  1,  5],
+        [  1,  1,  2,  1,  1,  2,  1,  1],
+        [  1,  1,  2,  1,  1,  2,  1,  1],
+        [  5,  1,  5,  2,  2,  5,  1,  5],
+        [  1,  1,  1,  1,  1,  1,  1,  1],
+        [  8,  1,  5,  1,  1,  5,  1,  8]
+    ];
+
     chesses: PiecesType[][];
     previous: PiecesType[][];
-    changes: Pieces[];
+    //changes: Pieces[];
 
     blackCount: number = 0;
     whiteCount: number = 0;
@@ -56,13 +67,18 @@ export class Logic {
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0]
         ];
-        this.changes = [];
     }
 
     addPiece(i: number, j: number, t: PiecesType) {
-        console.log(`addPiece ${t} : (${i}, ${j})`);
+        //console.log(`addPiece ${t} : (${i}, ${j})`);
         this.chesses[i][j] = t
         this.addPieceCount(t, 1)
+    }
+
+    removePiece(i: number, j: number) {
+        const t = this.chesses[i][j]
+        this.chesses[i][j] = PiecesType.NONE
+        this.addPieceCount(t, -1)
     }
 
     addPieceCount(t: PiecesType, add: number) {
@@ -99,6 +115,17 @@ export class Logic {
         return false;
     }
 
+    canPlace(t: PiecesType): boolean {
+        for (let i = 0; i < Logic.rowSize; i++) {
+            for (let j = 0; j < Logic.colSize; j++) {
+                if (this.canPlacePiece(i, j, t)){
+                    return true
+                }
+            }
+        }
+        return false;
+    }
+
     getCanPlacePieceCount(i: number, j: number, t: PiecesType): number {
         if (!this.canPlaceLocation(i, j)) {
             return 0;
@@ -127,6 +154,68 @@ export class Logic {
         return total;
     }
 
+    getBestLocation(t: PiecesType): Vec2 {
+        let ret = this.getMax(t, 3)
+        if (ret) {
+            return new Vec2(ret[0], ret[1]);
+        } else {
+            return null
+        }
+    }
+
+    getMax(t: PiecesType, deep: number): [number,number,number] {
+        if (deep == 0) {
+            return null
+        }
+        let op = t == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK
+        let max = -65535;
+        let loc: Vec2 = null;
+        for (let i = 0; i < Logic.rowSize; i++) {
+            for (let j = 0; j < Logic.colSize; j++) {
+                if (!this.canPlaceLocation(i, j)) {
+                    continue
+                }
+                this.addPiece(i, j, t)
+                const list = this.reverse(i, j, t) 
+                let num = list.length;
+                if (num > 0) {
+                    if (loc == null) {
+                        loc = new Vec2(i, j)
+                    }
+                    let a = (this.blackCount+this.whiteCount)/64
+                    num = a * num + (1-a) * Logic.weights[i][j] 
+                    if (this.checkEnd()) {
+                        num = 10000
+                    } else {
+                        let opRet = this.getMax(op, deep-1)
+                        if (opRet) {
+                            num = num - opRet[2]
+                        }
+                    }
+                    if (num > max) {
+                        max = num
+                        loc.x = i
+                        loc.y = j
+                    }
+                }
+                // 还原
+                this.removePiece(i, j)
+                if (list.length > 0) {
+                    for (let k = 0; k < list.length; k++) {
+                        let item = list[k]
+                        this.chesses[item.i][item.j] = op
+                    }
+                    this.addPieceCount(t, -list.length)
+                    this.addPieceCount(op, list.length)
+                }
+            }
+        }
+        if (loc == null) {
+            return null
+        }
+        return [loc.x, loc.y, max]
+    }
+
     changeOperator() {
         this.operator = this.operator == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
     }
@@ -135,8 +224,8 @@ export class Logic {
         return this.operator == t;
     }
 
-    reverse(i: number, j: number, t: PiecesType) {
-        this.changes = [];
+    reverse(i: number, j: number, t: PiecesType): Pieces[] {
+        let list: Pieces[] = [];
         const op = t == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
         for (let d = 0; d < Logic.dirs.length; d++) {
             let di = Logic.dirs[d][0];
@@ -152,7 +241,7 @@ export class Logic {
                     y -= dj;
                     while(!(x == i && y == j)) {
                         this.chesses[x][y] = t;
-                        this.changes.push(new Pieces(x, y, t))
+                        list.push(new Pieces(x, y, t))
                         x -= di;
                         y -= dj;
                     }
@@ -160,29 +249,12 @@ export class Logic {
                 }
             }
         }
-        this.addPieceCount(t, this.changes.length)
-        this.addPieceCount(op, -this.changes.length)
-    }
-
-    getBestLocation(t: PiecesType): Vec2 {
-        let maxCount = 0;
-        let loc = new Vec2();
-        for (let i = 0; i < Logic.rowSize; i++) {
-            for (let j = 0; j < Logic.colSize; j++) {
-                let num = this.getCanPlacePieceCount(i, j, t)
-                if (num > maxCount) {
-                    maxCount = num
-                    loc.x = i
-                    loc.y = j
-                    //console.log(`max ${maxCount}: (${loc.x}, ${loc.y})`);
-                }
-            }
+        if (list.length == 0) {
+            return []
         }
-        if (maxCount > 0) {
-            return loc
-        } else {
-            return null
-        }
+        this.addPieceCount(t, list.length)
+        this.addPieceCount(op, -list.length)
+        return list
     }
 
     checkEnd(): boolean {

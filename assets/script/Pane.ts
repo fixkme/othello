@@ -1,4 +1,4 @@
-import { _decorator, Component, Sprite, SpriteFrame, Graphics, EventTouch, Node, UITransform, Vec3, v2, Vec2} from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame, Graphics, EventTouch, Node, UITransform, Vec3, v2, Vec2, Label} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
@@ -26,11 +26,17 @@ export class Pane extends Component {
         [null,null,null,null,null,null,null,null],
     ];
 
-    @property(SpriteFrame)
-    private blackSprite: SpriteFrame | null = null;
+    robotContinue = false;
 
     @property(SpriteFrame)
+    private blackSprite: SpriteFrame | null = null;
+    @property(SpriteFrame)
     private whiteSprite: SpriteFrame | null = null;
+
+    @property(Label)
+    private blackScore: Label | null = null;
+    @property(Label)
+    private whiteScore: Label | null = null;
 
     onLoad () {
         // resources.load('imgs/black_piece', SpriteFrame, (err, spriteFrame: SpriteFrame) => {
@@ -50,6 +56,9 @@ export class Pane extends Component {
     }
 
     update(deltaTime: number) {
+        if (this.robotContinue) {
+            this.processRobot();
+        }
     }
     
     initGame() {
@@ -117,6 +126,8 @@ export class Pane extends Component {
         this.node.addChild(node);
         this.pieces[i][j] = node
         this.logic.addPiece(i, j, t)
+        this.blackScore.string = this.logic.blackCount.toString()
+        this.whiteScore.string = this.logic.whiteCount.toString()
     }
 
     onTouchEnd(event: EventTouch) {
@@ -139,7 +150,11 @@ export class Pane extends Component {
         }
 
         // 机器人
-        loc = this.logic.getBestLocation(PiecesType.WHITE)
+        this.processRobot();
+    }
+
+    processRobot() {
+        let loc = this.logic.getBestLocation(PiecesType.WHITE)
         if (loc) {
             console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
             this.scheduleOnce(function () {
@@ -147,18 +162,27 @@ export class Pane extends Component {
                     return;
                 }
                 this.logic.changeOperator()
+                if (!this.logic.canPlace(PiecesType.BLACK)) {
+                    this.logic.changeOperator()
+                    this.robotContinue = true;
+                } else {
+                    this.robotContinue = false;
+                }
             }, 1.5);
+        } else {
+            console.log(`getBestLocation max : null`);
+            this.logic.changeOperator()
         }
-        
     }
 
     putPiece(i: number, j: number, t: PiecesType): boolean {
         this.placePiece(i, j, t);
-        this.logic.reverse(i, j, t)
-        this.logic.changes.forEach(element => {
+        const list = this.logic.reverse(i, j, t)
+        list.forEach(element => {
             this.reversePiece(element.i, element.j, element.t);
         });
-        this.logic.changes = [];
+        this.blackScore.string = this.logic.blackCount.toString()
+        this.whiteScore.string = this.logic.whiteCount.toString()
         return this.checkGameEnd();
     }
 
