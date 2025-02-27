@@ -94,7 +94,7 @@ export class Logic {
         if (!this.canPlaceLocation(i, j)) {
             return false;
         }
-        const op = t == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
+        const op = -t;
         for (let d = 0; d < Logic.dirs.length; d++) {
             let di = Logic.dirs[d][0];
             let dj = Logic.dirs[d][1];
@@ -132,7 +132,7 @@ export class Logic {
             return 0;
         }
         let total = 0;
-        const op = t == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
+        const op = -t;
         for (let d = 0; d < Logic.dirs.length; d++) {
             let di = Logic.dirs[d][0];
             let dj = Logic.dirs[d][1];
@@ -168,7 +168,7 @@ export class Logic {
         if (deep == 0) {
             return null
         }
-        let op = t == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK
+        let op = -t
         let max = -65535;
         let loc: Vec2 = null;
         for (let i = 0; i < Logic.rowSize; i++) {
@@ -218,7 +218,7 @@ export class Logic {
     }
 
     changeOperator() {
-        this.operator = this.operator == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
+        this.operator = -this.operator;
     }
 
     setOperator(t: PiecesType) {
@@ -231,7 +231,7 @@ export class Logic {
 
     reverse(i: number, j: number, t: PiecesType): Pieces[] {
         let list: Pieces[] = [];
-        const op = t == PiecesType.BLACK ? PiecesType.WHITE : PiecesType.BLACK;
+        const op = -t;
         for (let d = 0; d < Logic.dirs.length; d++) {
             let di = Logic.dirs[d][0];
             let dj = Logic.dirs[d][1];

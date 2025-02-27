@@ -1,5 +1,10 @@
 import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
-    EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button} from 'cc';
+    EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button,
+    Prefab,
+    instantiate,
+    Event,
+    view,
+    BlockInputEvents} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
@@ -41,6 +46,9 @@ export class Pane extends Component {
     private buttonRenew: Button = null!;
     @property(Button)
     private buttonRetract: Button = null!;
+
+    @property(Prefab)
+    private prefabEndWidget: Prefab = null!;
 
     onLoad () {
         // resources.load('imgs/black_piece', SpriteFrame, (err, spriteFrame: SpriteFrame) => {
@@ -215,8 +223,17 @@ export class Pane extends Component {
     }
 
     gameEnd() {
-        const win = this.logic.blackCount > this.logic.whiteCount ? PiecesType.BLACK : PiecesType.WHITE;
-        console.log(`winer: (${win})`);
+        const winStr = this.logic.blackCount > this.logic.whiteCount ? "黑方胜" : "白方胜";
+        console.log(`winer: (${winStr})`);
+        const endWidget = instantiate(this.prefabEndWidget)
+        endWidget.name = "endWidget";
+        endWidget.position.set(0, 120);
+        endWidget.getChildByName("Mask").getComponent(UITransform).setContentSize(view.getVisibleSize())
+        endWidget.getChildByName("Label").getComponent(Label).string = winStr;
+        endWidget.getChildByName("Button").getComponent(Button).node.on(Button.EventType.CLICK, () => {
+            endWidget.destroy();
+        }, this);
+        this.node.parent.addChild(endWidget);
     }
 
     getInput(event: EventTouch): Vec2 {
@@ -240,7 +257,7 @@ export class Pane extends Component {
         for (let i = 0; i < Logic.rowSize; i++) {
             for (let j = 0; j < Logic.colSize; j++) {
                 if (this.pieces[i][j]) {
-                    this.node.removeChild(this.pieces[i][j]);
+                    this.pieces[i][j].destroy();
                     this.pieces[i][j] = null;
                 }
             }
@@ -255,13 +272,16 @@ export class Pane extends Component {
 
     // 悔棋
     onButtonRetractClick() {
+        if (this.logic.checkEnd()) {
+            return;
+        }
         this.unscheduleAllCallbacks();
         this.robotContinue = false;
         const {removes, changes} = this.logic.undo();
         removes.forEach(item => {
             let node = this.pieces[item.i][item.j]
             if (node) {
-                this.node.removeChild(node);
+                node.destroy();
             }
         });
         changes.forEach(item => {
@@ -272,24 +292,5 @@ export class Pane extends Component {
         this.logic.setOperator(PiecesType.BLACK)
     }
 
-    // i:row[0,7], j:col[0,7]
-    drawPieces(i: number, j: number, type: PiecesType) {
-        let x = (j-4+0.5)*this.cellWidth
-        let y = (3-i+0.5)*this.cellHeight
-        let graphics = this.node.getComponent(Graphics);
-       switch (type) {
-            case PiecesType.BLACK:
-                graphics.fillColor.fromHEX('#000000'); break;
-            case PiecesType.WHITE:
-                graphics.fillColor.fromHEX('#ffffff'); break;
-            default:
-                graphics.fillColor.fromHEX('#C2914A7A'); break;
-       }
-        const radius = 32;
-        // 绘制圆形路径
-        graphics.arc(x, y, radius, 0, 2 * Math.PI, false);
-        // 填充圆形
-        graphics.fill();
-    }
 }
 
