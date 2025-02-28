@@ -1,10 +1,8 @@
 import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
     EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button,
-    Prefab,
-    instantiate,
-    Event,
-    view,
-    BlockInputEvents} from 'cc';
+    Prefab, instantiate, view, Animation,
+    AnimationClip,
+    random} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
@@ -47,6 +45,8 @@ export class Pane extends Component {
     @property(Button)
     private buttonRetract: Button = null!;
 
+    @property(Prefab)
+    private prefabPiece: Prefab = null!;
     @property(Prefab)
     private prefabEndWidget: Prefab = null!;
 
@@ -121,23 +121,20 @@ export class Pane extends Component {
         let x = (j - 4 + 0.5) * this.cellWidth
         let y = (3 - i + 0.5) * this.cellHeight
         let name = `pieces_${i}_${j}`
-        let node: Node = new Node(name);
+        let node: Node = instantiate(this.prefabPiece);
         node.setPosition(x, y);
-        let sprite = node.addComponent(Sprite);
         switch (t) {
             case PiecesType.BLACK:
-                sprite.spriteFrame = this.blackSprite;
+                node.getComponent(Sprite).spriteFrame = this.blackSprite;
                 break;
             case PiecesType.WHITE:
-                sprite.spriteFrame = this.whiteSprite;
+                node.getComponent(Sprite).spriteFrame = this.whiteSprite;
                 break;
             default:
                 node.destroy();
                 return;
         }
         let ui =  node.getComponent(UITransform)
-        ui.width = 80
-        ui.height = 80
         this.node.addChild(node);
         this.pieces[i][j] = node
         this.logic.addPiece(i, j, t)
@@ -184,7 +181,7 @@ export class Pane extends Component {
                 } else {
                     this.robotContinue = false;
                 }
-            }, 1.5);
+            }, 0.5);
         } else {
             console.log(`getBestLocation max : null`);
             this.logic.changeOperator()
@@ -195,15 +192,29 @@ export class Pane extends Component {
         this.placePiece(i, j, t);
         const list = this.logic.reverse(i, j, t)
         list.forEach(element => {
-            this.changePieceSprite(element.i, element.j, element.t);
+            this.reversePiece(element.i, element.j, element.t);
         });
         this.blackScore.string = this.logic.blackCount.toString()
         this.whiteScore.string = this.logic.whiteCount.toString()
         return this.checkGameEnd();
     }
 
+    reversePiece(i: number, j: number, t: PiecesType) {
+        const node = this.pieces[i][j];
+        switch (t) {
+            case PiecesType.BLACK:
+                node.getComponent(Animation).play("reverse_black_piece");
+                break;
+            case PiecesType.WHITE:
+                node.getComponent(Animation).play("reverse_white_piece");
+                break;
+            default:
+                return;
+        }
+    }
+
     changePieceSprite(i: number, j: number, t: PiecesType) {
-        let node = this.pieces[i][j];
+        const node = this.pieces[i][j];
         switch (t) {
             case PiecesType.BLACK:
                 node.getComponent(Sprite).spriteFrame = this.blackSprite;
@@ -214,9 +225,6 @@ export class Pane extends Component {
             default:
                 return;
         }
-        let ui = node.getComponent(UITransform)
-        ui.width = 80;
-        ui.height = 80;
     }
 
     checkGameEnd(): boolean {

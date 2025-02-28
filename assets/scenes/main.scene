@@ -474,6 +474,10 @@
     "buttonRetract": {
       "__id__": 37
     },
+    "prefabPiece": {
+      "__uuid__": "bd3effe5-960b-40c3-abf6-a3228cf65159",
+      "__expectedType__": "cc.Prefab"
+    },
     "prefabEndWidget": {
       "__uuid__": "3525a1dc-176b-40df-8dec-93c2b5c50c7d",
       "__expectedType__": "cc.Prefab"

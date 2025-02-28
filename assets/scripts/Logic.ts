@@ -246,7 +246,7 @@ export class Logic {
                     y -= dj;
                     while(!(x == i && y == j)) {
                         this.chesses[x][y] = t;
-                        list.push(new Pieces(x, y, t))
+                        list.push(new Pieces(x, y, op))
                         x -= di;
                         y -= dj;
                     }
