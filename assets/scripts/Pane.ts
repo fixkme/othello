@@ -132,6 +132,7 @@ export class Pane extends Component {
                 sprite.spriteFrame = this.whiteSprite;
                 break;
             default:
+                node.destroy();
                 return;
         }
         let ui =  node.getComponent(UITransform)
@@ -149,14 +150,15 @@ export class Pane extends Component {
         const i = loc.x
         const j = loc.y
 
-        if (!this.logic.isOperator(PiecesType.BLACK) ||
-            !this.logic.canPlacePiece(i, j, PiecesType.BLACK)) {
+        const playerPieceType = PiecesType.BLACK
+        if (!this.logic.isOperator(playerPieceType) ||
+            !this.logic.canPlacePiece(i, j, playerPieceType)) {
             return;
         }
         this.logic.changeOperator()
 
         this.logic.record();
-        if (this.putPiece(i, j, PiecesType.BLACK)) {
+        if (this.putPiece(i, j, playerPieceType)) {
             return;
         }
 
@@ -165,15 +167,18 @@ export class Pane extends Component {
     }
 
     processRobot() {
-        let loc = this.logic.getBestLocation(PiecesType.WHITE)
+        const difficulty = 5;
+        const robotPieceType = PiecesType.WHITE;
+        const op = -robotPieceType;
+        let loc = this.logic.getBestLocation(robotPieceType, difficulty)
         if (loc) {
             console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
             this.scheduleOnce(function () {
-                if (this.putPiece(loc.x, loc.y, PiecesType.WHITE)) {
+                if (this.putPiece(loc.x, loc.y, robotPieceType)) {
                     return;
                 }
                 this.logic.changeOperator()
-                if (!this.logic.canPlace(PiecesType.BLACK)) {
+                if (!this.logic.canPlace(op)) {
                     this.logic.changeOperator()
                     this.robotContinue = true;
                 } else {

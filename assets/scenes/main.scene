@@ -455,11 +455,11 @@
     "_enabled": true,
     "__prefab": null,
     "blackSprite": {
-      "__uuid__": "dbf4d53d-5b9b-4437-affd-48648d82bfc6@f9941",
+      "__uuid__": "2a7a24e9-8b71-4c2a-b4ee-11c0d548ce24@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "whiteSprite": {
-      "__uuid__": "591f3503-c91c-4ecb-be32-e7831ab924ff@f9941",
+      "__uuid__": "0b417931-2f1a-4ad6-9cd6-b1aff36f4bd6@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "blackScore": {

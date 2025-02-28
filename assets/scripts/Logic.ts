@@ -155,8 +155,8 @@ export class Logic {
         return total;
     }
 
-    getBestLocation(t: PiecesType): Vec2 {
-        let ret = this.getMax(t, 3)
+    getBestLocation(t: PiecesType, difficulty: number): Vec2 {
+        let ret = this.getMax(t, difficulty)
         if (ret) {
             return new Vec2(ret[0], ret[1]);
         } else {
