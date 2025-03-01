@@ -23,7 +23,7 @@
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 47
+      "__id__": 48
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -54,7 +54,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 48
+      "__id__": 49
     },
     "_id": "bb6e584b-0257-447b-9423-ff402f081fce"
   },
@@ -92,13 +92,13 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 44
-      },
-      {
         "__id__": 45
       },
       {
         "__id__": 46
+      },
+      {
+        "__id__": 47
       }
     ],
     "_prefab": null,
@@ -350,6 +350,9 @@
       },
       {
         "__id__": 11
+      },
+      {
+        "__id__": 44
       }
     ],
     "_prefab": null,
@@ -1795,6 +1798,25 @@
     "_id": "0345WyVDdGPIRrj51xC1fZ"
   },
   {
+    "__type__": "cc.AudioSource",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 8
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_clip": {
+      "__uuid__": "b4fd029a-1b90-4b8a-b3df-14f83c3604f8",
+      "__expectedType__": "cc.AudioClip"
+    },
+    "_loop": true,
+    "_playOnAwake": true,
+    "_volume": 1,
+    "_id": "5fygaKQaBBfpXIFussiCr5"
+  },
+  {
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
@@ -1873,28 +1895,28 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 49
-    },
-    "shadows": {
       "__id__": 50
     },
-    "_skybox": {
+    "shadows": {
       "__id__": 51
     },
-    "fog": {
+    "_skybox": {
       "__id__": 52
     },
-    "octree": {
+    "fog": {
       "__id__": 53
     },
-    "skin": {
+    "octree": {
       "__id__": 54
     },
-    "lightProbeInfo": {
+    "skin": {
       "__id__": 55
     },
-    "postSettings": {
+    "lightProbeInfo": {
       "__id__": 56
+    },
+    "postSettings": {
+      "__id__": 57
     },
     "bakedWithStationaryMainLight": false,
     "bakedWithHighpLightmap": false

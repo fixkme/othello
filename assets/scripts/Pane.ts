@@ -1,8 +1,7 @@
 import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
     EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button,
     Prefab, instantiate, view, Animation,
-    AnimationClip,
-    random} from 'cc';
+    AudioSource} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
@@ -51,14 +50,6 @@ export class Pane extends Component {
     private prefabEndWidget: Prefab = null!;
 
     onLoad () {
-        // resources.load('imgs/black_piece', SpriteFrame, (err, spriteFrame: SpriteFrame) => {
-        //     if (err) {
-        //         console.error('Failed to load sprite frame:', err);
-        //         return;
-        //     }
-        //     // 将加载好的 SpriteFrame 存储在类的属性中
-        //     this.blackSprite = spriteFrame;
-        // });
     }
 
     start() {
@@ -78,10 +69,11 @@ export class Pane extends Component {
     initGame() {
         this.drawPane();
         this.logic = new Logic();
-        this.placePiece(3, 3, PiecesType.BLACK);
-        this.placePiece(3, 4, PiecesType.WHITE);
-        this.placePiece(4, 3, PiecesType.WHITE);
-        this.placePiece(4, 4, PiecesType.BLACK);
+        this.placePiece(3, 3, PiecesType.BLACK, false);
+        this.placePiece(3, 4, PiecesType.WHITE, false);
+        this.placePiece(4, 3, PiecesType.WHITE, false);
+        this.placePiece(4, 4, PiecesType.BLACK, false);
+        //this.node.getComponent(AudioSource).play();
     }
 
     drawPane() {
@@ -117,10 +109,9 @@ export class Pane extends Component {
     }
 
     // i:row[0,7], j:col[0,7]
-    placePiece(i: number, j: number, t: PiecesType) {
+    placePiece(i: number, j: number, t: PiecesType, sound: boolean) {
         let x = (j - 4 + 0.5) * this.cellWidth
         let y = (3 - i + 0.5) * this.cellHeight
-        let name = `pieces_${i}_${j}`
         let node: Node = instantiate(this.prefabPiece);
         node.setPosition(x, y);
         switch (t) {
@@ -134,9 +125,12 @@ export class Pane extends Component {
                 node.destroy();
                 return;
         }
-        let ui =  node.getComponent(UITransform)
         this.node.addChild(node);
         this.pieces[i][j] = node
+        if (sound) {
+            let audio =  node.getComponent(AudioSource)
+            audio.play();
+        }
         this.logic.addPiece(i, j, t)
         this.blackScore.string = this.logic.blackCount.toString()
         this.whiteScore.string = this.logic.whiteCount.toString()
@@ -169,7 +163,7 @@ export class Pane extends Component {
         const op = -robotPieceType;
         let loc = this.logic.getBestLocation(robotPieceType, difficulty)
         if (loc) {
-            console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
+            //console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
             this.scheduleOnce(function () {
                 if (this.putPiece(loc.x, loc.y, robotPieceType)) {
                     return;
@@ -184,12 +178,16 @@ export class Pane extends Component {
             }, 0.5);
         } else {
             console.log(`getBestLocation max : null`);
-            this.logic.changeOperator()
+            if (this.logic.canPlace(op)) {
+                this.logic.changeOperator()
+            } else {
+                this.gameEnd();
+            }
         }
     }
 
     putPiece(i: number, j: number, t: PiecesType): boolean {
-        this.placePiece(i, j, t);
+        this.placePiece(i, j, t, true);
         const list = this.logic.reverse(i, j, t)
         list.forEach(element => {
             this.reversePiece(element.i, element.j, element.t);
@@ -276,10 +274,10 @@ export class Pane extends Component {
             }
         }
         this.logic.reset();
-        this.placePiece(3, 3, PiecesType.BLACK);
-        this.placePiece(3, 4, PiecesType.WHITE);
-        this.placePiece(4, 3, PiecesType.WHITE);
-        this.placePiece(4, 4, PiecesType.BLACK);
+        this.placePiece(3, 3, PiecesType.BLACK, false);
+        this.placePiece(3, 4, PiecesType.WHITE, false);
+        this.placePiece(4, 3, PiecesType.WHITE, false);
+        this.placePiece(4, 4, PiecesType.BLACK, false);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
     }
 
