@@ -1,8 +1,10 @@
 import { _decorator, Component, UITransform, Node, EventTouch } from 'cc';
+import { NetworkManager } from './NetworkManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('Test')
 export class Test extends Component {
+    private last: number = 0;
     protected onLoad(): void {
         console.log('bg loaded!');
         const canvas = this.node.getParent();
@@ -21,7 +23,10 @@ export class Test extends Component {
     }
 
     update(deltaTime: number) {
-
+        if (Date.now() - this.last > 2000 ) {
+            NetworkManager.getInstance().sendPlayerMove(1,2)
+            this.last = Date.now()
+        }
     }
 
     onTouchEnd(event: EventTouch) {

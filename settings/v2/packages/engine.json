@@ -129,7 +129,7 @@
         "_value": true
       },
       "websocket": {
-        "_value": false
+        "_value": true
       },
       "websocket-server": {
         "_value": false
@@ -198,12 +198,15 @@
       "tween",
       "ui",
       "video",
+      "websocket",
       "webview"
     ],
     "noDeprecatedFeatures": {
       "value": false,
       "version": ""
     },
-    "flags": {}
+    "flags": {
+      "LOAD_SPINE_MANUALLY": false
+    }
   }
 }
