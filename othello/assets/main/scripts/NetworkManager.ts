@@ -8,7 +8,7 @@ export class NetworkManager extends Component {
     private _ws: GlobalWebSocket = GlobalWebSocket.getInstance();
 
     // 配置项
-    private readonly WS_URL = "ws://127.0.0.1:2333/ws";
+    private readonly WS_URL = "ws://127.0.0.1:2333/ws?x-palyer-id=1";
     private readonly HEARTBEAT_INTERVAL = 20000; // 20秒
     private readonly HEARTBEAT_TIMEOUT = 40000; // 40秒
 

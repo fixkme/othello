@@ -13,7 +13,7 @@
           },
           "web": {
             "preferredOptions": {
-              "isRemote": true,
+              "isRemote": false,
               "compressionType": "merge_dep"
             },
             "fallbackOptions": {
@@ -22,17 +22,22 @@
           },
           "miniGame": {
             "fallbackOptions": {
-              "isRemote": false,
-              "compressionType": "merge_dep"
+              "isRemote": false
             },
-            "configMode": "fallback",
+            "configMode": "overwrite",
             "overwriteSettings": {
-              "alipay-mini-game": {
+              "alipay-mini-game": {},
+              "bytedance-mini-game": {},
+              "fb-instant-games": {},
+              "huawei-quick-game": {},
+              "migu-mini-game": {},
+              "oppo-mini-game": {},
+              "taobao-mini-game": {},
+              "vivo-mini-game": {},
+              "wechatgame": {
                 "isRemote": false
               },
-              "wechatgame": {
-                "isRemote": true
-              }
+              "xiaomi-quick-game": {}
             }
           }
         }
