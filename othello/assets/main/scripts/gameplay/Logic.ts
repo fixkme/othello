@@ -222,7 +222,7 @@ export class Logic {
     }
 
     setOperator(t: PiecesType) {
-        return this.operator == t;
+        this.operator = t;
     }
 
     isOperator(t: PiecesType): boolean {

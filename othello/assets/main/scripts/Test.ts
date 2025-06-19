@@ -1,5 +1,5 @@
 import { _decorator, Component, UITransform, Node, EventTouch } from 'cc';
-import { NetworkManager } from './NetworkManager';
+import { NetworkManager } from './common/NetworkManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('Test')

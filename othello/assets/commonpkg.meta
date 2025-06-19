@@ -2,12 +2,11 @@
   "ver": "1.2.0",
   "importer": "directory",
   "imported": true,
-  "uuid": "fe0e6350-c913-4139-bacb-0047b38410ec",
+  "uuid": "12b68fec-b894-4c0d-97e3-3be407ced210",
   "files": [],
   "subMetas": {},
   "userData": {
     "isBundle": true,
-    "bundleName": "gamepkg",
-    "priority": 2
+    "bundleName": "commonpkg"
   }
 }

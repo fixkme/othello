@@ -5,6 +5,12 @@ import { _decorator, Component, Sprite, SpriteFrame, Graphics,
 import { Logic, PiecesType, Pieces } from './Logic';
 const { ccclass, property } = _decorator;
 
+export enum GameType {
+    ROBOT = 0, // 人机对战
+    PLAYER = 1, // 真人对战
+    FRIEND = 2, // 好友对战
+}
+
 @ccclass('Pane')
 export class Pane extends Component {
     // 格子的行数
@@ -28,6 +34,11 @@ export class Pane extends Component {
         [null,null,null,null,null,null,null,null],
     ];
     robotContinue = false;
+    private gameType: GameType = GameType.ROBOT;
+
+    // 人机
+    private playerPieceType: PiecesType = PiecesType.BLACK;
+    private robotDifficulty: number = 1;
 
     @property(SpriteFrame)
     private blackSprite: SpriteFrame | null = null;
@@ -65,6 +76,18 @@ export class Pane extends Component {
             this.processRobot();
         }
     }
+
+    initData(gameType: number, data: any) {
+        // console.log("gameType:", gameType, data);
+        this.gameType = gameType;
+        switch (gameType) {
+            case GameType.ROBOT:
+                this.playerPieceType = data.playerPieceType;
+                this.robotDifficulty = data.difficulty;
+                break;
+        }
+        
+    }
     
     initGame() {
         this.drawPane();
@@ -74,6 +97,16 @@ export class Pane extends Component {
         this.placePiece(4, 3, PiecesType.WHITE, false);
         this.placePiece(4, 4, PiecesType.BLACK, false);
         //this.node.getComponent(AudioSource).play();
+        switch(this.gameType) {
+            case GameType.ROBOT:
+                console.log("playerPieceType:", this.playerPieceType, this.robotDifficulty);
+                if (this.playerPieceType == PiecesType.WHITE) {
+                    this.scheduleOnce(function () {
+                        this.robotContinue = true;
+                    }, 3);
+                }
+                break;
+        }
     }
 
     drawPane() {
@@ -113,6 +146,7 @@ export class Pane extends Component {
         let x = (j - 4 + 0.5) * this.cellWidth
         let y = (3 - i + 0.5) * this.cellHeight
         let node: Node = instantiate(this.prefabPiece);
+        
         node.setPosition(x, y);
         switch (t) {
             case PiecesType.BLACK:
@@ -141,7 +175,7 @@ export class Pane extends Component {
         const i = loc.x
         const j = loc.y
 
-        const playerPieceType = PiecesType.BLACK
+        const playerPieceType = this.playerPieceType
         if (!this.logic.isOperator(playerPieceType) ||
             !this.logic.canPlacePiece(i, j, playerPieceType)) {
             return;
@@ -158,12 +192,12 @@ export class Pane extends Component {
     }
 
     processRobot() {
-        const difficulty = 5;
-        const robotPieceType = PiecesType.WHITE;
+        const difficulty = this.robotDifficulty;
+        const robotPieceType = -this.playerPieceType;
         const op = -robotPieceType;
         let loc = this.logic.getBestLocation(robotPieceType, difficulty)
         if (loc) {
-            //console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
+            console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
             this.scheduleOnce(function () {
                 if (this.putPiece(loc.x, loc.y, robotPieceType)) {
                     return;
