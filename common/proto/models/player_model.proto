@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/models";
+package models;
+
+import "pbext/options_ext.proto";
+import "datas/player_data.proto";
+
+// @model
+// 玩家数据
+message PlayerModel 
+{
+	option (is_model) = true;
+
+	int64 player_id = 1;
+	// 活动信息
+	datas.PlayerInfo model_activity = 2;
+}

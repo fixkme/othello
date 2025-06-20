@@ -19,7 +19,7 @@ export class StartGame extends Component {
 
     public targetBundle: AssetManager.Bundle = null;
     public isScenePreloaded: boolean = false;
-    public readonly gameScene: string = "game";
+    public readonly gameScene: string = "game_robot";
 
     protected onLoad(): void {
         assetManager.loadBundle(PkgNames.Common, (err, bundle) => { 

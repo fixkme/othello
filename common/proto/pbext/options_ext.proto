@@ -1,0 +1,12 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/pbext";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MessageOptions {
+    bool is_model = 50000;      //告诉插件当前Message为model
+}
+
+extend google.protobuf.FieldOptions {
+    bool no_sync_client = 50000; //该字段不需要同步给客户端
+}

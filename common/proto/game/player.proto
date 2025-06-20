@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/game";
+package game;
+
+import "models/player_model.proto";
+
+message CLogin {
+    int64 player_id = 1;
+}
+
+message SLogin {
+    models.PlayerModel player_data = 1;
+    int64 server_tz = 2;
+}

@@ -31,10 +31,6 @@ export class RobotMenu extends Component {
         this.startButton.node.on(Button.EventType.CLICK, this.onStartButtonClicked, this);
     }
 
-    update(deltaTime: number) {
-        
-    }
-
     onSliderMoved(slider: Slider) {
         let d: number;
         const progress = slider.progress;

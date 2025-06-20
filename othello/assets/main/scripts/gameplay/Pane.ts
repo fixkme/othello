@@ -33,12 +33,13 @@ export class Pane extends Component {
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
     ];
-    robotContinue = false;
-    private gameType: GameType = GameType.ROBOT;
-
-    // 人机
-    private playerPieceType: PiecesType = PiecesType.BLACK;
+    
+    private gameType: GameType = GameType.ROBOT; 
+    private selfPieceType: PiecesType = PiecesType.BLACK; //玩家自己的
+    private opponentPieceType: PiecesType = PiecesType.WHITE; //对手的
+    // 人机难度
     private robotDifficulty: number = 1;
+    private robotContinue = false;
 
     @property(SpriteFrame)
     private blackSprite: SpriteFrame | null = null;
@@ -72,7 +73,7 @@ export class Pane extends Component {
     }
 
     update(deltaTime: number) {
-        if (this.robotContinue) {
+        if (this.gameType == GameType.ROBOT && this.robotContinue) {
             this.processRobot();
         }
     }
@@ -82,7 +83,7 @@ export class Pane extends Component {
         this.gameType = gameType;
         switch (gameType) {
             case GameType.ROBOT:
-                this.playerPieceType = data.playerPieceType;
+                this.selfPieceType = data.playerPieceType;
                 this.robotDifficulty = data.difficulty;
                 break;
         }
@@ -99,8 +100,8 @@ export class Pane extends Component {
         //this.node.getComponent(AudioSource).play();
         switch(this.gameType) {
             case GameType.ROBOT:
-                console.log("playerPieceType:", this.playerPieceType, this.robotDifficulty);
-                if (this.playerPieceType == PiecesType.WHITE) {
+                //console.log("selfPieceType:", this.selfPieceType, this.robotDifficulty);
+                if (this.selfPieceType == PiecesType.WHITE) {
                     this.scheduleOnce(function () {
                         this.robotContinue = true;
                     }, 3);
@@ -175,15 +176,15 @@ export class Pane extends Component {
         const i = loc.x
         const j = loc.y
 
-        const playerPieceType = this.playerPieceType
-        if (!this.logic.isOperator(playerPieceType) ||
-            !this.logic.canPlacePiece(i, j, playerPieceType)) {
+        const selfPieceType = this.selfPieceType
+        if (!this.logic.isOperator(selfPieceType) ||
+            !this.logic.canPlacePiece(i, j, selfPieceType)) {
             return;
         }
         this.logic.changeOperator()
 
         this.logic.record();
-        if (this.putPiece(i, j, playerPieceType)) {
+        if (this.putPiece(i, j, selfPieceType)) {
             return;
         }
 
@@ -193,7 +194,7 @@ export class Pane extends Component {
 
     processRobot() {
         const difficulty = this.robotDifficulty;
-        const robotPieceType = -this.playerPieceType;
+        const robotPieceType = -this.selfPieceType;
         const op = -robotPieceType;
         let loc = this.logic.getBestLocation(robotPieceType, difficulty)
         if (loc) {
