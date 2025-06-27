@@ -6,6 +6,7 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { PlayerInfo, TableInfo } from "../datas/player_data";
 import { PlayerModel } from "../models/player_model";
 
 export const protobufPackage = "game";
@@ -17,6 +18,32 @@ export interface CLogin {
 export interface SLogin {
   playerData: PlayerModel | undefined;
   serverTz: number;
+}
+
+export interface CEnterGame {
+}
+
+export interface SEnterGame {
+  tableInfo: TableInfo | undefined;
+}
+
+export interface PPlayerEnterGame {
+  playerInfo: PlayerInfo | undefined;
+}
+
+export interface CPlacePiece {
+  pieceType: number;
+  x: number;
+  y: number;
+}
+
+export interface SPlacePiece {
+}
+
+export interface PPlacePiece {
+  pieceType: number;
+  x: number;
+  y: number;
 }
 
 function createBaseCLogin(): CLogin {
@@ -151,6 +178,396 @@ export const SLogin: MessageFns<SLogin> = {
       ? PlayerModel.fromPartial(object.playerData)
       : undefined;
     message.serverTz = object.serverTz ?? 0;
+    return message;
+  },
+};
+
+function createBaseCEnterGame(): CEnterGame {
+  return {};
+}
+
+export const CEnterGame: MessageFns<CEnterGame> = {
+  encode(_: CEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CEnterGame {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCEnterGame();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): CEnterGame {
+    return {};
+  },
+
+  toJSON(_: CEnterGame): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CEnterGame>, I>>(base?: I): CEnterGame {
+    return CEnterGame.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CEnterGame>, I>>(_: I): CEnterGame {
+    const message = createBaseCEnterGame();
+    return message;
+  },
+};
+
+function createBaseSEnterGame(): SEnterGame {
+  return { tableInfo: undefined };
+}
+
+export const SEnterGame: MessageFns<SEnterGame> = {
+  encode(message: SEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tableInfo !== undefined) {
+      TableInfo.encode(message.tableInfo, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SEnterGame {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSEnterGame();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.tableInfo = TableInfo.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SEnterGame {
+    return { tableInfo: isSet(object.tableInfo) ? TableInfo.fromJSON(object.tableInfo) : undefined };
+  },
+
+  toJSON(message: SEnterGame): unknown {
+    const obj: any = {};
+    if (message.tableInfo !== undefined) {
+      obj.tableInfo = TableInfo.toJSON(message.tableInfo);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SEnterGame>, I>>(base?: I): SEnterGame {
+    return SEnterGame.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SEnterGame>, I>>(object: I): SEnterGame {
+    const message = createBaseSEnterGame();
+    message.tableInfo = (object.tableInfo !== undefined && object.tableInfo !== null)
+      ? TableInfo.fromPartial(object.tableInfo)
+      : undefined;
+    return message;
+  },
+};
+
+function createBasePPlayerEnterGame(): PPlayerEnterGame {
+  return { playerInfo: undefined };
+}
+
+export const PPlayerEnterGame: MessageFns<PPlayerEnterGame> = {
+  encode(message: PPlayerEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.playerInfo !== undefined) {
+      PlayerInfo.encode(message.playerInfo, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PPlayerEnterGame {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePPlayerEnterGame();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.playerInfo = PlayerInfo.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PPlayerEnterGame {
+    return { playerInfo: isSet(object.playerInfo) ? PlayerInfo.fromJSON(object.playerInfo) : undefined };
+  },
+
+  toJSON(message: PPlayerEnterGame): unknown {
+    const obj: any = {};
+    if (message.playerInfo !== undefined) {
+      obj.playerInfo = PlayerInfo.toJSON(message.playerInfo);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PPlayerEnterGame>, I>>(base?: I): PPlayerEnterGame {
+    return PPlayerEnterGame.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PPlayerEnterGame>, I>>(object: I): PPlayerEnterGame {
+    const message = createBasePPlayerEnterGame();
+    message.playerInfo = (object.playerInfo !== undefined && object.playerInfo !== null)
+      ? PlayerInfo.fromPartial(object.playerInfo)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseCPlacePiece(): CPlacePiece {
+  return { pieceType: 0, x: 0, y: 0 };
+}
+
+export const CPlacePiece: MessageFns<CPlacePiece> = {
+  encode(message: CPlacePiece, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pieceType !== 0) {
+      writer.uint32(8).int32(message.pieceType);
+    }
+    if (message.x !== 0) {
+      writer.uint32(16).int32(message.x);
+    }
+    if (message.y !== 0) {
+      writer.uint32(24).int32(message.y);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CPlacePiece {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCPlacePiece();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.pieceType = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.x = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.y = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CPlacePiece {
+    return {
+      pieceType: isSet(object.pieceType) ? globalThis.Number(object.pieceType) : 0,
+      x: isSet(object.x) ? globalThis.Number(object.x) : 0,
+      y: isSet(object.y) ? globalThis.Number(object.y) : 0,
+    };
+  },
+
+  toJSON(message: CPlacePiece): unknown {
+    const obj: any = {};
+    if (message.pieceType !== 0) {
+      obj.pieceType = Math.round(message.pieceType);
+    }
+    if (message.x !== 0) {
+      obj.x = Math.round(message.x);
+    }
+    if (message.y !== 0) {
+      obj.y = Math.round(message.y);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CPlacePiece>, I>>(base?: I): CPlacePiece {
+    return CPlacePiece.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CPlacePiece>, I>>(object: I): CPlacePiece {
+    const message = createBaseCPlacePiece();
+    message.pieceType = object.pieceType ?? 0;
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
+    return message;
+  },
+};
+
+function createBaseSPlacePiece(): SPlacePiece {
+  return {};
+}
+
+export const SPlacePiece: MessageFns<SPlacePiece> = {
+  encode(_: SPlacePiece, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SPlacePiece {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSPlacePiece();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): SPlacePiece {
+    return {};
+  },
+
+  toJSON(_: SPlacePiece): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SPlacePiece>, I>>(base?: I): SPlacePiece {
+    return SPlacePiece.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SPlacePiece>, I>>(_: I): SPlacePiece {
+    const message = createBaseSPlacePiece();
+    return message;
+  },
+};
+
+function createBasePPlacePiece(): PPlacePiece {
+  return { pieceType: 0, x: 0, y: 0 };
+}
+
+export const PPlacePiece: MessageFns<PPlacePiece> = {
+  encode(message: PPlacePiece, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pieceType !== 0) {
+      writer.uint32(8).int32(message.pieceType);
+    }
+    if (message.x !== 0) {
+      writer.uint32(16).int32(message.x);
+    }
+    if (message.y !== 0) {
+      writer.uint32(24).int32(message.y);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PPlacePiece {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePPlacePiece();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.pieceType = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.x = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.y = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PPlacePiece {
+    return {
+      pieceType: isSet(object.pieceType) ? globalThis.Number(object.pieceType) : 0,
+      x: isSet(object.x) ? globalThis.Number(object.x) : 0,
+      y: isSet(object.y) ? globalThis.Number(object.y) : 0,
+    };
+  },
+
+  toJSON(message: PPlacePiece): unknown {
+    const obj: any = {};
+    if (message.pieceType !== 0) {
+      obj.pieceType = Math.round(message.pieceType);
+    }
+    if (message.x !== 0) {
+      obj.x = Math.round(message.x);
+    }
+    if (message.y !== 0) {
+      obj.y = Math.round(message.y);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PPlacePiece>, I>>(base?: I): PPlacePiece {
+    return PPlacePiece.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PPlacePiece>, I>>(object: I): PPlacePiece {
+    const message = createBasePPlacePiece();
+    message.pieceType = object.pieceType ?? 0;
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
     return message;
   },
 };

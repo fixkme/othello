@@ -8,11 +8,21 @@ import (
 )
 
 type GameServer interface {
+	EnterGame(context.Context, *CEnterGame) (*SEnterGame, error)
 	Login(context.Context, *CLogin) (*SLogin, error)
+	PlacePiece(context.Context, *CPlacePiece) (*SPlacePiece, error)
 }
 
 func RegisterGameServer(s rpc.ServiceRegistrar, srv GameServer) {
 	s.RegisterService(&Game_ServiceDesc, srv)
+}
+
+func _Game_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CEnterGame)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GameServer).EnterGame(ctx, req.(*CEnterGame))
+	}
+	return arg, h
 }
 
 func _Game_Login_Materializer(srv any) (proto.Message, rpc.Handler) {
@@ -23,13 +33,29 @@ func _Game_Login_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
+func _Game_PlacePiece_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CPlacePiece)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GameServer).PlacePiece(ctx, req.(*CPlacePiece))
+	}
+	return arg, h
+}
+
 var Game_ServiceDesc = rpc.ServiceDesc{
 	ServiceName: "Game",
 	HandlerType: (*GameServer)(nil),
 	Methods: []rpc.MethodDesc{
 		{
+			MethodName: "EnterGame",
+			Handler:    _Game_EnterGame_Materializer,
+		},
+		{
 			MethodName: "Login",
 			Handler:    _Game_Login_Materializer,
+		},
+		{
+			MethodName: "PlacePiece",
+			Handler:    _Game_PlacePiece_Materializer,
 		},
 	},
 }

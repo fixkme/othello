@@ -15,6 +15,28 @@ export interface PlayerInfo {
   portrait: string;
 }
 
+export interface PieceInfo {
+  x: number;
+  y: number;
+  color: number;
+}
+
+export interface TableInfo {
+  id: number;
+  /** 房主 */
+  ownerId: number;
+  /** 对手 */
+  playerId: number;
+  status: number;
+  /** 当前操作方 */
+  turn: number;
+  blackCount: number;
+  whiteCount: number;
+  pieces: PieceInfo[];
+  players: PlayerInfo[];
+  createdTime: number;
+}
+
 function createBasePlayerInfo(): PlayerInfo {
   return { id: 0, name: "", portrait: "" };
 }
@@ -103,6 +125,313 @@ export const PlayerInfo: MessageFns<PlayerInfo> = {
     message.id = object.id ?? 0;
     message.name = object.name ?? "";
     message.portrait = object.portrait ?? "";
+    return message;
+  },
+};
+
+function createBasePieceInfo(): PieceInfo {
+  return { x: 0, y: 0, color: 0 };
+}
+
+export const PieceInfo: MessageFns<PieceInfo> = {
+  encode(message: PieceInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.x !== 0) {
+      writer.uint32(8).int32(message.x);
+    }
+    if (message.y !== 0) {
+      writer.uint32(16).int32(message.y);
+    }
+    if (message.color !== 0) {
+      writer.uint32(24).int32(message.color);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PieceInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePieceInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.x = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.y = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.color = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PieceInfo {
+    return {
+      x: isSet(object.x) ? globalThis.Number(object.x) : 0,
+      y: isSet(object.y) ? globalThis.Number(object.y) : 0,
+      color: isSet(object.color) ? globalThis.Number(object.color) : 0,
+    };
+  },
+
+  toJSON(message: PieceInfo): unknown {
+    const obj: any = {};
+    if (message.x !== 0) {
+      obj.x = Math.round(message.x);
+    }
+    if (message.y !== 0) {
+      obj.y = Math.round(message.y);
+    }
+    if (message.color !== 0) {
+      obj.color = Math.round(message.color);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PieceInfo>, I>>(base?: I): PieceInfo {
+    return PieceInfo.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PieceInfo>, I>>(object: I): PieceInfo {
+    const message = createBasePieceInfo();
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
+    message.color = object.color ?? 0;
+    return message;
+  },
+};
+
+function createBaseTableInfo(): TableInfo {
+  return {
+    id: 0,
+    ownerId: 0,
+    playerId: 0,
+    status: 0,
+    turn: 0,
+    blackCount: 0,
+    whiteCount: 0,
+    pieces: [],
+    players: [],
+    createdTime: 0,
+  };
+}
+
+export const TableInfo: MessageFns<TableInfo> = {
+  encode(message: TableInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int64(message.id);
+    }
+    if (message.ownerId !== 0) {
+      writer.uint32(16).int64(message.ownerId);
+    }
+    if (message.playerId !== 0) {
+      writer.uint32(24).int64(message.playerId);
+    }
+    if (message.status !== 0) {
+      writer.uint32(32).int32(message.status);
+    }
+    if (message.turn !== 0) {
+      writer.uint32(40).int32(message.turn);
+    }
+    if (message.blackCount !== 0) {
+      writer.uint32(48).int32(message.blackCount);
+    }
+    if (message.whiteCount !== 0) {
+      writer.uint32(56).int32(message.whiteCount);
+    }
+    for (const v of message.pieces) {
+      PieceInfo.encode(v!, writer.uint32(66).fork()).join();
+    }
+    for (const v of message.players) {
+      PlayerInfo.encode(v!, writer.uint32(74).fork()).join();
+    }
+    if (message.createdTime !== 0) {
+      writer.uint32(80).int64(message.createdTime);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): TableInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = longToNumber(reader.int64());
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.ownerId = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.playerId = longToNumber(reader.int64());
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.status = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.turn = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.blackCount = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.whiteCount = reader.int32();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.pieces.push(PieceInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
+
+          message.players.push(PlayerInfo.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.createdTime = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TableInfo {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      ownerId: isSet(object.ownerId) ? globalThis.Number(object.ownerId) : 0,
+      playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
+      status: isSet(object.status) ? globalThis.Number(object.status) : 0,
+      turn: isSet(object.turn) ? globalThis.Number(object.turn) : 0,
+      blackCount: isSet(object.blackCount) ? globalThis.Number(object.blackCount) : 0,
+      whiteCount: isSet(object.whiteCount) ? globalThis.Number(object.whiteCount) : 0,
+      pieces: globalThis.Array.isArray(object?.pieces) ? object.pieces.map((e: any) => PieceInfo.fromJSON(e)) : [],
+      players: globalThis.Array.isArray(object?.players) ? object.players.map((e: any) => PlayerInfo.fromJSON(e)) : [],
+      createdTime: isSet(object.createdTime) ? globalThis.Number(object.createdTime) : 0,
+    };
+  },
+
+  toJSON(message: TableInfo): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.ownerId !== 0) {
+      obj.ownerId = Math.round(message.ownerId);
+    }
+    if (message.playerId !== 0) {
+      obj.playerId = Math.round(message.playerId);
+    }
+    if (message.status !== 0) {
+      obj.status = Math.round(message.status);
+    }
+    if (message.turn !== 0) {
+      obj.turn = Math.round(message.turn);
+    }
+    if (message.blackCount !== 0) {
+      obj.blackCount = Math.round(message.blackCount);
+    }
+    if (message.whiteCount !== 0) {
+      obj.whiteCount = Math.round(message.whiteCount);
+    }
+    if (message.pieces?.length) {
+      obj.pieces = message.pieces.map((e) => PieceInfo.toJSON(e));
+    }
+    if (message.players?.length) {
+      obj.players = message.players.map((e) => PlayerInfo.toJSON(e));
+    }
+    if (message.createdTime !== 0) {
+      obj.createdTime = Math.round(message.createdTime);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<TableInfo>, I>>(base?: I): TableInfo {
+    return TableInfo.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<TableInfo>, I>>(object: I): TableInfo {
+    const message = createBaseTableInfo();
+    message.id = object.id ?? 0;
+    message.ownerId = object.ownerId ?? 0;
+    message.playerId = object.playerId ?? 0;
+    message.status = object.status ?? 0;
+    message.turn = object.turn ?? 0;
+    message.blackCount = object.blackCount ?? 0;
+    message.whiteCount = object.whiteCount ?? 0;
+    message.pieces = object.pieces?.map((e) => PieceInfo.fromPartial(e)) || [];
+    message.players = object.players?.map((e) => PlayerInfo.fromPartial(e)) || [];
+    message.createdTime = object.createdTime ?? 0;
     return message;
   },
 };

@@ -7,3 +7,22 @@ message PlayerInfo {
     string name = 2;
     string portrait = 3;
 }
+
+message PieceInfo {
+    int32 x = 1;
+    int32 y = 2;
+    int32 color = 3;
+}
+
+message TableInfo {
+    int64 id = 1;
+    int64 owner_id = 2; //房主
+    int64 player_id = 3; //对手
+    int32 status = 4;
+    int32 turn = 5; //当前操作方
+    int32 black_count = 6; 
+    int32 white_count = 7;
+    repeated PieceInfo pieces = 8;
+    repeated PlayerInfo players = 9;
+    int64 created_time = 10;
+}

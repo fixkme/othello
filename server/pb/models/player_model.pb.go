@@ -28,10 +28,10 @@ const (
 type PBPlayerModel struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
-	// 活动信息
-	ModelActivity *datas.PBPlayerInfo `protobuf:"bytes,2,opt,name=model_activity,json=modelActivity,proto3" json:"model_activity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// 玩家信息
+	ModelPlayerInfo *datas.PBPlayerInfo `protobuf:"bytes,2,opt,name=model_player_info,json=modelPlayerInfo,proto3" json:"model_player_info,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *PBPlayerModel) Reset() {
@@ -71,9 +71,9 @@ func (x *PBPlayerModel) GetPlayerId() int64 {
 	return 0
 }
 
-func (x *PBPlayerModel) GetModelActivity() *datas.PBPlayerInfo {
+func (x *PBPlayerModel) GetModelPlayerInfo() *datas.PBPlayerInfo {
 	if x != nil {
-		return x.ModelActivity
+		return x.ModelPlayerInfo
 	}
 	return nil
 }
@@ -82,10 +82,10 @@ var File_models_player_model_proto protoreflect.FileDescriptor
 
 const file_models_player_model_proto_rawDesc = "" +
 	"\n" +
-	"\x19models/player_model.proto\x12\x06models\x1a\x17pbext/options_ext.proto\x1a\x17datas/player_data.proto\"j\n" +
+	"\x19models/player_model.proto\x12\x06models\x1a\x17pbext/options_ext.proto\x1a\x17datas/player_data.proto\"o\n" +
 	"\vPlayerModel\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x128\n" +
-	"\x0emodel_activity\x18\x02 \x01(\v2\x11.datas.PlayerInfoR\rmodelActivity:\x04\x80\xb5\x18\x01B,Z*github.com/fixkme/othello/server/pb/modelsb\x06proto3"
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12=\n" +
+	"\x11model_player_info\x18\x02 \x01(\v2\x11.datas.PlayerInfoR\x0fmodelPlayerInfo:\x04\x80\xb5\x18\x01B,Z*github.com/fixkme/othello/server/pb/modelsb\x06proto3"
 
 var (
 	file_models_player_model_proto_rawDescOnce sync.Once
@@ -105,7 +105,7 @@ var file_models_player_model_proto_goTypes = []any{
 	(*datas.PBPlayerInfo)(nil), // 1: datas.PlayerInfo
 }
 var file_models_player_model_proto_depIdxs = []int32{
-	1, // 0: models.PlayerModel.model_activity:type_name -> datas.PlayerInfo
+	1, // 0: models.PlayerModel.model_player_info:type_name -> datas.PlayerInfo
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

@@ -3,6 +3,7 @@ option go_package = "github.com/fixkme/othello/server/pb/game";
 package game;
 
 import "models/player_model.proto";
+import "datas/player_data.proto";
 
 message CLogin {
     int64 player_id = 1;
@@ -11,4 +12,26 @@ message CLogin {
 message SLogin {
     models.PlayerModel player_data = 1;
     int64 server_tz = 2;
+}
+
+message CEnterGame {
+}
+message SEnterGame {
+    datas.TableInfo table_info = 1;
+}
+message PPlayerEnterGame {
+    datas.PlayerInfo player_info = 1;
+}
+
+message CPlacePiece {
+    int32 piece_type = 1;
+    int32 x = 2;
+    int32 y = 3;
+}
+message SPlacePiece {
+}
+message PPlacePiece {
+    int32 piece_type = 1;
+    int32 x = 2;
+    int32 y = 3;
 }

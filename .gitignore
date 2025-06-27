@@ -22,3 +22,8 @@ node_modules/
 # WebStorm
 #//////////////////////////
 .idea/
+
+.env
+bin/
+logs/
+*__debug*

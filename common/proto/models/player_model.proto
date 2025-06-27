@@ -12,6 +12,6 @@ message PlayerModel
 	option (is_model) = true;
 
 	int64 player_id = 1;
-	// 活动信息
-	datas.PlayerInfo model_activity = 2;
+	// 玩家信息
+	datas.PlayerInfo model_player_info = 2;
 }

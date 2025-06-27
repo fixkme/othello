@@ -81,6 +81,182 @@ func (x *PBPlayerInfo) GetPortrait() string {
 	return ""
 }
 
+type PBPieceInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	X             int32                  `protobuf:"varint,1,opt,name=x,proto3" json:"x,omitempty"`
+	Y             int32                  `protobuf:"varint,2,opt,name=y,proto3" json:"y,omitempty"`
+	Color         int32                  `protobuf:"varint,3,opt,name=color,proto3" json:"color,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PBPieceInfo) Reset() {
+	*x = PBPieceInfo{}
+	mi := &file_datas_player_data_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PBPieceInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PBPieceInfo) ProtoMessage() {}
+
+func (x *PBPieceInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_datas_player_data_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PBPieceInfo.ProtoReflect.Descriptor instead.
+func (*PBPieceInfo) Descriptor() ([]byte, []int) {
+	return file_datas_player_data_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *PBPieceInfo) GetX() int32 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *PBPieceInfo) GetY() int32 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
+}
+
+func (x *PBPieceInfo) GetColor() int32 {
+	if x != nil {
+		return x.Color
+	}
+	return 0
+}
+
+type PBTableInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	OwnerId       int64                  `protobuf:"varint,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`    //房主
+	PlayerId      int64                  `protobuf:"varint,3,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` //对手
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
+	Turn          int32                  `protobuf:"varint,5,opt,name=turn,proto3" json:"turn,omitempty"` //当前操作方
+	BlackCount    int32                  `protobuf:"varint,6,opt,name=black_count,json=blackCount,proto3" json:"black_count,omitempty"`
+	WhiteCount    int32                  `protobuf:"varint,7,opt,name=white_count,json=whiteCount,proto3" json:"white_count,omitempty"`
+	Pieces        []*PBPieceInfo         `protobuf:"bytes,8,rep,name=pieces,proto3" json:"pieces,omitempty"`
+	Players       []*PBPlayerInfo        `protobuf:"bytes,9,rep,name=players,proto3" json:"players,omitempty"`
+	CreatedTime   int64                  `protobuf:"varint,10,opt,name=created_time,json=createdTime,proto3" json:"created_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PBTableInfo) Reset() {
+	*x = PBTableInfo{}
+	mi := &file_datas_player_data_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PBTableInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PBTableInfo) ProtoMessage() {}
+
+func (x *PBTableInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_datas_player_data_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PBTableInfo.ProtoReflect.Descriptor instead.
+func (*PBTableInfo) Descriptor() ([]byte, []int) {
+	return file_datas_player_data_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PBTableInfo) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetOwnerId() int64 {
+	if x != nil {
+		return x.OwnerId
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetPlayerId() int64 {
+	if x != nil {
+		return x.PlayerId
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetTurn() int32 {
+	if x != nil {
+		return x.Turn
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetBlackCount() int32 {
+	if x != nil {
+		return x.BlackCount
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetWhiteCount() int32 {
+	if x != nil {
+		return x.WhiteCount
+	}
+	return 0
+}
+
+func (x *PBTableInfo) GetPieces() []*PBPieceInfo {
+	if x != nil {
+		return x.Pieces
+	}
+	return nil
+}
+
+func (x *PBTableInfo) GetPlayers() []*PBPlayerInfo {
+	if x != nil {
+		return x.Players
+	}
+	return nil
+}
+
+func (x *PBTableInfo) GetCreatedTime() int64 {
+	if x != nil {
+		return x.CreatedTime
+	}
+	return 0
+}
+
 var File_datas_player_data_proto protoreflect.FileDescriptor
 
 const file_datas_player_data_proto_rawDesc = "" +
@@ -90,7 +266,25 @@ const file_datas_player_data_proto_rawDesc = "" +
 	"PlayerInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
-	"\bportrait\x18\x03 \x01(\tR\bportraitB+Z)github.com/fixkme/othello/server/pb/datasb\x06proto3"
+	"\bportrait\x18\x03 \x01(\tR\bportrait\"=\n" +
+	"\tPieceInfo\x12\f\n" +
+	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
+	"\x01y\x18\x02 \x01(\x05R\x01y\x12\x14\n" +
+	"\x05color\x18\x03 \x01(\x05R\x05color\"\xbb\x02\n" +
+	"\tTableInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x19\n" +
+	"\bowner_id\x18\x02 \x01(\x03R\aownerId\x12\x1b\n" +
+	"\tplayer_id\x18\x03 \x01(\x03R\bplayerId\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x12\n" +
+	"\x04turn\x18\x05 \x01(\x05R\x04turn\x12\x1f\n" +
+	"\vblack_count\x18\x06 \x01(\x05R\n" +
+	"blackCount\x12\x1f\n" +
+	"\vwhite_count\x18\a \x01(\x05R\n" +
+	"whiteCount\x12(\n" +
+	"\x06pieces\x18\b \x03(\v2\x10.datas.PieceInfoR\x06pieces\x12+\n" +
+	"\aplayers\x18\t \x03(\v2\x11.datas.PlayerInfoR\aplayers\x12!\n" +
+	"\fcreated_time\x18\n" +
+	" \x01(\x03R\vcreatedTimeB+Z)github.com/fixkme/othello/server/pb/datasb\x06proto3"
 
 var (
 	file_datas_player_data_proto_rawDescOnce sync.Once
@@ -104,16 +298,20 @@ func file_datas_player_data_proto_rawDescGZIP() []byte {
 	return file_datas_player_data_proto_rawDescData
 }
 
-var file_datas_player_data_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_datas_player_data_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_datas_player_data_proto_goTypes = []any{
 	(*PBPlayerInfo)(nil), // 0: datas.PlayerInfo
+	(*PBPieceInfo)(nil),  // 1: datas.PieceInfo
+	(*PBTableInfo)(nil),  // 2: datas.TableInfo
 }
 var file_datas_player_data_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: datas.TableInfo.pieces:type_name -> datas.PieceInfo
+	0, // 1: datas.TableInfo.players:type_name -> datas.PlayerInfo
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_datas_player_data_proto_init() }
@@ -127,7 +325,7 @@ func file_datas_player_data_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_datas_player_data_proto_rawDesc), len(file_datas_player_data_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

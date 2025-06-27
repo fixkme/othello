@@ -18,8 +18,8 @@ import (
 // 玩家数据
 type MPlayerModel struct {
 	playerId int64
-	// 活动信息
-	modelActivity *datas.MPlayerInfo
+	// 玩家信息
+	modelPlayerInfo *datas.MPlayerInfo
 
 	// 自己本身的同步key,由父对象指定
 	selfSyncID string
@@ -34,16 +34,16 @@ type MPlayerModel struct {
 // 构造函数
 func NewMPlayerModel() *MPlayerModel {
 	m := &MPlayerModel{}
-	m.modelActivity = datas.NewMPlayerInfo()
+	m.modelPlayerInfo = datas.NewMPlayerInfo()
 	m.fieldSyncIDs[0] = "player_id"
-	m.fieldSyncIDs[1] = "model_activity"
+	m.fieldSyncIDs[1] = "model_player_info"
 	return m
 }
 
 // PB构造函数
 func NewPBPlayerModel() *PBPlayerModel {
 	pb := &PBPlayerModel{}
-	pb.ModelActivity = datas.NewPBPlayerInfo()
+	pb.ModelPlayerInfo = datas.NewPBPlayerInfo()
 	return pb
 }
 
@@ -56,8 +56,8 @@ func (m *MPlayerModel) SetCollector(syncID string, collector pbext.ICollector, c
 		syncID = syncID + "."
 	}
 	m.fieldSyncIDs[0] = syncID + "player_id"
-	m.fieldSyncIDs[1] = syncID + "model_activity"
-	m.modelActivity.SetCollector(m.fieldSyncIDs[1], collector, cb)
+	m.fieldSyncIDs[1] = syncID + "model_player_info"
+	m.modelPlayerInfo.SetCollector(m.fieldSyncIDs[1], collector, cb)
 }
 
 // 检查数值变化函数
@@ -81,7 +81,7 @@ func (m *MPlayerModel) ToPB() *PBPlayerModel {
 	}
 	pb := NewPBPlayerModel()
 	pb.PlayerId = m.playerId
-	pb.ModelActivity = m.modelActivity.ToPB()
+	pb.ModelPlayerInfo = m.modelPlayerInfo.ToPB()
 	return pb
 }
 
@@ -91,7 +91,7 @@ func (m *MPlayerModel) InitFromPB(pb *PBPlayerModel) {
 		return
 	}
 	m.playerId = pb.PlayerId
-	m.modelActivity.InitFromPB(pb.ModelActivity)
+	m.modelPlayerInfo.InitFromPB(pb.ModelPlayerInfo)
 }
 
 // String 函数
@@ -101,8 +101,8 @@ func (m *MPlayerModel) String() string {
 	strBuilder.WriteString("playerId:")
 	strBuilder.WriteString(fmt.Sprintf("%v", m.playerId))
 	strBuilder.WriteString(", ")
-	strBuilder.WriteString("modelActivity:")
-	strBuilder.WriteString(m.modelActivity.String())
+	strBuilder.WriteString("modelPlayerInfo:")
+	strBuilder.WriteString(m.modelPlayerInfo.String())
 	strBuilder.WriteString("}")
 	return strBuilder.String()
 }
@@ -123,14 +123,14 @@ func (m *MPlayerModel) AddPlayerId(add int64) int64 {
 	return m.playerId
 }
 
-// 活动信息
-func (m *MPlayerModel) GetModelActivity() *datas.MPlayerInfo {
-	return m.modelActivity
+// 玩家信息
+func (m *MPlayerModel) GetModelPlayerInfo() *datas.MPlayerInfo {
+	return m.modelPlayerInfo
 }
 
-func (m *MPlayerModel) SetModelActivity(value *datas.MPlayerInfo) {
-	if m.checkDirty(m.modelActivity, value, m.fieldSyncIDs[1], true) {
+func (m *MPlayerModel) SetModelPlayerInfo(value *datas.MPlayerInfo) {
+	if m.checkDirty(m.modelPlayerInfo, value, m.fieldSyncIDs[1], true) {
 		value.SetCollector(m.fieldSyncIDs[1], m.collector, m.changedCb)
 	}
-	m.modelActivity = value
+	m.modelPlayerInfo = value
 }

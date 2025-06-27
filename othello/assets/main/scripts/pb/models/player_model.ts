@@ -16,12 +16,12 @@ export const protobufPackage = "models";
  */
 export interface PlayerModel {
   playerId: number;
-  /** 活动信息 */
-  modelActivity: PlayerInfo | undefined;
+  /** 玩家信息 */
+  modelPlayerInfo: PlayerInfo | undefined;
 }
 
 function createBasePlayerModel(): PlayerModel {
-  return { playerId: 0, modelActivity: undefined };
+  return { playerId: 0, modelPlayerInfo: undefined };
 }
 
 export const PlayerModel: MessageFns<PlayerModel> = {
@@ -29,8 +29,8 @@ export const PlayerModel: MessageFns<PlayerModel> = {
     if (message.playerId !== 0) {
       writer.uint32(8).int64(message.playerId);
     }
-    if (message.modelActivity !== undefined) {
-      PlayerInfo.encode(message.modelActivity, writer.uint32(18).fork()).join();
+    if (message.modelPlayerInfo !== undefined) {
+      PlayerInfo.encode(message.modelPlayerInfo, writer.uint32(18).fork()).join();
     }
     return writer;
   },
@@ -55,7 +55,7 @@ export const PlayerModel: MessageFns<PlayerModel> = {
             break;
           }
 
-          message.modelActivity = PlayerInfo.decode(reader, reader.uint32());
+          message.modelPlayerInfo = PlayerInfo.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -70,7 +70,7 @@ export const PlayerModel: MessageFns<PlayerModel> = {
   fromJSON(object: any): PlayerModel {
     return {
       playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
-      modelActivity: isSet(object.modelActivity) ? PlayerInfo.fromJSON(object.modelActivity) : undefined,
+      modelPlayerInfo: isSet(object.modelPlayerInfo) ? PlayerInfo.fromJSON(object.modelPlayerInfo) : undefined,
     };
   },
 
@@ -79,8 +79,8 @@ export const PlayerModel: MessageFns<PlayerModel> = {
     if (message.playerId !== 0) {
       obj.playerId = Math.round(message.playerId);
     }
-    if (message.modelActivity !== undefined) {
-      obj.modelActivity = PlayerInfo.toJSON(message.modelActivity);
+    if (message.modelPlayerInfo !== undefined) {
+      obj.modelPlayerInfo = PlayerInfo.toJSON(message.modelPlayerInfo);
     }
     return obj;
   },
@@ -91,8 +91,8 @@ export const PlayerModel: MessageFns<PlayerModel> = {
   fromPartial<I extends Exact<DeepPartial<PlayerModel>, I>>(object: I): PlayerModel {
     const message = createBasePlayerModel();
     message.playerId = object.playerId ?? 0;
-    message.modelActivity = (object.modelActivity !== undefined && object.modelActivity !== null)
-      ? PlayerInfo.fromPartial(object.modelActivity)
+    message.modelPlayerInfo = (object.modelPlayerInfo !== undefined && object.modelPlayerInfo !== null)
+      ? PlayerInfo.fromPartial(object.modelPlayerInfo)
       : undefined;
     return message;
   },
