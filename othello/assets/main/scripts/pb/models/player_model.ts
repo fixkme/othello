@@ -7,6 +7,7 @@
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { PlayerInfo } from "../datas/player_data";
+import { messageTypeRegistry } from "../typeRegistry";
 
 export const protobufPackage = "models";
 
@@ -15,16 +16,19 @@ export const protobufPackage = "models";
  * 玩家数据
  */
 export interface PlayerModel {
+  $type: "models.PlayerModel";
   playerId: number;
   /** 玩家信息 */
   modelPlayerInfo: PlayerInfo | undefined;
 }
 
 function createBasePlayerModel(): PlayerModel {
-  return { playerId: 0, modelPlayerInfo: undefined };
+  return { $type: "models.PlayerModel", playerId: 0, modelPlayerInfo: undefined };
 }
 
-export const PlayerModel: MessageFns<PlayerModel> = {
+export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
+  $type: "models.PlayerModel" as const,
+
   encode(message: PlayerModel, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.playerId !== 0) {
       writer.uint32(8).int64(message.playerId);
@@ -69,6 +73,7 @@ export const PlayerModel: MessageFns<PlayerModel> = {
 
   fromJSON(object: any): PlayerModel {
     return {
+      $type: PlayerModel.$type,
       playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
       modelPlayerInfo: isSet(object.modelPlayerInfo) ? PlayerInfo.fromJSON(object.modelPlayerInfo) : undefined,
     };
@@ -98,17 +103,19 @@ export const PlayerModel: MessageFns<PlayerModel> = {
   },
 };
 
+messageTypeRegistry.set(PlayerModel.$type, PlayerModel);
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T extends {} ? { [K in Exclude<keyof T, "$type">]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P> | "$type">]: never };
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
@@ -125,7 +132,8 @@ function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
 
-export interface MessageFns<T> {
+export interface MessageFns<T, V extends string> {
+  readonly $type: V;
   encode(message: T, writer?: BinaryWriter): BinaryWriter;
   decode(input: BinaryReader | Uint8Array, length?: number): T;
   fromJSON(object: any): T;

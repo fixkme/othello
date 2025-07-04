@@ -6,22 +6,26 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { messageTypeRegistry } from "../typeRegistry";
 
 export const protobufPackage = "datas";
 
 export interface PlayerInfo {
+  $type: "datas.PlayerInfo";
   id: number;
   name: string;
   portrait: string;
 }
 
 export interface PieceInfo {
+  $type: "datas.PieceInfo";
   x: number;
   y: number;
   color: number;
 }
 
 export interface TableInfo {
+  $type: "datas.TableInfo";
   id: number;
   /** 房主 */
   ownerId: number;
@@ -38,10 +42,12 @@ export interface TableInfo {
 }
 
 function createBasePlayerInfo(): PlayerInfo {
-  return { id: 0, name: "", portrait: "" };
+  return { $type: "datas.PlayerInfo", id: 0, name: "", portrait: "" };
 }
 
-export const PlayerInfo: MessageFns<PlayerInfo> = {
+export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
+  $type: "datas.PlayerInfo" as const,
+
   encode(message: PlayerInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== 0) {
       writer.uint32(8).int64(message.id);
@@ -97,6 +103,7 @@ export const PlayerInfo: MessageFns<PlayerInfo> = {
 
   fromJSON(object: any): PlayerInfo {
     return {
+      $type: PlayerInfo.$type,
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       portrait: isSet(object.portrait) ? globalThis.String(object.portrait) : "",
@@ -129,11 +136,15 @@ export const PlayerInfo: MessageFns<PlayerInfo> = {
   },
 };
 
+messageTypeRegistry.set(PlayerInfo.$type, PlayerInfo);
+
 function createBasePieceInfo(): PieceInfo {
-  return { x: 0, y: 0, color: 0 };
+  return { $type: "datas.PieceInfo", x: 0, y: 0, color: 0 };
 }
 
-export const PieceInfo: MessageFns<PieceInfo> = {
+export const PieceInfo: MessageFns<PieceInfo, "datas.PieceInfo"> = {
+  $type: "datas.PieceInfo" as const,
+
   encode(message: PieceInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.x !== 0) {
       writer.uint32(8).int32(message.x);
@@ -189,6 +200,7 @@ export const PieceInfo: MessageFns<PieceInfo> = {
 
   fromJSON(object: any): PieceInfo {
     return {
+      $type: PieceInfo.$type,
       x: isSet(object.x) ? globalThis.Number(object.x) : 0,
       y: isSet(object.y) ? globalThis.Number(object.y) : 0,
       color: isSet(object.color) ? globalThis.Number(object.color) : 0,
@@ -221,8 +233,11 @@ export const PieceInfo: MessageFns<PieceInfo> = {
   },
 };
 
+messageTypeRegistry.set(PieceInfo.$type, PieceInfo);
+
 function createBaseTableInfo(): TableInfo {
   return {
+    $type: "datas.TableInfo",
     id: 0,
     ownerId: 0,
     playerId: 0,
@@ -236,7 +251,9 @@ function createBaseTableInfo(): TableInfo {
   };
 }
 
-export const TableInfo: MessageFns<TableInfo> = {
+export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
+  $type: "datas.TableInfo" as const,
+
   encode(message: TableInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== 0) {
       writer.uint32(8).int64(message.id);
@@ -369,6 +386,7 @@ export const TableInfo: MessageFns<TableInfo> = {
 
   fromJSON(object: any): TableInfo {
     return {
+      $type: TableInfo.$type,
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       ownerId: isSet(object.ownerId) ? globalThis.Number(object.ownerId) : 0,
       playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
@@ -436,17 +454,19 @@ export const TableInfo: MessageFns<TableInfo> = {
   },
 };
 
+messageTypeRegistry.set(TableInfo.$type, TableInfo);
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T extends {} ? { [K in Exclude<keyof T, "$type">]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P> | "$type">]: never };
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
@@ -463,7 +483,8 @@ function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
 
-export interface MessageFns<T> {
+export interface MessageFns<T, V extends string> {
+  readonly $type: V;
   encode(message: T, writer?: BinaryWriter): BinaryWriter;
   decode(input: BinaryReader | Uint8Array, length?: number): T;
   fromJSON(object: any): T;

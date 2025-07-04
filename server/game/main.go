@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/fixkme/gokit/log"
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/util/app"
 	"github.com/fixkme/othello/server/common/framework"
 	"github.com/fixkme/othello/server/game/internal/logic"
@@ -32,7 +32,7 @@ func start() {
 
 	wg := &sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(context.Background())
-	if err := log.UseDefaultLogger(ctx, wg, "../logs", "game", "debug", true); err != nil {
+	if err := mlog.UseDefaultLogger(ctx, wg, "../logs", "game", "debug", true); err != nil {
 		panic(err)
 	}
 

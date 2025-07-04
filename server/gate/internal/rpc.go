@@ -5,7 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/cloudwego/netpoll"
-	"github.com/fixkme/gokit/log"
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/othello/server/common/const/values"
 	"github.com/fixkme/othello/server/common/framework"
@@ -32,9 +32,9 @@ func RpcHandlerFunc(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 		rc.ReplyErr = err
 	}
 	if rc.ReplyErr == nil {
-		log.Info("gate handler msg succeed, req_data:%v, rsp_data:%v", argMsg, rc.Reply)
+		mlog.Info("gate handler msg succeed, req_data:%v, rsp_data:%v", argMsg, rc.Reply)
 	} else {
-		log.Error("gate handler msg failed, req_data:%v, err:%v", argMsg, rc.ReplyErr)
+		mlog.Error("gate handler msg failed, req_data:%v, err:%v", argMsg, rc.ReplyErr)
 	}
 	ser(rc, false)
 }

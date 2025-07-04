@@ -1,5 +1,8 @@
 import { _decorator, Component, UITransform, Node, EventTouch } from 'cc';
 import { NetworkManager } from './common/NetworkManager';
+import { PlayerInfo } from './pb/datas/player_data';
+import { CLogin } from './pb/game/player';
+import { messageTypeRegistry } from './pb/typeRegistry';
 const { ccclass, property } = _decorator;
 
 @ccclass('Test')
@@ -20,6 +23,11 @@ export class Test extends Component {
 
     start() {
         //this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+         
+        const clogin = CLogin.create()
+        clogin.playerId = 1
+        const typ = messageTypeRegistry.get(CLogin.$type)
+        console.log(typ)
     }
 
     update(deltaTime: number) {

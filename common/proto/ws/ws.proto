@@ -1,0 +1,56 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/ws";
+
+package ws;
+
+message PBPackage
+{
+	// 消息类型
+	string message_type = 1;
+	// 数据
+	bytes message_payload = 2;
+}
+
+message WsRequestMessage
+{
+	string uuid = 1;		// 消息的唯一id
+    string msgName = 2;		// request的消息名，game.CLogin
+	bytes payload = 3;		// 数据
+}
+
+message WsResponseMessage
+{
+	string uuid = 1;		// 和request的uuid对应
+    string msgName = 2; 	// response的消息名，game.SLogin
+	bytes payload = 3; 		// 数据
+    int32 error_code = 4;	// 错误码, >0 表示错误
+    string error_desc = 5;	// 错误描述, error_code>0时有效
+	repeated PBPackage notices = 6; // 回应带下的推送消息
+}
+
+message WsPushMessage
+{
+	repeated PBPackage notices = 1;
+}
+
+// message WebsocketMessage
+// {
+// 	// 客户端上行传递值,由jsonmap指定
+// 	string uri = 1;
+// 	// 同上
+// 	string method = 2;
+// 	// 请求
+// 	PBPackage request = 3;
+// 	// 返回
+// 	PBPackage response = 4;
+// 	// 请求回应包唯一ID
+// 	string uuid = 5;
+// 	// 见ErrorCode
+// 	int64 errno = 6;
+// 	// 如果errno不为0时的错误消息
+// 	string errmsg = 7;
+// 	// 服务器下发的server_id,可用于跨服数据的判断
+// 	int64 server_id = 8;
+// 	// 随返回下发的推送消息数组
+// 	repeated PBPackage notifications = 9;
+// }

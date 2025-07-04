@@ -15,9 +15,9 @@ rm -rf $OUT_DIR/*
 protoc \
   --plugin=protoc-gen-ts_proto=../node_modules/.bin/protoc-gen-ts_proto \
   --ts_proto_out=$OUT_DIR \
-  --ts_proto_opt=outputEncodeMethods=true,outputJsonMethods=true,env=node \
+  --ts_proto_opt=outputEncodeMethods=true,outputJsonMethods=true,outputTypeRegistry=true,env=browser \
   -I=$PROTO_DIR \
-  $PROTO_DIR/datas/*.proto $PROTO_DIR/game/*.proto
+  $PROTO_DIR/ws/*.proto $PROTO_DIR/datas/*.proto $PROTO_DIR/game/*.proto
 
 # 统一文件权限（解决跨平台问题）
 chmod -R 755 $OUT_DIR

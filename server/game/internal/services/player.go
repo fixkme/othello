@@ -3,12 +3,15 @@ package services
 import (
 	"context"
 
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/othello/server/pb/game"
 )
 
 func (s *Service) Login(ctx context.Context, in *game.CLogin) (*game.SLogin, error) {
-
-	resp := &game.SLogin{}
+	mlog.Info("game handler CLogin:%v", in)
+	resp := &game.SLogin{
+		ServerTz: 28800000,
+	}
 	return resp, nil
 }
 

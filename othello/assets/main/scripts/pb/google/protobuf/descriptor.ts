@@ -6,6 +6,7 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { messageTypeRegistry } from "../../typeRegistry";
 
 export const protobufPackage = "google.protobuf";
 
@@ -133,11 +134,13 @@ export function editionToJSON(object: Edition): string {
  * files it parses.
  */
 export interface FileDescriptorSet {
+  $type: "google.protobuf.FileDescriptorSet";
   file: FileDescriptorProto[];
 }
 
 /** Describes a complete .proto file. */
 export interface FileDescriptorProto {
+  $type: "google.protobuf.FileDescriptorProto";
   /** file name, relative to root of source tree */
   name?:
     | string
@@ -187,6 +190,7 @@ export interface FileDescriptorProto {
 
 /** Describes a message type. */
 export interface DescriptorProto {
+  $type: "google.protobuf.DescriptorProto";
   name?: string | undefined;
   field: FieldDescriptorProto[];
   extension: FieldDescriptorProto[];
@@ -204,6 +208,7 @@ export interface DescriptorProto {
 }
 
 export interface DescriptorProto_ExtensionRange {
+  $type: "google.protobuf.DescriptorProto.ExtensionRange";
   /** Inclusive. */
   start?:
     | number
@@ -219,6 +224,7 @@ export interface DescriptorProto_ExtensionRange {
  * not overlap.
  */
 export interface DescriptorProto_ReservedRange {
+  $type: "google.protobuf.DescriptorProto.ReservedRange";
   /** Inclusive. */
   start?:
     | number
@@ -228,6 +234,7 @@ export interface DescriptorProto_ReservedRange {
 }
 
 export interface ExtensionRangeOptions {
+  $type: "google.protobuf.ExtensionRangeOptions";
   /** The parser stores options it doesn't recognize here. See above. */
   uninterpretedOption: UninterpretedOption[];
   /**
@@ -284,6 +291,7 @@ export function extensionRangeOptions_VerificationStateToJSON(object: ExtensionR
 }
 
 export interface ExtensionRangeOptions_Declaration {
+  $type: "google.protobuf.ExtensionRangeOptions.Declaration";
   /** The extension number declared within the extension range. */
   number?:
     | number
@@ -320,6 +328,7 @@ export interface ExtensionRangeOptions_Declaration {
 
 /** Describes a field within a message. */
 export interface FieldDescriptorProto {
+  $type: "google.protobuf.FieldDescriptorProto";
   name?: string | undefined;
   number?: number | undefined;
   label?:
@@ -600,12 +609,14 @@ export function fieldDescriptorProto_LabelToJSON(object: FieldDescriptorProto_La
 
 /** Describes a oneof. */
 export interface OneofDescriptorProto {
+  $type: "google.protobuf.OneofDescriptorProto";
   name?: string | undefined;
   options?: OneofOptions | undefined;
 }
 
 /** Describes an enum type. */
 export interface EnumDescriptorProto {
+  $type: "google.protobuf.EnumDescriptorProto";
   name?: string | undefined;
   value: EnumValueDescriptorProto[];
   options?:
@@ -633,6 +644,7 @@ export interface EnumDescriptorProto {
  * domain.
  */
 export interface EnumDescriptorProto_EnumReservedRange {
+  $type: "google.protobuf.EnumDescriptorProto.EnumReservedRange";
   /** Inclusive. */
   start?:
     | number
@@ -643,6 +655,7 @@ export interface EnumDescriptorProto_EnumReservedRange {
 
 /** Describes a value within an enum. */
 export interface EnumValueDescriptorProto {
+  $type: "google.protobuf.EnumValueDescriptorProto";
   name?: string | undefined;
   number?: number | undefined;
   options?: EnumValueOptions | undefined;
@@ -650,6 +663,7 @@ export interface EnumValueDescriptorProto {
 
 /** Describes a service. */
 export interface ServiceDescriptorProto {
+  $type: "google.protobuf.ServiceDescriptorProto";
   name?: string | undefined;
   method: MethodDescriptorProto[];
   options?: ServiceOptions | undefined;
@@ -657,6 +671,7 @@ export interface ServiceDescriptorProto {
 
 /** Describes a method of a service. */
 export interface MethodDescriptorProto {
+  $type: "google.protobuf.MethodDescriptorProto";
   name?:
     | string
     | undefined;
@@ -678,6 +693,7 @@ export interface MethodDescriptorProto {
 }
 
 export interface FileOptions {
+  $type: "google.protobuf.FileOptions";
   /**
    * Sets the Java package where classes generated from this .proto will be
    * placed.  By default, the proto package is used, but this is often
@@ -881,6 +897,7 @@ export function fileOptions_OptimizeModeToJSON(object: FileOptions_OptimizeMode)
 }
 
 export interface MessageOptions {
+  $type: "google.protobuf.MessageOptions";
   /**
    * Set true to use the old proto1 MessageSet wire format for extensions.
    * This is provided for backwards-compatibility with the MessageSet wire
@@ -973,6 +990,7 @@ export interface MessageOptions {
 }
 
 export interface FieldOptions {
+  $type: "google.protobuf.FieldOptions";
   /**
    * The ctype option instructs the C++ code generator to use a different
    * representation of the field than it normally would.  See the specific
@@ -1299,6 +1317,7 @@ export function fieldOptions_OptionTargetTypeToJSON(object: FieldOptions_OptionT
 }
 
 export interface FieldOptions_EditionDefault {
+  $type: "google.protobuf.FieldOptions.EditionDefault";
   edition?:
     | Edition
     | undefined;
@@ -1308,6 +1327,7 @@ export interface FieldOptions_EditionDefault {
 
 /** Information about the support window of a feature. */
 export interface FieldOptions_FeatureSupport {
+  $type: "google.protobuf.FieldOptions.FeatureSupport";
   /**
    * The edition that this feature was first available in.  In editions
    * earlier than this one, the default assigned to EDITION_LEGACY will be
@@ -1339,6 +1359,7 @@ export interface FieldOptions_FeatureSupport {
 }
 
 export interface OneofOptions {
+  $type: "google.protobuf.OneofOptions";
   /** Any features defined in the specific edition. */
   features?:
     | FeatureSet
@@ -1348,6 +1369,7 @@ export interface OneofOptions {
 }
 
 export interface EnumOptions {
+  $type: "google.protobuf.EnumOptions";
   /**
    * Set this option to true to allow mapping different tag names to the same
    * value.
@@ -1386,6 +1408,7 @@ export interface EnumOptions {
 }
 
 export interface EnumValueOptions {
+  $type: "google.protobuf.EnumValueOptions";
   /**
    * Is this enum value deprecated?
    * Depending on the target platform, this can emit Deprecated annotations
@@ -1416,6 +1439,7 @@ export interface EnumValueOptions {
 }
 
 export interface ServiceOptions {
+  $type: "google.protobuf.ServiceOptions";
   /** Any features defined in the specific edition. */
   features?:
     | FeatureSet
@@ -1434,6 +1458,7 @@ export interface ServiceOptions {
 }
 
 export interface MethodOptions {
+  $type: "google.protobuf.MethodOptions";
   /**
    * Is this method deprecated?
    * Depending on the target platform, this can emit Deprecated annotations
@@ -1507,6 +1532,7 @@ export function methodOptions_IdempotencyLevelToJSON(object: MethodOptions_Idemp
  * in them.
  */
 export interface UninterpretedOption {
+  $type: "google.protobuf.UninterpretedOption";
   name: UninterpretedOption_NamePart[];
   /**
    * The value of the uninterpreted option, in whatever type the tokenizer
@@ -1516,7 +1542,7 @@ export interface UninterpretedOption {
   positiveIntValue?: number | undefined;
   negativeIntValue?: number | undefined;
   doubleValue?: number | undefined;
-  stringValue?: Buffer | undefined;
+  stringValue?: Uint8Array | undefined;
   aggregateValue?: string | undefined;
 }
 
@@ -1528,6 +1554,7 @@ export interface UninterpretedOption {
  * "foo.(bar.baz).moo".
  */
 export interface UninterpretedOption_NamePart {
+  $type: "google.protobuf.UninterpretedOption.NamePart";
   namePart: string;
   isExtension: boolean;
 }
@@ -1541,6 +1568,7 @@ export interface UninterpretedOption_NamePart {
  * conflict here.
  */
 export interface FeatureSet {
+  $type: "google.protobuf.FeatureSet";
   fieldPresence?: FeatureSet_FieldPresence | undefined;
   enumType?: FeatureSet_EnumType | undefined;
   repeatedFieldEncoding?: FeatureSet_RepeatedFieldEncoding | undefined;
@@ -1796,6 +1824,7 @@ export function featureSet_JsonFormatToJSON(object: FeatureSet_JsonFormat): stri
  * for the closest matching edition, followed by proto merges.
  */
 export interface FeatureSetDefaults {
+  $type: "google.protobuf.FeatureSetDefaults";
   defaults: FeatureSetDefaults_FeatureSetEditionDefault[];
   /**
    * The minimum supported edition (inclusive) when this was constructed.
@@ -1818,6 +1847,7 @@ export interface FeatureSetDefaults {
  * be used.  This field must be in strict ascending order by edition.
  */
 export interface FeatureSetDefaults_FeatureSetEditionDefault {
+  $type: "google.protobuf.FeatureSetDefaults.FeatureSetEditionDefault";
   edition?:
     | Edition
     | undefined;
@@ -1834,6 +1864,7 @@ export interface FeatureSetDefaults_FeatureSetEditionDefault {
  * FileDescriptorProto was generated.
  */
 export interface SourceCodeInfo {
+  $type: "google.protobuf.SourceCodeInfo";
   /**
    * A Location identifies a piece of source code in a .proto file which
    * corresponds to a particular definition.  This information is intended
@@ -1883,6 +1914,7 @@ export interface SourceCodeInfo {
 }
 
 export interface SourceCodeInfo_Location {
+  $type: "google.protobuf.SourceCodeInfo.Location";
   /**
    * Identifies which part of the FileDescriptorProto was defined at this
    * location.
@@ -1977,6 +2009,7 @@ export interface SourceCodeInfo_Location {
  * source file, but may contain references to different source .proto files.
  */
 export interface GeneratedCodeInfo {
+  $type: "google.protobuf.GeneratedCodeInfo";
   /**
    * An Annotation connects some span of text in generated code to an element
    * of its generating .proto file.
@@ -1985,6 +2018,7 @@ export interface GeneratedCodeInfo {
 }
 
 export interface GeneratedCodeInfo_Annotation {
+  $type: "google.protobuf.GeneratedCodeInfo.Annotation";
   /**
    * Identifies the element in the original source .proto file. This field
    * is formatted the same as SourceCodeInfo.Location.path.
@@ -2057,10 +2091,12 @@ export function generatedCodeInfo_Annotation_SemanticToJSON(object: GeneratedCod
 }
 
 function createBaseFileDescriptorSet(): FileDescriptorSet {
-  return { file: [] };
+  return { $type: "google.protobuf.FileDescriptorSet", file: [] };
 }
 
-export const FileDescriptorSet: MessageFns<FileDescriptorSet> = {
+export const FileDescriptorSet: MessageFns<FileDescriptorSet, "google.protobuf.FileDescriptorSet"> = {
+  $type: "google.protobuf.FileDescriptorSet" as const,
+
   encode(message: FileDescriptorSet, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.file) {
       FileDescriptorProto.encode(v!, writer.uint32(10).fork()).join();
@@ -2094,6 +2130,7 @@ export const FileDescriptorSet: MessageFns<FileDescriptorSet> = {
 
   fromJSON(object: any): FileDescriptorSet {
     return {
+      $type: FileDescriptorSet.$type,
       file: globalThis.Array.isArray(object?.file) ? object.file.map((e: any) => FileDescriptorProto.fromJSON(e)) : [],
     };
   },
@@ -2116,8 +2153,11 @@ export const FileDescriptorSet: MessageFns<FileDescriptorSet> = {
   },
 };
 
+messageTypeRegistry.set(FileDescriptorSet.$type, FileDescriptorSet);
+
 function createBaseFileDescriptorProto(): FileDescriptorProto {
   return {
+    $type: "google.protobuf.FileDescriptorProto",
     name: "",
     package: "",
     dependency: [],
@@ -2134,7 +2174,9 @@ function createBaseFileDescriptorProto(): FileDescriptorProto {
   };
 }
 
-export const FileDescriptorProto: MessageFns<FileDescriptorProto> = {
+export const FileDescriptorProto: MessageFns<FileDescriptorProto, "google.protobuf.FileDescriptorProto"> = {
+  $type: "google.protobuf.FileDescriptorProto" as const,
+
   encode(message: FileDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -2324,6 +2366,7 @@ export const FileDescriptorProto: MessageFns<FileDescriptorProto> = {
 
   fromJSON(object: any): FileDescriptorProto {
     return {
+      $type: FileDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       package: isSet(object.package) ? globalThis.String(object.package) : "",
       dependency: globalThis.Array.isArray(object?.dependency)
@@ -2424,8 +2467,11 @@ export const FileDescriptorProto: MessageFns<FileDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(FileDescriptorProto.$type, FileDescriptorProto);
+
 function createBaseDescriptorProto(): DescriptorProto {
   return {
+    $type: "google.protobuf.DescriptorProto",
     name: "",
     field: [],
     extension: [],
@@ -2439,7 +2485,9 @@ function createBaseDescriptorProto(): DescriptorProto {
   };
 }
 
-export const DescriptorProto: MessageFns<DescriptorProto> = {
+export const DescriptorProto: MessageFns<DescriptorProto, "google.protobuf.DescriptorProto"> = {
+  $type: "google.protobuf.DescriptorProto" as const,
+
   encode(message: DescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -2572,6 +2620,7 @@ export const DescriptorProto: MessageFns<DescriptorProto> = {
 
   fromJSON(object: any): DescriptorProto {
     return {
+      $type: DescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       field: globalThis.Array.isArray(object?.field)
         ? object.field.map((e: any) => FieldDescriptorProto.fromJSON(e))
@@ -2657,11 +2706,18 @@ export const DescriptorProto: MessageFns<DescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(DescriptorProto.$type, DescriptorProto);
+
 function createBaseDescriptorProto_ExtensionRange(): DescriptorProto_ExtensionRange {
-  return { start: 0, end: 0, options: undefined };
+  return { $type: "google.protobuf.DescriptorProto.ExtensionRange", start: 0, end: 0, options: undefined };
 }
 
-export const DescriptorProto_ExtensionRange: MessageFns<DescriptorProto_ExtensionRange> = {
+export const DescriptorProto_ExtensionRange: MessageFns<
+  DescriptorProto_ExtensionRange,
+  "google.protobuf.DescriptorProto.ExtensionRange"
+> = {
+  $type: "google.protobuf.DescriptorProto.ExtensionRange" as const,
+
   encode(message: DescriptorProto_ExtensionRange, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.start !== undefined && message.start !== 0) {
       writer.uint32(8).int32(message.start);
@@ -2717,6 +2773,7 @@ export const DescriptorProto_ExtensionRange: MessageFns<DescriptorProto_Extensio
 
   fromJSON(object: any): DescriptorProto_ExtensionRange {
     return {
+      $type: DescriptorProto_ExtensionRange.$type,
       start: isSet(object.start) ? globalThis.Number(object.start) : 0,
       end: isSet(object.end) ? globalThis.Number(object.end) : 0,
       options: isSet(object.options) ? ExtensionRangeOptions.fromJSON(object.options) : undefined,
@@ -2753,11 +2810,18 @@ export const DescriptorProto_ExtensionRange: MessageFns<DescriptorProto_Extensio
   },
 };
 
+messageTypeRegistry.set(DescriptorProto_ExtensionRange.$type, DescriptorProto_ExtensionRange);
+
 function createBaseDescriptorProto_ReservedRange(): DescriptorProto_ReservedRange {
-  return { start: 0, end: 0 };
+  return { $type: "google.protobuf.DescriptorProto.ReservedRange", start: 0, end: 0 };
 }
 
-export const DescriptorProto_ReservedRange: MessageFns<DescriptorProto_ReservedRange> = {
+export const DescriptorProto_ReservedRange: MessageFns<
+  DescriptorProto_ReservedRange,
+  "google.protobuf.DescriptorProto.ReservedRange"
+> = {
+  $type: "google.protobuf.DescriptorProto.ReservedRange" as const,
+
   encode(message: DescriptorProto_ReservedRange, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.start !== undefined && message.start !== 0) {
       writer.uint32(8).int32(message.start);
@@ -2802,6 +2866,7 @@ export const DescriptorProto_ReservedRange: MessageFns<DescriptorProto_ReservedR
 
   fromJSON(object: any): DescriptorProto_ReservedRange {
     return {
+      $type: DescriptorProto_ReservedRange.$type,
       start: isSet(object.start) ? globalThis.Number(object.start) : 0,
       end: isSet(object.end) ? globalThis.Number(object.end) : 0,
     };
@@ -2831,11 +2896,21 @@ export const DescriptorProto_ReservedRange: MessageFns<DescriptorProto_ReservedR
   },
 };
 
+messageTypeRegistry.set(DescriptorProto_ReservedRange.$type, DescriptorProto_ReservedRange);
+
 function createBaseExtensionRangeOptions(): ExtensionRangeOptions {
-  return { uninterpretedOption: [], declaration: [], features: undefined, verification: 1 };
+  return {
+    $type: "google.protobuf.ExtensionRangeOptions",
+    uninterpretedOption: [],
+    declaration: [],
+    features: undefined,
+    verification: 1,
+  };
 }
 
-export const ExtensionRangeOptions: MessageFns<ExtensionRangeOptions> = {
+export const ExtensionRangeOptions: MessageFns<ExtensionRangeOptions, "google.protobuf.ExtensionRangeOptions"> = {
+  $type: "google.protobuf.ExtensionRangeOptions" as const,
+
   encode(message: ExtensionRangeOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.uninterpretedOption) {
       UninterpretedOption.encode(v!, writer.uint32(7994).fork()).join();
@@ -2902,6 +2977,7 @@ export const ExtensionRangeOptions: MessageFns<ExtensionRangeOptions> = {
 
   fromJSON(object: any): ExtensionRangeOptions {
     return {
+      $type: ExtensionRangeOptions.$type,
       uninterpretedOption: globalThis.Array.isArray(object?.uninterpretedOption)
         ? object.uninterpretedOption.map((e: any) => UninterpretedOption.fromJSON(e))
         : [],
@@ -2947,11 +3023,25 @@ export const ExtensionRangeOptions: MessageFns<ExtensionRangeOptions> = {
   },
 };
 
+messageTypeRegistry.set(ExtensionRangeOptions.$type, ExtensionRangeOptions);
+
 function createBaseExtensionRangeOptions_Declaration(): ExtensionRangeOptions_Declaration {
-  return { number: 0, fullName: "", type: "", reserved: false, repeated: false };
+  return {
+    $type: "google.protobuf.ExtensionRangeOptions.Declaration",
+    number: 0,
+    fullName: "",
+    type: "",
+    reserved: false,
+    repeated: false,
+  };
 }
 
-export const ExtensionRangeOptions_Declaration: MessageFns<ExtensionRangeOptions_Declaration> = {
+export const ExtensionRangeOptions_Declaration: MessageFns<
+  ExtensionRangeOptions_Declaration,
+  "google.protobuf.ExtensionRangeOptions.Declaration"
+> = {
+  $type: "google.protobuf.ExtensionRangeOptions.Declaration" as const,
+
   encode(message: ExtensionRangeOptions_Declaration, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.number !== undefined && message.number !== 0) {
       writer.uint32(8).int32(message.number);
@@ -3029,6 +3119,7 @@ export const ExtensionRangeOptions_Declaration: MessageFns<ExtensionRangeOptions
 
   fromJSON(object: any): ExtensionRangeOptions_Declaration {
     return {
+      $type: ExtensionRangeOptions_Declaration.$type,
       number: isSet(object.number) ? globalThis.Number(object.number) : 0,
       fullName: isSet(object.fullName) ? globalThis.String(object.fullName) : "",
       type: isSet(object.type) ? globalThis.String(object.type) : "",
@@ -3075,8 +3166,11 @@ export const ExtensionRangeOptions_Declaration: MessageFns<ExtensionRangeOptions
   },
 };
 
+messageTypeRegistry.set(ExtensionRangeOptions_Declaration.$type, ExtensionRangeOptions_Declaration);
+
 function createBaseFieldDescriptorProto(): FieldDescriptorProto {
   return {
+    $type: "google.protobuf.FieldDescriptorProto",
     name: "",
     number: 0,
     label: 1,
@@ -3091,7 +3185,9 @@ function createBaseFieldDescriptorProto(): FieldDescriptorProto {
   };
 }
 
-export const FieldDescriptorProto: MessageFns<FieldDescriptorProto> = {
+export const FieldDescriptorProto: MessageFns<FieldDescriptorProto, "google.protobuf.FieldDescriptorProto"> = {
+  $type: "google.protobuf.FieldDescriptorProto" as const,
+
   encode(message: FieldDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -3235,6 +3331,7 @@ export const FieldDescriptorProto: MessageFns<FieldDescriptorProto> = {
 
   fromJSON(object: any): FieldDescriptorProto {
     return {
+      $type: FieldDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       number: isSet(object.number) ? globalThis.Number(object.number) : 0,
       label: isSet(object.label) ? fieldDescriptorProto_LabelFromJSON(object.label) : 1,
@@ -3309,11 +3406,15 @@ export const FieldDescriptorProto: MessageFns<FieldDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(FieldDescriptorProto.$type, FieldDescriptorProto);
+
 function createBaseOneofDescriptorProto(): OneofDescriptorProto {
-  return { name: "", options: undefined };
+  return { $type: "google.protobuf.OneofDescriptorProto", name: "", options: undefined };
 }
 
-export const OneofDescriptorProto: MessageFns<OneofDescriptorProto> = {
+export const OneofDescriptorProto: MessageFns<OneofDescriptorProto, "google.protobuf.OneofDescriptorProto"> = {
+  $type: "google.protobuf.OneofDescriptorProto" as const,
+
   encode(message: OneofDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -3358,6 +3459,7 @@ export const OneofDescriptorProto: MessageFns<OneofDescriptorProto> = {
 
   fromJSON(object: any): OneofDescriptorProto {
     return {
+      $type: OneofDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       options: isSet(object.options) ? OneofOptions.fromJSON(object.options) : undefined,
     };
@@ -3387,11 +3489,22 @@ export const OneofDescriptorProto: MessageFns<OneofDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(OneofDescriptorProto.$type, OneofDescriptorProto);
+
 function createBaseEnumDescriptorProto(): EnumDescriptorProto {
-  return { name: "", value: [], options: undefined, reservedRange: [], reservedName: [] };
+  return {
+    $type: "google.protobuf.EnumDescriptorProto",
+    name: "",
+    value: [],
+    options: undefined,
+    reservedRange: [],
+    reservedName: [],
+  };
 }
 
-export const EnumDescriptorProto: MessageFns<EnumDescriptorProto> = {
+export const EnumDescriptorProto: MessageFns<EnumDescriptorProto, "google.protobuf.EnumDescriptorProto"> = {
+  $type: "google.protobuf.EnumDescriptorProto" as const,
+
   encode(message: EnumDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -3469,6 +3582,7 @@ export const EnumDescriptorProto: MessageFns<EnumDescriptorProto> = {
 
   fromJSON(object: any): EnumDescriptorProto {
     return {
+      $type: EnumDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       value: globalThis.Array.isArray(object?.value)
         ? object.value.map((e: any) => EnumValueDescriptorProto.fromJSON(e))
@@ -3520,11 +3634,18 @@ export const EnumDescriptorProto: MessageFns<EnumDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(EnumDescriptorProto.$type, EnumDescriptorProto);
+
 function createBaseEnumDescriptorProto_EnumReservedRange(): EnumDescriptorProto_EnumReservedRange {
-  return { start: 0, end: 0 };
+  return { $type: "google.protobuf.EnumDescriptorProto.EnumReservedRange", start: 0, end: 0 };
 }
 
-export const EnumDescriptorProto_EnumReservedRange: MessageFns<EnumDescriptorProto_EnumReservedRange> = {
+export const EnumDescriptorProto_EnumReservedRange: MessageFns<
+  EnumDescriptorProto_EnumReservedRange,
+  "google.protobuf.EnumDescriptorProto.EnumReservedRange"
+> = {
+  $type: "google.protobuf.EnumDescriptorProto.EnumReservedRange" as const,
+
   encode(message: EnumDescriptorProto_EnumReservedRange, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.start !== undefined && message.start !== 0) {
       writer.uint32(8).int32(message.start);
@@ -3569,6 +3690,7 @@ export const EnumDescriptorProto_EnumReservedRange: MessageFns<EnumDescriptorPro
 
   fromJSON(object: any): EnumDescriptorProto_EnumReservedRange {
     return {
+      $type: EnumDescriptorProto_EnumReservedRange.$type,
       start: isSet(object.start) ? globalThis.Number(object.start) : 0,
       end: isSet(object.end) ? globalThis.Number(object.end) : 0,
     };
@@ -3600,11 +3722,18 @@ export const EnumDescriptorProto_EnumReservedRange: MessageFns<EnumDescriptorPro
   },
 };
 
+messageTypeRegistry.set(EnumDescriptorProto_EnumReservedRange.$type, EnumDescriptorProto_EnumReservedRange);
+
 function createBaseEnumValueDescriptorProto(): EnumValueDescriptorProto {
-  return { name: "", number: 0, options: undefined };
+  return { $type: "google.protobuf.EnumValueDescriptorProto", name: "", number: 0, options: undefined };
 }
 
-export const EnumValueDescriptorProto: MessageFns<EnumValueDescriptorProto> = {
+export const EnumValueDescriptorProto: MessageFns<
+  EnumValueDescriptorProto,
+  "google.protobuf.EnumValueDescriptorProto"
+> = {
+  $type: "google.protobuf.EnumValueDescriptorProto" as const,
+
   encode(message: EnumValueDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -3660,6 +3789,7 @@ export const EnumValueDescriptorProto: MessageFns<EnumValueDescriptorProto> = {
 
   fromJSON(object: any): EnumValueDescriptorProto {
     return {
+      $type: EnumValueDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       number: isSet(object.number) ? globalThis.Number(object.number) : 0,
       options: isSet(object.options) ? EnumValueOptions.fromJSON(object.options) : undefined,
@@ -3694,11 +3824,15 @@ export const EnumValueDescriptorProto: MessageFns<EnumValueDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(EnumValueDescriptorProto.$type, EnumValueDescriptorProto);
+
 function createBaseServiceDescriptorProto(): ServiceDescriptorProto {
-  return { name: "", method: [], options: undefined };
+  return { $type: "google.protobuf.ServiceDescriptorProto", name: "", method: [], options: undefined };
 }
 
-export const ServiceDescriptorProto: MessageFns<ServiceDescriptorProto> = {
+export const ServiceDescriptorProto: MessageFns<ServiceDescriptorProto, "google.protobuf.ServiceDescriptorProto"> = {
+  $type: "google.protobuf.ServiceDescriptorProto" as const,
+
   encode(message: ServiceDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -3754,6 +3888,7 @@ export const ServiceDescriptorProto: MessageFns<ServiceDescriptorProto> = {
 
   fromJSON(object: any): ServiceDescriptorProto {
     return {
+      $type: ServiceDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       method: globalThis.Array.isArray(object?.method)
         ? object.method.map((e: any) => MethodDescriptorProto.fromJSON(e))
@@ -3790,8 +3925,11 @@ export const ServiceDescriptorProto: MessageFns<ServiceDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(ServiceDescriptorProto.$type, ServiceDescriptorProto);
+
 function createBaseMethodDescriptorProto(): MethodDescriptorProto {
   return {
+    $type: "google.protobuf.MethodDescriptorProto",
     name: "",
     inputType: "",
     outputType: "",
@@ -3801,7 +3939,9 @@ function createBaseMethodDescriptorProto(): MethodDescriptorProto {
   };
 }
 
-export const MethodDescriptorProto: MessageFns<MethodDescriptorProto> = {
+export const MethodDescriptorProto: MessageFns<MethodDescriptorProto, "google.protobuf.MethodDescriptorProto"> = {
+  $type: "google.protobuf.MethodDescriptorProto" as const,
+
   encode(message: MethodDescriptorProto, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined && message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -3890,6 +4030,7 @@ export const MethodDescriptorProto: MessageFns<MethodDescriptorProto> = {
 
   fromJSON(object: any): MethodDescriptorProto {
     return {
+      $type: MethodDescriptorProto.$type,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       inputType: isSet(object.inputType) ? globalThis.String(object.inputType) : "",
       outputType: isSet(object.outputType) ? globalThis.String(object.outputType) : "",
@@ -3939,8 +4080,11 @@ export const MethodDescriptorProto: MessageFns<MethodDescriptorProto> = {
   },
 };
 
+messageTypeRegistry.set(MethodDescriptorProto.$type, MethodDescriptorProto);
+
 function createBaseFileOptions(): FileOptions {
   return {
+    $type: "google.protobuf.FileOptions",
     javaPackage: "",
     javaOuterClassname: "",
     javaMultipleFiles: false,
@@ -3965,7 +4109,9 @@ function createBaseFileOptions(): FileOptions {
   };
 }
 
-export const FileOptions: MessageFns<FileOptions> = {
+export const FileOptions: MessageFns<FileOptions, "google.protobuf.FileOptions"> = {
+  $type: "google.protobuf.FileOptions" as const,
+
   encode(message: FileOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.javaPackage !== undefined && message.javaPackage !== "") {
       writer.uint32(10).string(message.javaPackage);
@@ -4219,6 +4365,7 @@ export const FileOptions: MessageFns<FileOptions> = {
 
   fromJSON(object: any): FileOptions {
     return {
+      $type: FileOptions.$type,
       javaPackage: isSet(object.javaPackage) ? globalThis.String(object.javaPackage) : "",
       javaOuterClassname: isSet(object.javaOuterClassname) ? globalThis.String(object.javaOuterClassname) : "",
       javaMultipleFiles: isSet(object.javaMultipleFiles) ? globalThis.Boolean(object.javaMultipleFiles) : false,
@@ -4347,8 +4494,11 @@ export const FileOptions: MessageFns<FileOptions> = {
   },
 };
 
+messageTypeRegistry.set(FileOptions.$type, FileOptions);
+
 function createBaseMessageOptions(): MessageOptions {
   return {
+    $type: "google.protobuf.MessageOptions",
     messageSetWireFormat: false,
     noStandardDescriptorAccessor: false,
     deprecated: false,
@@ -4359,7 +4509,9 @@ function createBaseMessageOptions(): MessageOptions {
   };
 }
 
-export const MessageOptions: MessageFns<MessageOptions> = {
+export const MessageOptions: MessageFns<MessageOptions, "google.protobuf.MessageOptions"> = {
+  $type: "google.protobuf.MessageOptions" as const,
+
   encode(message: MessageOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.messageSetWireFormat !== undefined && message.messageSetWireFormat !== false) {
       writer.uint32(8).bool(message.messageSetWireFormat);
@@ -4461,6 +4613,7 @@ export const MessageOptions: MessageFns<MessageOptions> = {
 
   fromJSON(object: any): MessageOptions {
     return {
+      $type: MessageOptions.$type,
       messageSetWireFormat: isSet(object.messageSetWireFormat)
         ? globalThis.Boolean(object.messageSetWireFormat)
         : false,
@@ -4525,8 +4678,11 @@ export const MessageOptions: MessageFns<MessageOptions> = {
   },
 };
 
+messageTypeRegistry.set(MessageOptions.$type, MessageOptions);
+
 function createBaseFieldOptions(): FieldOptions {
   return {
+    $type: "google.protobuf.FieldOptions",
     ctype: 0,
     packed: false,
     jstype: 0,
@@ -4544,7 +4700,9 @@ function createBaseFieldOptions(): FieldOptions {
   };
 }
 
-export const FieldOptions: MessageFns<FieldOptions> = {
+export const FieldOptions: MessageFns<FieldOptions, "google.protobuf.FieldOptions"> = {
+  $type: "google.protobuf.FieldOptions" as const,
+
   encode(message: FieldOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.ctype !== undefined && message.ctype !== 0) {
       writer.uint32(8).int32(message.ctype);
@@ -4733,6 +4891,7 @@ export const FieldOptions: MessageFns<FieldOptions> = {
 
   fromJSON(object: any): FieldOptions {
     return {
+      $type: FieldOptions.$type,
       ctype: isSet(object.ctype) ? fieldOptions_CTypeFromJSON(object.ctype) : 0,
       packed: isSet(object.packed) ? globalThis.Boolean(object.packed) : false,
       jstype: isSet(object.jstype) ? fieldOptions_JSTypeFromJSON(object.jstype) : 0,
@@ -4832,11 +4991,18 @@ export const FieldOptions: MessageFns<FieldOptions> = {
   },
 };
 
+messageTypeRegistry.set(FieldOptions.$type, FieldOptions);
+
 function createBaseFieldOptions_EditionDefault(): FieldOptions_EditionDefault {
-  return { edition: 0, value: "" };
+  return { $type: "google.protobuf.FieldOptions.EditionDefault", edition: 0, value: "" };
 }
 
-export const FieldOptions_EditionDefault: MessageFns<FieldOptions_EditionDefault> = {
+export const FieldOptions_EditionDefault: MessageFns<
+  FieldOptions_EditionDefault,
+  "google.protobuf.FieldOptions.EditionDefault"
+> = {
+  $type: "google.protobuf.FieldOptions.EditionDefault" as const,
+
   encode(message: FieldOptions_EditionDefault, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.edition !== undefined && message.edition !== 0) {
       writer.uint32(24).int32(message.edition);
@@ -4881,6 +5047,7 @@ export const FieldOptions_EditionDefault: MessageFns<FieldOptions_EditionDefault
 
   fromJSON(object: any): FieldOptions_EditionDefault {
     return {
+      $type: FieldOptions_EditionDefault.$type,
       edition: isSet(object.edition) ? editionFromJSON(object.edition) : 0,
       value: isSet(object.value) ? globalThis.String(object.value) : "",
     };
@@ -4908,11 +5075,24 @@ export const FieldOptions_EditionDefault: MessageFns<FieldOptions_EditionDefault
   },
 };
 
+messageTypeRegistry.set(FieldOptions_EditionDefault.$type, FieldOptions_EditionDefault);
+
 function createBaseFieldOptions_FeatureSupport(): FieldOptions_FeatureSupport {
-  return { editionIntroduced: 0, editionDeprecated: 0, deprecationWarning: "", editionRemoved: 0 };
+  return {
+    $type: "google.protobuf.FieldOptions.FeatureSupport",
+    editionIntroduced: 0,
+    editionDeprecated: 0,
+    deprecationWarning: "",
+    editionRemoved: 0,
+  };
 }
 
-export const FieldOptions_FeatureSupport: MessageFns<FieldOptions_FeatureSupport> = {
+export const FieldOptions_FeatureSupport: MessageFns<
+  FieldOptions_FeatureSupport,
+  "google.protobuf.FieldOptions.FeatureSupport"
+> = {
+  $type: "google.protobuf.FieldOptions.FeatureSupport" as const,
+
   encode(message: FieldOptions_FeatureSupport, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.editionIntroduced !== undefined && message.editionIntroduced !== 0) {
       writer.uint32(8).int32(message.editionIntroduced);
@@ -4979,6 +5159,7 @@ export const FieldOptions_FeatureSupport: MessageFns<FieldOptions_FeatureSupport
 
   fromJSON(object: any): FieldOptions_FeatureSupport {
     return {
+      $type: FieldOptions_FeatureSupport.$type,
       editionIntroduced: isSet(object.editionIntroduced) ? editionFromJSON(object.editionIntroduced) : 0,
       editionDeprecated: isSet(object.editionDeprecated) ? editionFromJSON(object.editionDeprecated) : 0,
       deprecationWarning: isSet(object.deprecationWarning) ? globalThis.String(object.deprecationWarning) : "",
@@ -5016,11 +5197,15 @@ export const FieldOptions_FeatureSupport: MessageFns<FieldOptions_FeatureSupport
   },
 };
 
+messageTypeRegistry.set(FieldOptions_FeatureSupport.$type, FieldOptions_FeatureSupport);
+
 function createBaseOneofOptions(): OneofOptions {
-  return { features: undefined, uninterpretedOption: [] };
+  return { $type: "google.protobuf.OneofOptions", features: undefined, uninterpretedOption: [] };
 }
 
-export const OneofOptions: MessageFns<OneofOptions> = {
+export const OneofOptions: MessageFns<OneofOptions, "google.protobuf.OneofOptions"> = {
+  $type: "google.protobuf.OneofOptions" as const,
+
   encode(message: OneofOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.features !== undefined) {
       FeatureSet.encode(message.features, writer.uint32(10).fork()).join();
@@ -5065,6 +5250,7 @@ export const OneofOptions: MessageFns<OneofOptions> = {
 
   fromJSON(object: any): OneofOptions {
     return {
+      $type: OneofOptions.$type,
       features: isSet(object.features) ? FeatureSet.fromJSON(object.features) : undefined,
       uninterpretedOption: globalThis.Array.isArray(object?.uninterpretedOption)
         ? object.uninterpretedOption.map((e: any) => UninterpretedOption.fromJSON(e))
@@ -5096,8 +5282,11 @@ export const OneofOptions: MessageFns<OneofOptions> = {
   },
 };
 
+messageTypeRegistry.set(OneofOptions.$type, OneofOptions);
+
 function createBaseEnumOptions(): EnumOptions {
   return {
+    $type: "google.protobuf.EnumOptions",
     allowAlias: false,
     deprecated: false,
     deprecatedLegacyJsonFieldConflicts: false,
@@ -5106,7 +5295,9 @@ function createBaseEnumOptions(): EnumOptions {
   };
 }
 
-export const EnumOptions: MessageFns<EnumOptions> = {
+export const EnumOptions: MessageFns<EnumOptions, "google.protobuf.EnumOptions"> = {
+  $type: "google.protobuf.EnumOptions" as const,
+
   encode(message: EnumOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.allowAlias !== undefined && message.allowAlias !== false) {
       writer.uint32(16).bool(message.allowAlias);
@@ -5186,6 +5377,7 @@ export const EnumOptions: MessageFns<EnumOptions> = {
 
   fromJSON(object: any): EnumOptions {
     return {
+      $type: EnumOptions.$type,
       allowAlias: isSet(object.allowAlias) ? globalThis.Boolean(object.allowAlias) : false,
       deprecated: isSet(object.deprecated) ? globalThis.Boolean(object.deprecated) : false,
       deprecatedLegacyJsonFieldConflicts: isSet(object.deprecatedLegacyJsonFieldConflicts)
@@ -5236,8 +5428,11 @@ export const EnumOptions: MessageFns<EnumOptions> = {
   },
 };
 
+messageTypeRegistry.set(EnumOptions.$type, EnumOptions);
+
 function createBaseEnumValueOptions(): EnumValueOptions {
   return {
+    $type: "google.protobuf.EnumValueOptions",
     deprecated: false,
     features: undefined,
     debugRedact: false,
@@ -5246,7 +5441,9 @@ function createBaseEnumValueOptions(): EnumValueOptions {
   };
 }
 
-export const EnumValueOptions: MessageFns<EnumValueOptions> = {
+export const EnumValueOptions: MessageFns<EnumValueOptions, "google.protobuf.EnumValueOptions"> = {
+  $type: "google.protobuf.EnumValueOptions" as const,
+
   encode(message: EnumValueOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.deprecated !== undefined && message.deprecated !== false) {
       writer.uint32(8).bool(message.deprecated);
@@ -5324,6 +5521,7 @@ export const EnumValueOptions: MessageFns<EnumValueOptions> = {
 
   fromJSON(object: any): EnumValueOptions {
     return {
+      $type: EnumValueOptions.$type,
       deprecated: isSet(object.deprecated) ? globalThis.Boolean(object.deprecated) : false,
       features: isSet(object.features) ? FeatureSet.fromJSON(object.features) : undefined,
       debugRedact: isSet(object.debugRedact) ? globalThis.Boolean(object.debugRedact) : false,
@@ -5374,11 +5572,15 @@ export const EnumValueOptions: MessageFns<EnumValueOptions> = {
   },
 };
 
+messageTypeRegistry.set(EnumValueOptions.$type, EnumValueOptions);
+
 function createBaseServiceOptions(): ServiceOptions {
-  return { features: undefined, deprecated: false, uninterpretedOption: [] };
+  return { $type: "google.protobuf.ServiceOptions", features: undefined, deprecated: false, uninterpretedOption: [] };
 }
 
-export const ServiceOptions: MessageFns<ServiceOptions> = {
+export const ServiceOptions: MessageFns<ServiceOptions, "google.protobuf.ServiceOptions"> = {
+  $type: "google.protobuf.ServiceOptions" as const,
+
   encode(message: ServiceOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.features !== undefined) {
       FeatureSet.encode(message.features, writer.uint32(274).fork()).join();
@@ -5434,6 +5636,7 @@ export const ServiceOptions: MessageFns<ServiceOptions> = {
 
   fromJSON(object: any): ServiceOptions {
     return {
+      $type: ServiceOptions.$type,
       features: isSet(object.features) ? FeatureSet.fromJSON(object.features) : undefined,
       deprecated: isSet(object.deprecated) ? globalThis.Boolean(object.deprecated) : false,
       uninterpretedOption: globalThis.Array.isArray(object?.uninterpretedOption)
@@ -5470,11 +5673,21 @@ export const ServiceOptions: MessageFns<ServiceOptions> = {
   },
 };
 
+messageTypeRegistry.set(ServiceOptions.$type, ServiceOptions);
+
 function createBaseMethodOptions(): MethodOptions {
-  return { deprecated: false, idempotencyLevel: 0, features: undefined, uninterpretedOption: [] };
+  return {
+    $type: "google.protobuf.MethodOptions",
+    deprecated: false,
+    idempotencyLevel: 0,
+    features: undefined,
+    uninterpretedOption: [],
+  };
 }
 
-export const MethodOptions: MessageFns<MethodOptions> = {
+export const MethodOptions: MessageFns<MethodOptions, "google.protobuf.MethodOptions"> = {
+  $type: "google.protobuf.MethodOptions" as const,
+
   encode(message: MethodOptions, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.deprecated !== undefined && message.deprecated !== false) {
       writer.uint32(264).bool(message.deprecated);
@@ -5541,6 +5754,7 @@ export const MethodOptions: MessageFns<MethodOptions> = {
 
   fromJSON(object: any): MethodOptions {
     return {
+      $type: MethodOptions.$type,
       deprecated: isSet(object.deprecated) ? globalThis.Boolean(object.deprecated) : false,
       idempotencyLevel: isSet(object.idempotencyLevel)
         ? methodOptions_IdempotencyLevelFromJSON(object.idempotencyLevel)
@@ -5584,19 +5798,24 @@ export const MethodOptions: MessageFns<MethodOptions> = {
   },
 };
 
+messageTypeRegistry.set(MethodOptions.$type, MethodOptions);
+
 function createBaseUninterpretedOption(): UninterpretedOption {
   return {
+    $type: "google.protobuf.UninterpretedOption",
     name: [],
     identifierValue: "",
     positiveIntValue: 0,
     negativeIntValue: 0,
     doubleValue: 0,
-    stringValue: Buffer.alloc(0),
+    stringValue: new Uint8Array(0),
     aggregateValue: "",
   };
 }
 
-export const UninterpretedOption: MessageFns<UninterpretedOption> = {
+export const UninterpretedOption: MessageFns<UninterpretedOption, "google.protobuf.UninterpretedOption"> = {
+  $type: "google.protobuf.UninterpretedOption" as const,
+
   encode(message: UninterpretedOption, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.name) {
       UninterpretedOption_NamePart.encode(v!, writer.uint32(18).fork()).join();
@@ -5674,7 +5893,7 @@ export const UninterpretedOption: MessageFns<UninterpretedOption> = {
             break;
           }
 
-          message.stringValue = Buffer.from(reader.bytes());
+          message.stringValue = reader.bytes();
           continue;
         }
         case 8: {
@@ -5696,6 +5915,7 @@ export const UninterpretedOption: MessageFns<UninterpretedOption> = {
 
   fromJSON(object: any): UninterpretedOption {
     return {
+      $type: UninterpretedOption.$type,
       name: globalThis.Array.isArray(object?.name)
         ? object.name.map((e: any) => UninterpretedOption_NamePart.fromJSON(e))
         : [],
@@ -5703,7 +5923,7 @@ export const UninterpretedOption: MessageFns<UninterpretedOption> = {
       positiveIntValue: isSet(object.positiveIntValue) ? globalThis.Number(object.positiveIntValue) : 0,
       negativeIntValue: isSet(object.negativeIntValue) ? globalThis.Number(object.negativeIntValue) : 0,
       doubleValue: isSet(object.doubleValue) ? globalThis.Number(object.doubleValue) : 0,
-      stringValue: isSet(object.stringValue) ? Buffer.from(bytesFromBase64(object.stringValue)) : Buffer.alloc(0),
+      stringValue: isSet(object.stringValue) ? bytesFromBase64(object.stringValue) : new Uint8Array(0),
       aggregateValue: isSet(object.aggregateValue) ? globalThis.String(object.aggregateValue) : "",
     };
   },
@@ -5744,17 +5964,24 @@ export const UninterpretedOption: MessageFns<UninterpretedOption> = {
     message.positiveIntValue = object.positiveIntValue ?? 0;
     message.negativeIntValue = object.negativeIntValue ?? 0;
     message.doubleValue = object.doubleValue ?? 0;
-    message.stringValue = object.stringValue ?? Buffer.alloc(0);
+    message.stringValue = object.stringValue ?? new Uint8Array(0);
     message.aggregateValue = object.aggregateValue ?? "";
     return message;
   },
 };
 
+messageTypeRegistry.set(UninterpretedOption.$type, UninterpretedOption);
+
 function createBaseUninterpretedOption_NamePart(): UninterpretedOption_NamePart {
-  return { namePart: "", isExtension: false };
+  return { $type: "google.protobuf.UninterpretedOption.NamePart", namePart: "", isExtension: false };
 }
 
-export const UninterpretedOption_NamePart: MessageFns<UninterpretedOption_NamePart> = {
+export const UninterpretedOption_NamePart: MessageFns<
+  UninterpretedOption_NamePart,
+  "google.protobuf.UninterpretedOption.NamePart"
+> = {
+  $type: "google.protobuf.UninterpretedOption.NamePart" as const,
+
   encode(message: UninterpretedOption_NamePart, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.namePart !== "") {
       writer.uint32(10).string(message.namePart);
@@ -5799,6 +6026,7 @@ export const UninterpretedOption_NamePart: MessageFns<UninterpretedOption_NamePa
 
   fromJSON(object: any): UninterpretedOption_NamePart {
     return {
+      $type: UninterpretedOption_NamePart.$type,
       namePart: isSet(object.namePart) ? globalThis.String(object.namePart) : "",
       isExtension: isSet(object.isExtension) ? globalThis.Boolean(object.isExtension) : false,
     };
@@ -5826,8 +6054,11 @@ export const UninterpretedOption_NamePart: MessageFns<UninterpretedOption_NamePa
   },
 };
 
+messageTypeRegistry.set(UninterpretedOption_NamePart.$type, UninterpretedOption_NamePart);
+
 function createBaseFeatureSet(): FeatureSet {
   return {
+    $type: "google.protobuf.FeatureSet",
     fieldPresence: 0,
     enumType: 0,
     repeatedFieldEncoding: 0,
@@ -5837,7 +6068,9 @@ function createBaseFeatureSet(): FeatureSet {
   };
 }
 
-export const FeatureSet: MessageFns<FeatureSet> = {
+export const FeatureSet: MessageFns<FeatureSet, "google.protobuf.FeatureSet"> = {
+  $type: "google.protobuf.FeatureSet" as const,
+
   encode(message: FeatureSet, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.fieldPresence !== undefined && message.fieldPresence !== 0) {
       writer.uint32(8).int32(message.fieldPresence);
@@ -5926,6 +6159,7 @@ export const FeatureSet: MessageFns<FeatureSet> = {
 
   fromJSON(object: any): FeatureSet {
     return {
+      $type: FeatureSet.$type,
       fieldPresence: isSet(object.fieldPresence) ? featureSet_FieldPresenceFromJSON(object.fieldPresence) : 0,
       enumType: isSet(object.enumType) ? featureSet_EnumTypeFromJSON(object.enumType) : 0,
       repeatedFieldEncoding: isSet(object.repeatedFieldEncoding)
@@ -5975,11 +6209,15 @@ export const FeatureSet: MessageFns<FeatureSet> = {
   },
 };
 
+messageTypeRegistry.set(FeatureSet.$type, FeatureSet);
+
 function createBaseFeatureSetDefaults(): FeatureSetDefaults {
-  return { defaults: [], minimumEdition: 0, maximumEdition: 0 };
+  return { $type: "google.protobuf.FeatureSetDefaults", defaults: [], minimumEdition: 0, maximumEdition: 0 };
 }
 
-export const FeatureSetDefaults: MessageFns<FeatureSetDefaults> = {
+export const FeatureSetDefaults: MessageFns<FeatureSetDefaults, "google.protobuf.FeatureSetDefaults"> = {
+  $type: "google.protobuf.FeatureSetDefaults" as const,
+
   encode(message: FeatureSetDefaults, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.defaults) {
       FeatureSetDefaults_FeatureSetEditionDefault.encode(v!, writer.uint32(10).fork()).join();
@@ -6035,6 +6273,7 @@ export const FeatureSetDefaults: MessageFns<FeatureSetDefaults> = {
 
   fromJSON(object: any): FeatureSetDefaults {
     return {
+      $type: FeatureSetDefaults.$type,
       defaults: globalThis.Array.isArray(object?.defaults)
         ? object.defaults.map((e: any) => FeatureSetDefaults_FeatureSetEditionDefault.fromJSON(e))
         : [],
@@ -6069,11 +6308,23 @@ export const FeatureSetDefaults: MessageFns<FeatureSetDefaults> = {
   },
 };
 
+messageTypeRegistry.set(FeatureSetDefaults.$type, FeatureSetDefaults);
+
 function createBaseFeatureSetDefaults_FeatureSetEditionDefault(): FeatureSetDefaults_FeatureSetEditionDefault {
-  return { edition: 0, overridableFeatures: undefined, fixedFeatures: undefined };
+  return {
+    $type: "google.protobuf.FeatureSetDefaults.FeatureSetEditionDefault",
+    edition: 0,
+    overridableFeatures: undefined,
+    fixedFeatures: undefined,
+  };
 }
 
-export const FeatureSetDefaults_FeatureSetEditionDefault: MessageFns<FeatureSetDefaults_FeatureSetEditionDefault> = {
+export const FeatureSetDefaults_FeatureSetEditionDefault: MessageFns<
+  FeatureSetDefaults_FeatureSetEditionDefault,
+  "google.protobuf.FeatureSetDefaults.FeatureSetEditionDefault"
+> = {
+  $type: "google.protobuf.FeatureSetDefaults.FeatureSetEditionDefault" as const,
+
   encode(
     message: FeatureSetDefaults_FeatureSetEditionDefault,
     writer: BinaryWriter = new BinaryWriter(),
@@ -6132,6 +6383,7 @@ export const FeatureSetDefaults_FeatureSetEditionDefault: MessageFns<FeatureSetD
 
   fromJSON(object: any): FeatureSetDefaults_FeatureSetEditionDefault {
     return {
+      $type: FeatureSetDefaults_FeatureSetEditionDefault.$type,
       edition: isSet(object.edition) ? editionFromJSON(object.edition) : 0,
       overridableFeatures: isSet(object.overridableFeatures)
         ? FeatureSet.fromJSON(object.overridableFeatures)
@@ -6174,11 +6426,15 @@ export const FeatureSetDefaults_FeatureSetEditionDefault: MessageFns<FeatureSetD
   },
 };
 
+messageTypeRegistry.set(FeatureSetDefaults_FeatureSetEditionDefault.$type, FeatureSetDefaults_FeatureSetEditionDefault);
+
 function createBaseSourceCodeInfo(): SourceCodeInfo {
-  return { location: [] };
+  return { $type: "google.protobuf.SourceCodeInfo", location: [] };
 }
 
-export const SourceCodeInfo: MessageFns<SourceCodeInfo> = {
+export const SourceCodeInfo: MessageFns<SourceCodeInfo, "google.protobuf.SourceCodeInfo"> = {
+  $type: "google.protobuf.SourceCodeInfo" as const,
+
   encode(message: SourceCodeInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.location) {
       SourceCodeInfo_Location.encode(v!, writer.uint32(10).fork()).join();
@@ -6212,6 +6468,7 @@ export const SourceCodeInfo: MessageFns<SourceCodeInfo> = {
 
   fromJSON(object: any): SourceCodeInfo {
     return {
+      $type: SourceCodeInfo.$type,
       location: globalThis.Array.isArray(object?.location)
         ? object.location.map((e: any) => SourceCodeInfo_Location.fromJSON(e))
         : [],
@@ -6236,11 +6493,22 @@ export const SourceCodeInfo: MessageFns<SourceCodeInfo> = {
   },
 };
 
+messageTypeRegistry.set(SourceCodeInfo.$type, SourceCodeInfo);
+
 function createBaseSourceCodeInfo_Location(): SourceCodeInfo_Location {
-  return { path: [], span: [], leadingComments: "", trailingComments: "", leadingDetachedComments: [] };
+  return {
+    $type: "google.protobuf.SourceCodeInfo.Location",
+    path: [],
+    span: [],
+    leadingComments: "",
+    trailingComments: "",
+    leadingDetachedComments: [],
+  };
 }
 
-export const SourceCodeInfo_Location: MessageFns<SourceCodeInfo_Location> = {
+export const SourceCodeInfo_Location: MessageFns<SourceCodeInfo_Location, "google.protobuf.SourceCodeInfo.Location"> = {
+  $type: "google.protobuf.SourceCodeInfo.Location" as const,
+
   encode(message: SourceCodeInfo_Location, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     writer.uint32(10).fork();
     for (const v of message.path) {
@@ -6342,6 +6610,7 @@ export const SourceCodeInfo_Location: MessageFns<SourceCodeInfo_Location> = {
 
   fromJSON(object: any): SourceCodeInfo_Location {
     return {
+      $type: SourceCodeInfo_Location.$type,
       path: globalThis.Array.isArray(object?.path) ? object.path.map((e: any) => globalThis.Number(e)) : [],
       span: globalThis.Array.isArray(object?.span) ? object.span.map((e: any) => globalThis.Number(e)) : [],
       leadingComments: isSet(object.leadingComments) ? globalThis.String(object.leadingComments) : "",
@@ -6386,11 +6655,15 @@ export const SourceCodeInfo_Location: MessageFns<SourceCodeInfo_Location> = {
   },
 };
 
+messageTypeRegistry.set(SourceCodeInfo_Location.$type, SourceCodeInfo_Location);
+
 function createBaseGeneratedCodeInfo(): GeneratedCodeInfo {
-  return { annotation: [] };
+  return { $type: "google.protobuf.GeneratedCodeInfo", annotation: [] };
 }
 
-export const GeneratedCodeInfo: MessageFns<GeneratedCodeInfo> = {
+export const GeneratedCodeInfo: MessageFns<GeneratedCodeInfo, "google.protobuf.GeneratedCodeInfo"> = {
+  $type: "google.protobuf.GeneratedCodeInfo" as const,
+
   encode(message: GeneratedCodeInfo, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.annotation) {
       GeneratedCodeInfo_Annotation.encode(v!, writer.uint32(10).fork()).join();
@@ -6424,6 +6697,7 @@ export const GeneratedCodeInfo: MessageFns<GeneratedCodeInfo> = {
 
   fromJSON(object: any): GeneratedCodeInfo {
     return {
+      $type: GeneratedCodeInfo.$type,
       annotation: globalThis.Array.isArray(object?.annotation)
         ? object.annotation.map((e: any) => GeneratedCodeInfo_Annotation.fromJSON(e))
         : [],
@@ -6448,11 +6722,25 @@ export const GeneratedCodeInfo: MessageFns<GeneratedCodeInfo> = {
   },
 };
 
+messageTypeRegistry.set(GeneratedCodeInfo.$type, GeneratedCodeInfo);
+
 function createBaseGeneratedCodeInfo_Annotation(): GeneratedCodeInfo_Annotation {
-  return { path: [], sourceFile: "", begin: 0, end: 0, semantic: 0 };
+  return {
+    $type: "google.protobuf.GeneratedCodeInfo.Annotation",
+    path: [],
+    sourceFile: "",
+    begin: 0,
+    end: 0,
+    semantic: 0,
+  };
 }
 
-export const GeneratedCodeInfo_Annotation: MessageFns<GeneratedCodeInfo_Annotation> = {
+export const GeneratedCodeInfo_Annotation: MessageFns<
+  GeneratedCodeInfo_Annotation,
+  "google.protobuf.GeneratedCodeInfo.Annotation"
+> = {
+  $type: "google.protobuf.GeneratedCodeInfo.Annotation" as const,
+
   encode(message: GeneratedCodeInfo_Annotation, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     writer.uint32(10).fork();
     for (const v of message.path) {
@@ -6542,6 +6830,7 @@ export const GeneratedCodeInfo_Annotation: MessageFns<GeneratedCodeInfo_Annotati
 
   fromJSON(object: any): GeneratedCodeInfo_Annotation {
     return {
+      $type: GeneratedCodeInfo_Annotation.$type,
       path: globalThis.Array.isArray(object?.path) ? object.path.map((e: any) => globalThis.Number(e)) : [],
       sourceFile: isSet(object.sourceFile) ? globalThis.String(object.sourceFile) : "",
       begin: isSet(object.begin) ? globalThis.Number(object.begin) : 0,
@@ -6584,12 +6873,23 @@ export const GeneratedCodeInfo_Annotation: MessageFns<GeneratedCodeInfo_Annotati
   },
 };
 
+messageTypeRegistry.set(GeneratedCodeInfo_Annotation.$type, GeneratedCodeInfo_Annotation);
+
 function bytesFromBase64(b64: string): Uint8Array {
-  return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  const bin = globalThis.atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
 }
 
 function base64FromBytes(arr: Uint8Array): string {
-  return globalThis.Buffer.from(arr).toString("base64");
+  const bin: string[] = [];
+  arr.forEach((byte) => {
+    bin.push(globalThis.String.fromCharCode(byte));
+  });
+  return globalThis.btoa(bin.join(""));
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
@@ -6597,12 +6897,12 @@ type Builtin = Date | Function | Uint8Array | string | number | boolean | undefi
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T extends {} ? { [K in Exclude<keyof T, "$type">]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P> | "$type">]: never };
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
@@ -6619,7 +6919,8 @@ function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
 
-export interface MessageFns<T> {
+export interface MessageFns<T, V extends string> {
+  readonly $type: V;
   encode(message: T, writer?: BinaryWriter): BinaryWriter;
   decode(input: BinaryReader | Uint8Array, length?: number): T;
   fromJSON(object: any): T;

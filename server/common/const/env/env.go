@@ -6,8 +6,10 @@ import (
 )
 
 const (
-	APP_RpcListenAddr = "RPC_LISTEN_ADDR"
-	APP_RpcAddr       = "RPC_ADDR"
+	APP_GateListenAddr = "GATE_LISTEN_ADDR" //gate监听地址
+	APP_RpcListenAddr  = "RPC_LISTEN_ADDR"  //用于服务端监听的地址
+	APP_RpcAddr        = "RPC_ADDR"         //用于rpc客户端连接服务的地址
+	APP_EtcdEndpoints  = "ETC_ENDPOINTS"    //etcd服务地址，用','隔开
 )
 
 func GetEnvInt(key string) int {

@@ -1,12 +1,11 @@
-package logic
+package internal
 
 import (
-	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
+	"github.com/fixkme/othello/server/pb/gate"
+
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/util/app"
-	mrpc "github.com/fixkme/othello/server/game/internal/rpc"
-	"github.com/fixkme/othello/server/game/internal/services"
-	"github.com/fixkme/othello/server/pb/game"
 )
 
 type LogicModule struct {
@@ -20,12 +19,16 @@ func NewLogicModule() app.Module {
 }
 
 func (m *LogicModule) OnInit() error {
-	err := mrpc.Module.GetRpcImp().RegisterService("game1", func(rpcSrv *rpc.Server, nodeName string) error {
+	err := RpcModule.GetRpcImp().RegisterService("gate1", func(rpcSrv *rpc.Server, nodeName string) error {
 		mlog.Info("RegisterService succeed %v", nodeName)
-		game.RegisterGameServer(rpcSrv, &services.Service{})
+		gate.RegisterGateServer(rpcSrv, &Service{})
 		return nil
 	})
-	return err
+	if err != nil {
+		mlog.Error("RegisterService failed %v", err)
+		return err
+	}
+	return nil
 }
 
 func (m *LogicModule) Run() {

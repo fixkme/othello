@@ -3,10 +3,11 @@ package framework
 import (
 	"context"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/cloudwego/netpoll"
-	"github.com/fixkme/gokit/log"
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/gokit/servicediscovery/impl/etcd"
 	"github.com/fixkme/othello/server/common/const/env"
@@ -37,9 +38,10 @@ func CreateRpcModule(name string, dispatcher rpc.DispatchHash, handlerFunc rpc.R
 		DispatcherFunc: dispatcher,
 		HandlerFunc:    handlerFunc,
 	}
+	etcdAddrs := env.GetEnvStr(env.APP_EtcdEndpoints)
 	etcdOpt := &etcd.EtcdOpt{
 		Config: clientv3.Config{
-			Endpoints:            []string{"127.0.0.1:2379"},
+			Endpoints:            strings.Split(etcdAddrs, ","),
 			DialTimeout:          5 * time.Second,
 			DialKeepAliveTime:    5 * time.Second,
 			DialKeepAliveTimeout: 3 * time.Second,
@@ -76,7 +78,7 @@ func (m *RpcModule) Run() {
 func (m *RpcModule) OnDestroy() {
 	err := m.rpcer.Stop()
 	if err != nil {
-		log.Error("%v module stop error: %v", m.name, err)
+		mlog.Error("%v module stop error: %v", m.name, err)
 	}
 }
 
@@ -104,9 +106,9 @@ func RpcHandlerFunc(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 		rc.ReplyErr = err
 	}
 	if rc.ReplyErr == nil {
-		log.Info("rpc handler msg succeed, req_data:%v, rsp_data:%v", argMsg, rc.Reply)
+		mlog.Info("rpc handler msg succeed, req_data:%v, rsp_data:%v", argMsg, rc.Reply)
 	} else {
-		log.Error("rpc handler msg failed, req_data:%v, err:%v", argMsg, rc.ReplyErr)
+		mlog.Error("rpc handler msg failed, req_data:%v, err:%v", argMsg, rc.ReplyErr)
 	}
 	ser(rc, false)
 }

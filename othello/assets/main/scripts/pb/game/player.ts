@@ -8,49 +8,60 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { PlayerInfo, TableInfo } from "../datas/player_data";
 import { PlayerModel } from "../models/player_model";
+import { messageTypeRegistry } from "../typeRegistry";
 
 export const protobufPackage = "game";
 
 export interface CLogin {
+  $type: "game.CLogin";
   playerId: number;
 }
 
 export interface SLogin {
+  $type: "game.SLogin";
   playerData: PlayerModel | undefined;
   serverTz: number;
 }
 
 export interface CEnterGame {
+  $type: "game.CEnterGame";
 }
 
 export interface SEnterGame {
+  $type: "game.SEnterGame";
   tableInfo: TableInfo | undefined;
 }
 
 export interface PPlayerEnterGame {
+  $type: "game.PPlayerEnterGame";
   playerInfo: PlayerInfo | undefined;
 }
 
 export interface CPlacePiece {
+  $type: "game.CPlacePiece";
   pieceType: number;
   x: number;
   y: number;
 }
 
 export interface SPlacePiece {
+  $type: "game.SPlacePiece";
 }
 
 export interface PPlacePiece {
+  $type: "game.PPlacePiece";
   pieceType: number;
   x: number;
   y: number;
 }
 
 function createBaseCLogin(): CLogin {
-  return { playerId: 0 };
+  return { $type: "game.CLogin", playerId: 0 };
 }
 
-export const CLogin: MessageFns<CLogin> = {
+export const CLogin: MessageFns<CLogin, "game.CLogin"> = {
+  $type: "game.CLogin" as const,
+
   encode(message: CLogin, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.playerId !== 0) {
       writer.uint32(8).int64(message.playerId);
@@ -83,7 +94,7 @@ export const CLogin: MessageFns<CLogin> = {
   },
 
   fromJSON(object: any): CLogin {
-    return { playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0 };
+    return { $type: CLogin.$type, playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0 };
   },
 
   toJSON(message: CLogin): unknown {
@@ -104,11 +115,15 @@ export const CLogin: MessageFns<CLogin> = {
   },
 };
 
+messageTypeRegistry.set(CLogin.$type, CLogin);
+
 function createBaseSLogin(): SLogin {
-  return { playerData: undefined, serverTz: 0 };
+  return { $type: "game.SLogin", playerData: undefined, serverTz: 0 };
 }
 
-export const SLogin: MessageFns<SLogin> = {
+export const SLogin: MessageFns<SLogin, "game.SLogin"> = {
+  $type: "game.SLogin" as const,
+
   encode(message: SLogin, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.playerData !== undefined) {
       PlayerModel.encode(message.playerData, writer.uint32(10).fork()).join();
@@ -153,6 +168,7 @@ export const SLogin: MessageFns<SLogin> = {
 
   fromJSON(object: any): SLogin {
     return {
+      $type: SLogin.$type,
       playerData: isSet(object.playerData) ? PlayerModel.fromJSON(object.playerData) : undefined,
       serverTz: isSet(object.serverTz) ? globalThis.Number(object.serverTz) : 0,
     };
@@ -182,11 +198,15 @@ export const SLogin: MessageFns<SLogin> = {
   },
 };
 
+messageTypeRegistry.set(SLogin.$type, SLogin);
+
 function createBaseCEnterGame(): CEnterGame {
-  return {};
+  return { $type: "game.CEnterGame" };
 }
 
-export const CEnterGame: MessageFns<CEnterGame> = {
+export const CEnterGame: MessageFns<CEnterGame, "game.CEnterGame"> = {
+  $type: "game.CEnterGame" as const,
+
   encode(_: CEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     return writer;
   },
@@ -208,7 +228,7 @@ export const CEnterGame: MessageFns<CEnterGame> = {
   },
 
   fromJSON(_: any): CEnterGame {
-    return {};
+    return { $type: CEnterGame.$type };
   },
 
   toJSON(_: CEnterGame): unknown {
@@ -225,11 +245,15 @@ export const CEnterGame: MessageFns<CEnterGame> = {
   },
 };
 
+messageTypeRegistry.set(CEnterGame.$type, CEnterGame);
+
 function createBaseSEnterGame(): SEnterGame {
-  return { tableInfo: undefined };
+  return { $type: "game.SEnterGame", tableInfo: undefined };
 }
 
-export const SEnterGame: MessageFns<SEnterGame> = {
+export const SEnterGame: MessageFns<SEnterGame, "game.SEnterGame"> = {
+  $type: "game.SEnterGame" as const,
+
   encode(message: SEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.tableInfo !== undefined) {
       TableInfo.encode(message.tableInfo, writer.uint32(10).fork()).join();
@@ -262,7 +286,10 @@ export const SEnterGame: MessageFns<SEnterGame> = {
   },
 
   fromJSON(object: any): SEnterGame {
-    return { tableInfo: isSet(object.tableInfo) ? TableInfo.fromJSON(object.tableInfo) : undefined };
+    return {
+      $type: SEnterGame.$type,
+      tableInfo: isSet(object.tableInfo) ? TableInfo.fromJSON(object.tableInfo) : undefined,
+    };
   },
 
   toJSON(message: SEnterGame): unknown {
@@ -285,11 +312,15 @@ export const SEnterGame: MessageFns<SEnterGame> = {
   },
 };
 
+messageTypeRegistry.set(SEnterGame.$type, SEnterGame);
+
 function createBasePPlayerEnterGame(): PPlayerEnterGame {
-  return { playerInfo: undefined };
+  return { $type: "game.PPlayerEnterGame", playerInfo: undefined };
 }
 
-export const PPlayerEnterGame: MessageFns<PPlayerEnterGame> = {
+export const PPlayerEnterGame: MessageFns<PPlayerEnterGame, "game.PPlayerEnterGame"> = {
+  $type: "game.PPlayerEnterGame" as const,
+
   encode(message: PPlayerEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.playerInfo !== undefined) {
       PlayerInfo.encode(message.playerInfo, writer.uint32(10).fork()).join();
@@ -322,7 +353,10 @@ export const PPlayerEnterGame: MessageFns<PPlayerEnterGame> = {
   },
 
   fromJSON(object: any): PPlayerEnterGame {
-    return { playerInfo: isSet(object.playerInfo) ? PlayerInfo.fromJSON(object.playerInfo) : undefined };
+    return {
+      $type: PPlayerEnterGame.$type,
+      playerInfo: isSet(object.playerInfo) ? PlayerInfo.fromJSON(object.playerInfo) : undefined,
+    };
   },
 
   toJSON(message: PPlayerEnterGame): unknown {
@@ -345,11 +379,15 @@ export const PPlayerEnterGame: MessageFns<PPlayerEnterGame> = {
   },
 };
 
+messageTypeRegistry.set(PPlayerEnterGame.$type, PPlayerEnterGame);
+
 function createBaseCPlacePiece(): CPlacePiece {
-  return { pieceType: 0, x: 0, y: 0 };
+  return { $type: "game.CPlacePiece", pieceType: 0, x: 0, y: 0 };
 }
 
-export const CPlacePiece: MessageFns<CPlacePiece> = {
+export const CPlacePiece: MessageFns<CPlacePiece, "game.CPlacePiece"> = {
+  $type: "game.CPlacePiece" as const,
+
   encode(message: CPlacePiece, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.pieceType !== 0) {
       writer.uint32(8).int32(message.pieceType);
@@ -405,6 +443,7 @@ export const CPlacePiece: MessageFns<CPlacePiece> = {
 
   fromJSON(object: any): CPlacePiece {
     return {
+      $type: CPlacePiece.$type,
       pieceType: isSet(object.pieceType) ? globalThis.Number(object.pieceType) : 0,
       x: isSet(object.x) ? globalThis.Number(object.x) : 0,
       y: isSet(object.y) ? globalThis.Number(object.y) : 0,
@@ -437,11 +476,15 @@ export const CPlacePiece: MessageFns<CPlacePiece> = {
   },
 };
 
+messageTypeRegistry.set(CPlacePiece.$type, CPlacePiece);
+
 function createBaseSPlacePiece(): SPlacePiece {
-  return {};
+  return { $type: "game.SPlacePiece" };
 }
 
-export const SPlacePiece: MessageFns<SPlacePiece> = {
+export const SPlacePiece: MessageFns<SPlacePiece, "game.SPlacePiece"> = {
+  $type: "game.SPlacePiece" as const,
+
   encode(_: SPlacePiece, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     return writer;
   },
@@ -463,7 +506,7 @@ export const SPlacePiece: MessageFns<SPlacePiece> = {
   },
 
   fromJSON(_: any): SPlacePiece {
-    return {};
+    return { $type: SPlacePiece.$type };
   },
 
   toJSON(_: SPlacePiece): unknown {
@@ -480,11 +523,15 @@ export const SPlacePiece: MessageFns<SPlacePiece> = {
   },
 };
 
+messageTypeRegistry.set(SPlacePiece.$type, SPlacePiece);
+
 function createBasePPlacePiece(): PPlacePiece {
-  return { pieceType: 0, x: 0, y: 0 };
+  return { $type: "game.PPlacePiece", pieceType: 0, x: 0, y: 0 };
 }
 
-export const PPlacePiece: MessageFns<PPlacePiece> = {
+export const PPlacePiece: MessageFns<PPlacePiece, "game.PPlacePiece"> = {
+  $type: "game.PPlacePiece" as const,
+
   encode(message: PPlacePiece, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.pieceType !== 0) {
       writer.uint32(8).int32(message.pieceType);
@@ -540,6 +587,7 @@ export const PPlacePiece: MessageFns<PPlacePiece> = {
 
   fromJSON(object: any): PPlacePiece {
     return {
+      $type: PPlacePiece.$type,
       pieceType: isSet(object.pieceType) ? globalThis.Number(object.pieceType) : 0,
       x: isSet(object.x) ? globalThis.Number(object.x) : 0,
       y: isSet(object.y) ? globalThis.Number(object.y) : 0,
@@ -572,17 +620,19 @@ export const PPlacePiece: MessageFns<PPlacePiece> = {
   },
 };
 
+messageTypeRegistry.set(PPlacePiece.$type, PPlacePiece);
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : T extends {} ? { [K in Exclude<keyof T, "$type">]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P> | "$type">]: never };
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());
@@ -599,7 +649,8 @@ function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
 
-export interface MessageFns<T> {
+export interface MessageFns<T, V extends string> {
+  readonly $type: V;
   encode(message: T, writer?: BinaryWriter): BinaryWriter;
   decode(input: BinaryReader | Uint8Array, length?: number): T;
   fromJSON(object: any): T;

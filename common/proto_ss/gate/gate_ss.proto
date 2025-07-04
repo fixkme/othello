@@ -1,0 +1,13 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/gate";
+package gate;
+
+import "ws/ws.proto";
+
+message CNoticePlayer {
+    int64 player_id = 1;
+    repeated ws.PBPackage notices = 2;
+}
+
+message SNoticePlayer {
+}

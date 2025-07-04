@@ -2,11 +2,13 @@ package internal
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
 
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/util/app"
 	"github.com/fixkme/gokit/wsg"
+	"github.com/fixkme/othello/server/common/const/env"
 	"github.com/panjf2000/gnet/v2"
 )
 
@@ -28,13 +30,15 @@ func (s *GateServer) OnInit() error {
 		NumEventLoop: 4,
 		LockOSThread: true,
 	}
+	listenAddr := env.GetEnvStr(env.APP_GateListenAddr)
 	opt := &wsg.ServerOptions{
-		Options:     gnetOpt,
-		Addr:        "tcp://:2333",
-		OnHandshake: func(conn *wsg.Conn, r *http.Request) error { return s.routerPool.OnHandshake(conn, r) },
+		Options:       gnetOpt,
+		Addr:          fmt.Sprintf("tcp://%s", listenAddr), // "tcp://:7070",
+		OnHandshake:   func(conn *wsg.Conn, r *http.Request) error { return s.routerPool.OnHandshake(conn, r) },
+		OnClientClose: OnClientClose,
 		OnServerShutdown: func(_ gnet.Engine) {
 			s.routerPool.Stop()
-			log.Println("ws server shutdown")
+			mlog.Info("ws server shutdown")
 		},
 	}
 	s.wsServer = wsg.NewServer(opt)
@@ -45,14 +49,14 @@ func (s *GateServer) OnInit() error {
 func (s *GateServer) Run() {
 	s.routerPool.Start()
 	if err := s.wsServer.Run(); err != nil {
-		log.Fatalf("wsServer Run error: %v", err)
+		mlog.Error("wsServer Run error: %v", err)
 	}
-	log.Println("ws server exit run")
+	mlog.Info("ws server exit run")
 }
 
 func (s *GateServer) OnDestroy() {
 	if err := s.wsServer.Stop(context.Background()); err != nil {
-		log.Println("wsServer Stop error:", err)
+		mlog.Error("wsServer Stop error:%v", err)
 	}
 }
 
