@@ -13,6 +13,7 @@ import (
 )
 
 var RpcModule *framework.RpcModule
+var RpcNodeName string
 
 func DispatcherFunc(conn netpoll.Connection, rpcReq *rpc.RpcRequestMessage) int {
 	md := rpcReq.GetMd()

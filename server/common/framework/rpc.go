@@ -45,7 +45,7 @@ func CreateRpcModule(name string, dispatcher rpc.DispatchHash, handlerFunc rpc.R
 			DialTimeout:          5 * time.Second,
 			DialKeepAliveTime:    5 * time.Second,
 			DialKeepAliveTimeout: 3 * time.Second,
-			AutoSyncInterval:     5 * time.Second,
+			AutoSyncInterval:     15 * time.Second,
 		},
 	}
 	return &RpcModule{

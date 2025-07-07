@@ -14,6 +14,7 @@ import (
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/gokit/util/errs"
 	"github.com/fixkme/gokit/wsg"
+	"github.com/fixkme/othello/server/common/const/values"
 	"github.com/fixkme/othello/server/pb/ws"
 	"google.golang.org/protobuf/proto"
 )
@@ -24,10 +25,11 @@ type RoutingTask struct {
 }
 
 type RoutingWorkerImp struct {
-	tasks chan *RoutingTask
+	routingChan  chan *RoutingTask
+	rpcReplyChan chan *rpc.AsyncCallResult
 }
 
-func (r *RoutingWorkerImp) DoTask(task *RoutingTask) {
+func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 	client := task.Cli
 	// 反序列化数据
 	wsMessage := &ws.WsRequestMessage{}
@@ -40,11 +42,11 @@ func (r *RoutingWorkerImp) DoTask(task *RoutingTask) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			mlog.Error("routing player %d panic %v", client.PlayerId, r)
+			mlog.Error("routing player %d panic: %v", client.PlayerId, r)
 			err = errors.New("routing panic")
 		}
 		if err != nil {
-			replyClientResponse(client, wsMessage.Uuid, nil, nil, err)
+			replyClientResponse(client, wsMessage.Uuid, "", nil, nil, err)
 		}
 	}()
 
@@ -54,23 +56,43 @@ func (r *RoutingWorkerImp) DoTask(task *RoutingTask) {
 		return
 	}
 	service, method := v2[0], v2[1][1:]
-	serviceNode := getServiceName(client, service)
+	serviceNode := getServiceNodeName(client, service)
 	// 路由数据到game或其他
 	RpcModule.GetRpcImp().Call(serviceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
-		callOpt := &rpc.CallOption{Timeout: time.Second * 5, Async: false, AsyncRetChan: nil}
-		service = "Game"
-		rspMd, rspData, callErr := cc.Invoke(context.Background(), service, method, wsMessage.Payload, nil, callOpt)
-		replyClientResponse(client, wsMessage.Uuid, rspMd, rspData, callErr)
+		md := &rpc.Meta{}
+		md.AddStr(values.Rpc_GateId, RpcNodeName)
+		callOpt := &rpc.CallOption{
+			Timeout:      time.Second * 10,
+			Async:        true,
+			AsyncRetChan: r.rpcReplyChan,
+			ReqMd:        md,
+			PassThrough:  &RoutingRpcPassThrough{Cli: client, ReqMsgName: wsMessage.MsgName, Uuid: wsMessage.Uuid, Service: service, Method: method},
+		}
+		if _, _, _err := cc.Invoke(ctx, service, method, wsMessage.Payload, nil, callOpt); _err != nil {
+			mlog.Error("routing invoke error: %v", _err)
+			return nil, _err
+		}
 		return nil, nil
 	})
 }
 
-func replyClientResponse(cli *WsClient, uuid string, rspMd *rpc.Meta, rspData []byte, callErr error) {
-	wsRsp := &ws.WsResponseMessage{
-		Uuid:    uuid,
-		MsgName: "",
-		Payload: rspData,
-	}
+type RoutingRpcPassThrough struct {
+	Cli        *WsClient
+	ReqMsgName string
+	Uuid       string
+	Service    string
+	Method     string
+}
+
+func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
+	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
+	msgName := passData.Service + ".S" + passData.Method
+	rspData := rpcReply.Rsp.([]byte)
+	replyClientResponse(passData.Cli, passData.Uuid, msgName, rpcReply.RspMd, rspData, rpcReply.Err)
+}
+
+func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, rspData []byte, callErr error) {
+	wsRsp := &ws.WsResponseMessage{Uuid: uuid}
 	if callErr != nil {
 		codeErr, ok := callErr.(errs.CodeError)
 		if ok {
@@ -79,6 +101,29 @@ func replyClientResponse(cli *WsClient, uuid string, rspMd *rpc.Meta, rspData []
 		} else {
 			wsRsp.ErrorCode = 1
 			wsRsp.ErrorDesc = callErr.Error()
+		}
+	} else {
+		wsRsp.MsgName = msgName
+		if offsets := rspMd.IntValues(values.Rpc_NoticeOffset); len(offsets) > 0 {
+			// response
+			wsRsp.Payload = rspData[:offsets[0]]
+			// notices
+			for i := 0; i < len(offsets); i++ {
+				wsNotice := &ws.PBPackage{}
+				var pushData []byte
+				if i == len(offsets)-1 {
+					pushData = rspData[offsets[i]:]
+				} else {
+					pushData = rspData[offsets[i]:offsets[i+1]]
+				}
+				if err := proto.Unmarshal(pushData, wsNotice); err != nil {
+					mlog.Error("Unmarshal ws.PBPackage error: %v", err)
+					return
+				}
+				wsRsp.Notices = append(wsRsp.Notices, wsNotice)
+			}
+		} else {
+			wsRsp.Payload = rspData
 		}
 	}
 
@@ -93,17 +138,17 @@ func replyClientResponse(cli *WsClient, uuid string, rspMd *rpc.Meta, rspData []
 	}
 }
 
-func getServiceName(cli *WsClient, service string) string {
+func getServiceNodeName(cli *WsClient, service string) string {
 	switch service {
 	case "game":
-		return fmt.Sprintf("game%d", 1)
+		return fmt.Sprintf("game%d", 1) //fmt.Sprintf("game%d", cli.ServerId)
 	default:
 		return service
 	}
 }
 
 func (r *RoutingWorkerImp) PushData(session any, datas []byte) {
-	r.tasks <- &RoutingTask{
+	r.routingChan <- &RoutingTask{
 		Cli:   session.(*WsClient),
 		Datas: datas,
 	}
@@ -118,8 +163,10 @@ func (r *RoutingWorkerImp) Run(wg *sync.WaitGroup, quit chan struct{}) {
 		select {
 		case <-quit:
 			return
-		case task := <-r.tasks:
-			r.DoTask(task)
+		case task := <-r.routingChan:
+			r.RoutingMsg(task)
+		case rpcReply := <-r.rpcReplyChan:
+			r.ProcessRpcReply(rpcReply)
 		}
 	}
 }
@@ -146,7 +193,8 @@ func (p *_LoadBalanceImp) Start() {
 	p.workers = make([]wsg.RoutingWorker, p.workerSize)
 	for i := 0; i < p.workerSize; i++ {
 		worker := &RoutingWorkerImp{
-			tasks: make(chan *RoutingTask, p.taskSize),
+			routingChan:  make(chan *RoutingTask, p.taskSize),
+			rpcReplyChan: make(chan *rpc.AsyncCallResult, p.taskSize),
 		}
 		p.workers[i] = worker
 		p.wg.Add(1)
@@ -177,6 +225,7 @@ func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
 	conn.BindSession(cli)
 	router := p.GetOne(cli)
 	conn.BindRoutingWorker(router)
+	cli.msgWorker = router.(*RoutingWorkerImp)
 	ClientMgr.AddClient(cli)
 	mlog.Info("player %d Handshake ok", cli.PlayerId)
 	return nil

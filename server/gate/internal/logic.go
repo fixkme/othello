@@ -21,6 +21,7 @@ func NewLogicModule() app.Module {
 func (m *LogicModule) OnInit() error {
 	err := RpcModule.GetRpcImp().RegisterService("gate1", func(rpcSrv *rpc.Server, nodeName string) error {
 		mlog.Info("RegisterService succeed %v", nodeName)
+		RpcNodeName = nodeName
 		gate.RegisterGateServer(rpcSrv, &Service{})
 		return nil
 	})

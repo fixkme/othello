@@ -32,7 +32,7 @@ func start() {
 
 	wg := &sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(context.Background())
-	if err := mlog.UseDefaultLogger(ctx, wg, "../logs", "game", "debug", true); err != nil {
+	if err := mlog.UseDefaultLogger(ctx, wg, "./logs", "game", "debug", true); err != nil {
 		panic(err)
 	}
 

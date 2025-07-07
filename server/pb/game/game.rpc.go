@@ -42,7 +42,7 @@ func _Game_PlacePiece_Materializer(srv any) (proto.Message, rpc.Handler) {
 }
 
 var Game_ServiceDesc = rpc.ServiceDesc{
-	ServiceName: "Game",
+	ServiceName: "game",
 	HandlerType: (*GameServer)(nil),
 	Methods: []rpc.MethodDesc{
 		{

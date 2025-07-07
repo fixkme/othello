@@ -24,7 +24,7 @@ func _Gate_NoticePlayer_Materializer(srv any) (proto.Message, rpc.Handler) {
 }
 
 var Gate_ServiceDesc = rpc.ServiceDesc{
-	ServiceName: "Gate",
+	ServiceName: "gate",
 	HandlerType: (*GateServer)(nil),
 	Methods: []rpc.MethodDesc{
 		{

@@ -16,6 +16,6 @@ func (s *Service) NoticePlayer(ctx context.Context, in *gate.CNoticePlayer) (*ga
 	if cli == nil {
 		return nil, nil
 	}
-	// todo: send notice
+
 	return nil, nil
 }

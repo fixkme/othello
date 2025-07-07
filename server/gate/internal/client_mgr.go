@@ -8,7 +8,8 @@ import (
 )
 
 type WsClient struct {
-	conn *wsg.Conn
+	conn      *wsg.Conn
+	msgWorker *RoutingWorkerImp
 
 	Account  string
 	PlayerId int64
