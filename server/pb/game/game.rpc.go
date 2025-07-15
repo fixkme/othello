@@ -11,6 +11,7 @@ type GameServer interface {
 	EnterGame(context.Context, *CEnterGame) (*SEnterGame, error)
 	Login(context.Context, *CLogin) (*SLogin, error)
 	PlacePiece(context.Context, *CPlacePiece) (*SPlacePiece, error)
+	PlayerOffline(context.Context, *CPlayerOffline) (*SPlayerOffline, error)
 }
 
 func RegisterGameServer(s rpc.ServiceRegistrar, srv GameServer) {
@@ -41,6 +42,14 @@ func _Game_PlacePiece_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
+func _Game_PlayerOffline_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CPlayerOffline)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GameServer).PlayerOffline(ctx, req.(*CPlayerOffline))
+	}
+	return arg, h
+}
+
 var Game_ServiceDesc = rpc.ServiceDesc{
 	ServiceName: "game",
 	HandlerType: (*GameServer)(nil),
@@ -56,6 +65,10 @@ var Game_ServiceDesc = rpc.ServiceDesc{
 		{
 			MethodName: "PlacePiece",
 			Handler:    _Game_PlacePiece_Materializer,
+		},
+		{
+			MethodName: "PlayerOffline",
+			Handler:    _Game_PlayerOffline_Materializer,
 		},
 	},
 }

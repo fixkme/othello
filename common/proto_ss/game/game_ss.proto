@@ -1,0 +1,10 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/game";
+package game;
+
+message CPlayerOffline {
+    int64 player_id = 1;
+}
+
+message SPlayerOffline {
+}

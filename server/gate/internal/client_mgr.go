@@ -1,15 +1,20 @@
 package internal
 
 import (
+	"context"
 	"sync"
 
 	"github.com/fixkme/gokit/mlog"
+	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/gokit/wsg"
+	"github.com/fixkme/othello/server/common/const/values"
+	"github.com/fixkme/othello/server/common/shared"
+	"github.com/fixkme/othello/server/pb/game"
+	"google.golang.org/protobuf/proto"
 )
 
 type WsClient struct {
-	conn      *wsg.Conn
-	msgWorker *RoutingWorkerImp
+	conn *wsg.Conn
 
 	Account  string
 	PlayerId int64
@@ -49,6 +54,16 @@ func (m *ClientManager) GetClient(playerId int64) *WsClient {
 
 func OnClientClose(conn *wsg.Conn, err error) {
 	cli := conn.GetSession().(*WsClient)
-	mlog.Info("player %d ws closed, %v", cli.PlayerId, conn.RemoteAddr().String())
-	ClientMgr.RemoveClient(cli.PlayerId)
+	pid := cli.PlayerId
+	mlog.Info("player %d ws closed, addr:%s, reason:%v", pid, conn.RemoteAddr().String(), err)
+	ClientMgr.RemoveClient(pid)
+	// 通知game玩家下线
+	gameServiceNode := getServiceNodeName(cli, values.Service_Game)
+	_, callErr := RpcModule.GetRpcImp().Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
+		_err := shared.AsyncCall(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
+		return nil, _err
+	})
+	if callErr != nil {
+		mlog.Error("player %d call PlayerOffline failed, %v", pid, callErr)
+	}
 }

@@ -17,7 +17,7 @@ message PieceInfo {
 message TableInfo {
     int64 id = 1;
     int64 owner_id = 2; //房主
-    int64 player_id = 3; //对手
+    int64 oppo_id = 3; //对手
     int32 status = 4;
     int32 turn = 5; //当前操作方
     int32 black_count = 6; 

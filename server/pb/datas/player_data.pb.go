@@ -144,8 +144,8 @@ func (x *PBPieceInfo) GetColor() int32 {
 type PBTableInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	OwnerId       int64                  `protobuf:"varint,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`    //房主
-	PlayerId      int64                  `protobuf:"varint,3,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"` //对手
+	OwnerId       int64                  `protobuf:"varint,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"` //房主
+	OppoId        int64                  `protobuf:"varint,3,opt,name=oppo_id,json=oppoId,proto3" json:"oppo_id,omitempty"`    //对手
 	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
 	Turn          int32                  `protobuf:"varint,5,opt,name=turn,proto3" json:"turn,omitempty"` //当前操作方
 	BlackCount    int32                  `protobuf:"varint,6,opt,name=black_count,json=blackCount,proto3" json:"black_count,omitempty"`
@@ -201,9 +201,9 @@ func (x *PBTableInfo) GetOwnerId() int64 {
 	return 0
 }
 
-func (x *PBTableInfo) GetPlayerId() int64 {
+func (x *PBTableInfo) GetOppoId() int64 {
 	if x != nil {
-		return x.PlayerId
+		return x.OppoId
 	}
 	return 0
 }
@@ -270,11 +270,11 @@ const file_datas_player_data_proto_rawDesc = "" +
 	"\tPieceInfo\x12\f\n" +
 	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
 	"\x01y\x18\x02 \x01(\x05R\x01y\x12\x14\n" +
-	"\x05color\x18\x03 \x01(\x05R\x05color\"\xbb\x02\n" +
+	"\x05color\x18\x03 \x01(\x05R\x05color\"\xb7\x02\n" +
 	"\tTableInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x19\n" +
-	"\bowner_id\x18\x02 \x01(\x03R\aownerId\x12\x1b\n" +
-	"\tplayer_id\x18\x03 \x01(\x03R\bplayerId\x12\x16\n" +
+	"\bowner_id\x18\x02 \x01(\x03R\aownerId\x12\x17\n" +
+	"\aoppo_id\x18\x03 \x01(\x03R\x06oppoId\x12\x16\n" +
 	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x12\n" +
 	"\x04turn\x18\x05 \x01(\x05R\x04turn\x12\x1f\n" +
 	"\vblack_count\x18\x06 \x01(\x05R\n" +

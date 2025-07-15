@@ -8,8 +8,7 @@ import (
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/util/app"
 	"github.com/fixkme/othello/server/common/framework"
-	"github.com/fixkme/othello/server/game/internal/logic"
-	"github.com/fixkme/othello/server/game/internal/rpc"
+	"github.com/fixkme/othello/server/game/internal"
 )
 
 func main() {
@@ -36,11 +35,11 @@ func start() {
 		panic(err)
 	}
 
-	rpcModule := framework.CreateRpcModule("game_rpc", nil, nil)
-	rpc.Module = rpcModule
+	rpcModule := framework.CreateRpcModule("game_rpc", internal.DispatcherFunc, internal.RpcHandler)
+	internal.RpcModule = rpcModule
 	app.DefaultApp().Run(
 		rpcModule,
-		logic.NewLogicModule(),
+		internal.NewLogicModule(),
 	)
 
 	cancel()

@@ -19,4 +19,4 @@ pbext-pkg=github.com/fixkme/othello/server/pb,\
 data-pkgs=datas^models,\
 rpc-pkgs=game^gate \
 ${PROTO_DIR}/ws/*.proto ${PROTO_DIR}/datas/*.proto ${PROTO_DIR}/models/*.proto ${PROTO_DIR}/game/*.proto \
-${PROTO_SS_DIR}/gate/*.proto 
+${PROTO_SS_DIR}/gate/*.proto  ${PROTO_SS_DIR}/game/*.proto

@@ -39,6 +39,12 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 		client.conn.Close()
 		return
 	}
+	// 检查是否登录
+	if client.PlayerId == 0 && wsMessage.MsgName != "game.CLogin" {
+		mlog.Error("first msg must game.CLogin")
+		client.conn.Close()
+		return
+	}
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -61,6 +67,9 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 	RpcModule.GetRpcImp().Call(serviceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
 		md := &rpc.Meta{}
 		md.AddStr(values.Rpc_GateId, RpcNodeName)
+		if client.PlayerId != 0 {
+			md.AddInt(values.Rpc_SessionId, client.PlayerId)
+		}
 		callOpt := &rpc.CallOption{
 			Timeout:      time.Second * 10,
 			Async:        true,
@@ -86,6 +95,11 @@ type RoutingRpcPassThrough struct {
 
 func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
+	if passData.ReqMsgName == "game.CLogin" {
+		cli := passData.Cli
+		cli.PlayerId = rpcReply.RspMd.GetInt(values.Rpc_SessionId)
+		ClientMgr.AddClient(passData.Cli)
+	}
 	msgName := passData.Service + ".S" + passData.Method
 	rspData := rpcReply.Rsp.([]byte)
 	replyClientResponse(passData.Cli, passData.Uuid, msgName, rpcReply.RspMd, rspData, rpcReply.Err)
@@ -141,7 +155,7 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 func getServiceNodeName(cli *WsClient, service string) string {
 	switch service {
 	case "game":
-		return fmt.Sprintf("game%d", 1) //fmt.Sprintf("game%d", cli.ServerId)
+		return fmt.Sprintf("game.%d", 1) //fmt.Sprintf("game%d", cli.ServerId)
 	default:
 		return service
 	}
@@ -217,16 +231,15 @@ func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
 	// fmt.Printf("URL: %v\n", req.URL.String())
 	// fmt.Printf("Header: %v\n", req.Header)
 	cli := &WsClient{
-		conn:     conn,
-		Account:  req.Header.Get("x-account"),
-		PlayerId: wsg.HttpHeaderGetInt64(req.Header, "x-player-id"),
-		ServerId: wsg.HttpHeaderGetInt64(req.Header, "x-server-id"),
+		conn: conn,
+		// Account:  req.Header.Get("x-account"),
+		// PlayerId: wsg.HttpHeaderGetInt64(req.Header, "x-player-id"),
+		// ServerId: wsg.HttpHeaderGetInt64(req.Header, "x-server-id"),
 	}
 	conn.BindSession(cli)
 	router := p.GetOne(cli)
 	conn.BindRoutingWorker(router)
-	cli.msgWorker = router.(*RoutingWorkerImp)
-	ClientMgr.AddClient(cli)
+
 	mlog.Info("player %d Handshake ok", cli.PlayerId)
 	return nil
 }

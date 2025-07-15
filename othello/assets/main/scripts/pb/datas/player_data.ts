@@ -30,7 +30,7 @@ export interface TableInfo {
   /** 房主 */
   ownerId: number;
   /** 对手 */
-  playerId: number;
+  oppoId: number;
   status: number;
   /** 当前操作方 */
   turn: number;
@@ -240,7 +240,7 @@ function createBaseTableInfo(): TableInfo {
     $type: "datas.TableInfo",
     id: 0,
     ownerId: 0,
-    playerId: 0,
+    oppoId: 0,
     status: 0,
     turn: 0,
     blackCount: 0,
@@ -261,8 +261,8 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     if (message.ownerId !== 0) {
       writer.uint32(16).int64(message.ownerId);
     }
-    if (message.playerId !== 0) {
-      writer.uint32(24).int64(message.playerId);
+    if (message.oppoId !== 0) {
+      writer.uint32(24).int64(message.oppoId);
     }
     if (message.status !== 0) {
       writer.uint32(32).int32(message.status);
@@ -316,7 +316,7 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
             break;
           }
 
-          message.playerId = longToNumber(reader.int64());
+          message.oppoId = longToNumber(reader.int64());
           continue;
         }
         case 4: {
@@ -389,7 +389,7 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
       $type: TableInfo.$type,
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       ownerId: isSet(object.ownerId) ? globalThis.Number(object.ownerId) : 0,
-      playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
+      oppoId: isSet(object.oppoId) ? globalThis.Number(object.oppoId) : 0,
       status: isSet(object.status) ? globalThis.Number(object.status) : 0,
       turn: isSet(object.turn) ? globalThis.Number(object.turn) : 0,
       blackCount: isSet(object.blackCount) ? globalThis.Number(object.blackCount) : 0,
@@ -408,8 +408,8 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     if (message.ownerId !== 0) {
       obj.ownerId = Math.round(message.ownerId);
     }
-    if (message.playerId !== 0) {
-      obj.playerId = Math.round(message.playerId);
+    if (message.oppoId !== 0) {
+      obj.oppoId = Math.round(message.oppoId);
     }
     if (message.status !== 0) {
       obj.status = Math.round(message.status);
@@ -442,7 +442,7 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     const message = createBaseTableInfo();
     message.id = object.id ?? 0;
     message.ownerId = object.ownerId ?? 0;
-    message.playerId = object.playerId ?? 0;
+    message.oppoId = object.oppoId ?? 0;
     message.status = object.status ?? 0;
     message.turn = object.turn ?? 0;
     message.blackCount = object.blackCount ?? 0;

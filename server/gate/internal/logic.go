@@ -1,7 +1,10 @@
 package internal
 
 import (
+	"fmt"
+
 	"github.com/fixkme/gokit/rpc"
+	"github.com/fixkme/othello/server/common/const/values"
 	"github.com/fixkme/othello/server/pb/gate"
 
 	"github.com/fixkme/gokit/mlog"
@@ -19,7 +22,8 @@ func NewLogicModule() app.Module {
 }
 
 func (m *LogicModule) OnInit() error {
-	err := RpcModule.GetRpcImp().RegisterService("gate1", func(rpcSrv *rpc.Server, nodeName string) error {
+	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Gate, 1)
+	err := RpcModule.GetRpcImp().RegisterService(serviceNodeName, func(rpcSrv *rpc.Server, nodeName string) error {
 		mlog.Info("RegisterService succeed %v", nodeName)
 		RpcNodeName = nodeName
 		gate.RegisterGateServer(rpcSrv, &Service{})
