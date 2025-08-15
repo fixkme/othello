@@ -18,7 +18,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	req := &game.CLogin{PlayerId: 1}
+	req := &game.CLogin{Account: "acc_test"}
 	rsp := &game.SLogin{}
 	go client(req, rsp)
 	<-time.After(time.Second * 10)

@@ -4,8 +4,10 @@ package datas;
 
 message PlayerInfo {
     int64 id = 1;
-    string name = 2;
-    string portrait = 3;
+    string account = 2;
+    string name = 3;
+    string portrait = 4;
+    int64 play_piece_type = 5;
 }
 
 message PieceInfo {
@@ -23,6 +25,6 @@ message TableInfo {
     int32 black_count = 6; 
     int32 white_count = 7;
     repeated PieceInfo pieces = 8;
-    repeated PlayerInfo players = 9;
+    repeated PlayerInfo players = 9; 
     int64 created_time = 10;
 }

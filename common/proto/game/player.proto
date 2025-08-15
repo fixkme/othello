@@ -6,12 +6,13 @@ import "models/player_model.proto";
 import "datas/player_data.proto";
 
 message CLogin {
-    int64 player_id = 1;
+    string account = 1;
 }
 
 message SLogin {
     models.PlayerModel player_data = 1;
     int64 server_tz = 2;
+    int64 table_id = 3; // >0表示在房间中
 }
 
 message CEnterGame {
@@ -22,6 +23,12 @@ message SEnterGame {
 message PPlayerEnterGame {
     datas.PlayerInfo player_info = 1;
 }
+
+message CLeaveGame {
+}
+message SLeaveGame {
+}
+
 
 message CPlacePiece {
     int32 piece_type = 1;
@@ -34,4 +41,11 @@ message PPlacePiece {
     int32 piece_type = 1;
     int32 x = 2;
     int32 y = 3;
+    int32 operate_piece = 4; //当前操作的棋子
+}
+
+message PGameResult {
+    int64 winner = 1;
+    int64 loser = 2;
+    bool is_give_up = 3;
 }

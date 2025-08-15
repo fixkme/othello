@@ -24,8 +24,10 @@ const (
 type PBPlayerInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Portrait      string                 `protobuf:"bytes,3,opt,name=portrait,proto3" json:"portrait,omitempty"`
+	Account       string                 `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Portrait      string                 `protobuf:"bytes,4,opt,name=portrait,proto3" json:"portrait,omitempty"`
+	PlayPieceType int64                  `protobuf:"varint,5,opt,name=play_piece_type,json=playPieceType,proto3" json:"play_piece_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,6 +69,13 @@ func (x *PBPlayerInfo) GetId() int64 {
 	return 0
 }
 
+func (x *PBPlayerInfo) GetAccount() string {
+	if x != nil {
+		return x.Account
+	}
+	return ""
+}
+
 func (x *PBPlayerInfo) GetName() string {
 	if x != nil {
 		return x.Name
@@ -79,6 +88,13 @@ func (x *PBPlayerInfo) GetPortrait() string {
 		return x.Portrait
 	}
 	return ""
+}
+
+func (x *PBPlayerInfo) GetPlayPieceType() int64 {
+	if x != nil {
+		return x.PlayPieceType
+	}
+	return 0
 }
 
 type PBPieceInfo struct {
@@ -261,12 +277,14 @@ var File_datas_player_data_proto protoreflect.FileDescriptor
 
 const file_datas_player_data_proto_rawDesc = "" +
 	"\n" +
-	"\x17datas/player_data.proto\x12\x05datas\"L\n" +
+	"\x17datas/player_data.proto\x12\x05datas\"\x8e\x01\n" +
 	"\n" +
 	"PlayerInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
-	"\bportrait\x18\x03 \x01(\tR\bportrait\"=\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
+	"\aaccount\x18\x02 \x01(\tR\aaccount\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
+	"\bportrait\x18\x04 \x01(\tR\bportrait\x12&\n" +
+	"\x0fplay_piece_type\x18\x05 \x01(\x03R\rplayPieceType\"=\n" +
 	"\tPieceInfo\x12\f\n" +
 	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
 	"\x01y\x18\x02 \x01(\x05R\x01y\x12\x14\n" +

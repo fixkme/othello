@@ -14,6 +14,7 @@ import (
 type LogicModule struct {
 	fnChan      chan func()
 	timerCbChan chan *timer.Promise
+	timerCaller func(data any, now int64)
 	quit        chan struct{}
 	name        string
 }
@@ -32,6 +33,7 @@ func NewLogicModule() app.Module {
 
 func (m *LogicModule) OnInit() error {
 	timer.Start(m.quit)
+	m.timerCaller = global.onTimerTrigger
 	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, 1)
 	err := RpcModule.GetRpcImp().RegisterService(serviceNodeName, func(rpcSrv *rpc.Server, nodeName string) error {
 		mlog.Info("RegisterService succeed %v", nodeName)
@@ -50,7 +52,7 @@ func (m *LogicModule) Run() {
 		case fn := <-m.fnChan:
 			fn()
 		case promise := <-m.timerCbChan:
-			m.onTimerTrigger(promise)
+			m.timerCaller(promise.Data, promise.NowTs)
 			return
 		}
 	}
@@ -62,11 +64,6 @@ func (m *LogicModule) OnDestroy() {
 
 func (m *LogicModule) Name() string {
 	return m.name
-}
-
-func (m *LogicModule) onTimerTrigger(promise *timer.Promise) {
-	mlog.Info("onTimerTrigger: timerId:%d, nowTs:%d, data:%v", promise.TimerId, promise.NowTs, promise.Data)
-
 }
 
 func (m *LogicModule) CreateTimer(when int64, data any) (timerId int64, err error) {

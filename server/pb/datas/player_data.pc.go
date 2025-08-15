@@ -14,14 +14,16 @@ import (
 )
 
 type MPlayerInfo struct {
-	id       int64
-	name     string
-	portrait string
+	id            int64
+	account       string
+	name          string
+	portrait      string
+	playPieceType int64
 
 	// 自己本身的同步key,由父对象指定
 	selfSyncID string
 	// 本对象所有属性的同步key数组
-	fieldSyncIDs [3]string
+	fieldSyncIDs [5]string
 	// 收集字典,每帧清空同步
 	collector pbext.ICollector
 	// 监测变化回调
@@ -32,8 +34,10 @@ type MPlayerInfo struct {
 func NewMPlayerInfo() *MPlayerInfo {
 	m := &MPlayerInfo{}
 	m.fieldSyncIDs[0] = "id"
-	m.fieldSyncIDs[1] = "name"
-	m.fieldSyncIDs[2] = "portrait"
+	m.fieldSyncIDs[1] = "account"
+	m.fieldSyncIDs[2] = "name"
+	m.fieldSyncIDs[3] = "portrait"
+	m.fieldSyncIDs[4] = "play_piece_type"
 	return m
 }
 
@@ -52,8 +56,10 @@ func (m *MPlayerInfo) SetCollector(syncID string, collector pbext.ICollector, cb
 		syncID = syncID + "."
 	}
 	m.fieldSyncIDs[0] = syncID + "id"
-	m.fieldSyncIDs[1] = syncID + "name"
-	m.fieldSyncIDs[2] = syncID + "portrait"
+	m.fieldSyncIDs[1] = syncID + "account"
+	m.fieldSyncIDs[2] = syncID + "name"
+	m.fieldSyncIDs[3] = syncID + "portrait"
+	m.fieldSyncIDs[4] = syncID + "play_piece_type"
 }
 
 // 检查数值变化函数
@@ -77,8 +83,10 @@ func (m *MPlayerInfo) ToPB() *PBPlayerInfo {
 	}
 	pb := NewPBPlayerInfo()
 	pb.Id = m.id
+	pb.Account = m.account
 	pb.Name = m.name
 	pb.Portrait = m.portrait
+	pb.PlayPieceType = m.playPieceType
 	return pb
 }
 
@@ -88,8 +96,10 @@ func (m *MPlayerInfo) InitFromPB(pb *PBPlayerInfo) {
 		return
 	}
 	m.id = pb.Id
+	m.account = pb.Account
 	m.name = pb.Name
 	m.portrait = pb.Portrait
+	m.playPieceType = pb.PlayPieceType
 }
 
 // String 函数
@@ -99,11 +109,17 @@ func (m *MPlayerInfo) String() string {
 	strBuilder.WriteString("id:")
 	strBuilder.WriteString(fmt.Sprintf("%v", m.id))
 	strBuilder.WriteString(", ")
+	strBuilder.WriteString("account:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.account))
+	strBuilder.WriteString(", ")
 	strBuilder.WriteString("name:")
 	strBuilder.WriteString(fmt.Sprintf("%v", m.name))
 	strBuilder.WriteString(", ")
 	strBuilder.WriteString("portrait:")
 	strBuilder.WriteString(fmt.Sprintf("%v", m.portrait))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("playPieceType:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.playPieceType))
 	strBuilder.WriteString("}")
 	return strBuilder.String()
 }
@@ -124,12 +140,21 @@ func (m *MPlayerInfo) AddId(add int64) int64 {
 	return m.id
 }
 
+func (m *MPlayerInfo) GetAccount() string {
+	return m.account
+}
+
+func (m *MPlayerInfo) SetAccount(value string) {
+	m.checkDirty(m.account, value, m.fieldSyncIDs[1], true)
+	m.account = value
+}
+
 func (m *MPlayerInfo) GetName() string {
 	return m.name
 }
 
 func (m *MPlayerInfo) SetName(value string) {
-	m.checkDirty(m.name, value, m.fieldSyncIDs[1], true)
+	m.checkDirty(m.name, value, m.fieldSyncIDs[2], true)
 	m.name = value
 }
 
@@ -138,6 +163,22 @@ func (m *MPlayerInfo) GetPortrait() string {
 }
 
 func (m *MPlayerInfo) SetPortrait(value string) {
-	m.checkDirty(m.portrait, value, m.fieldSyncIDs[2], true)
+	m.checkDirty(m.portrait, value, m.fieldSyncIDs[3], true)
 	m.portrait = value
+}
+
+func (m *MPlayerInfo) GetPlayPieceType() int64 {
+	return m.playPieceType
+}
+
+func (m *MPlayerInfo) SetPlayPieceType(value int64) {
+	m.checkDirty(m.playPieceType, value, m.fieldSyncIDs[4], true)
+	m.playPieceType = value
+}
+
+func (m *MPlayerInfo) AddPlayPieceType(add int64) int64 {
+	oldValue := m.playPieceType
+	m.playPieceType += add
+	m.checkDirty(oldValue, m.playPieceType, m.fieldSyncIDs[4], true)
+	return m.playPieceType
 }

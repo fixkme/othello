@@ -9,6 +9,7 @@ import (
 
 type GameServer interface {
 	EnterGame(context.Context, *CEnterGame) (*SEnterGame, error)
+	LeaveGame(context.Context, *CLeaveGame) (*SLeaveGame, error)
 	Login(context.Context, *CLogin) (*SLogin, error)
 	PlacePiece(context.Context, *CPlacePiece) (*SPlacePiece, error)
 	PlayerOffline(context.Context, *CPlayerOffline) (*SPlayerOffline, error)
@@ -22,6 +23,14 @@ func _Game_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
 	arg := new(CEnterGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).EnterGame(ctx, req.(*CEnterGame))
+	}
+	return arg, h
+}
+
+func _Game_LeaveGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CLeaveGame)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GameServer).LeaveGame(ctx, req.(*CLeaveGame))
 	}
 	return arg, h
 }
@@ -57,6 +66,10 @@ var Game_ServiceDesc = rpc.ServiceDesc{
 		{
 			MethodName: "EnterGame",
 			Handler:    _Game_EnterGame_Materializer,
+		},
+		{
+			MethodName: "LeaveGame",
+			Handler:    _Game_LeaveGame_Materializer,
 		},
 		{
 			MethodName: "Login",
