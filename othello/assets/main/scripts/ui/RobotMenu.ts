@@ -1,6 +1,7 @@
 import { _decorator, Button, Component, Label, Slider, director, Toggle} from 'cc';
 import { StartGame } from './StartGame';
-import { Pane, GameType } from '../gameplay/Pane';
+import { Pane } from '../gameplay/Pane';
+import { GameType } from '../common/ConstValue';
 const { ccclass, property } = _decorator;
 
 @ccclass('RobotMenu')
@@ -43,12 +44,12 @@ export class RobotMenu extends Component {
     }
 
     onStartButtonClicked() {
-        if (!this.startGame.isScenePreloaded) {
+        if (!this.startGame.robotScenePreloaded) {
             console.warn('game场景尚未预加载完成');
             return;
         }
         // 加载并运行场景
-        this.startGame.targetBundle.loadScene(this.startGame.gameScene, (err, scene) => {
+        this.startGame.targetBundle.loadScene(this.startGame.gameRobotScene, (err, scene) => {
             if (err) {
                 console.error('game场景加载失败:', err);
                 return;

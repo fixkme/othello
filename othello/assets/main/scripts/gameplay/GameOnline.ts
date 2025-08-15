@@ -3,12 +3,11 @@ import { _decorator, Component, Sprite, SpriteFrame, Graphics,
     Prefab, instantiate, view, Animation,
     AudioSource} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
-import { GameType } from '../common/ConstValue';
 const { ccclass, property } = _decorator;
 
 
-@ccclass('Pane')
-export class Pane extends Component {
+@ccclass('GameOnline')
+export class GameOnline extends Component {
     // 格子的行数
     readonly rows:  number = 8;
     // 格子的列数
@@ -29,8 +28,7 @@ export class Pane extends Component {
         [null,null,null,null,null,null,null,null],
         [null,null,null,null,null,null,null,null],
     ];
-    
-    private gameType: GameType = GameType.ROBOT; 
+
     private selfPieceType: PiecesType = PiecesType.BLACK; //玩家自己的
     private opponentPieceType: PiecesType = PiecesType.WHITE; //对手的
     // 人机难度
@@ -69,20 +67,10 @@ export class Pane extends Component {
     }
 
     update(deltaTime: number) {
-        if (this.gameType == GameType.ROBOT && this.robotContinue) {
-            this.processRobot();
-        }
+        
     }
 
     initData(gameType: number, data: any) {
-        // console.log("gameType:", gameType, data);
-        this.gameType = gameType;
-        switch (gameType) {
-            case GameType.ROBOT:
-                this.selfPieceType = data.playerPieceType;
-                this.robotDifficulty = data.difficulty;
-                break;
-        }
         
     }
     
@@ -94,16 +82,6 @@ export class Pane extends Component {
         this.placePiece(4, 3, PiecesType.WHITE, false);
         this.placePiece(4, 4, PiecesType.BLACK, false);
         //this.node.getComponent(AudioSource).play();
-        switch(this.gameType) {
-            case GameType.ROBOT:
-                //console.log("selfPieceType:", this.selfPieceType, this.robotDifficulty);
-                if (this.selfPieceType == PiecesType.WHITE) {
-                    this.scheduleOnce(function () {
-                        this.robotContinue = true;
-                    }, 3);
-                }
-                break;
-        }
     }
 
     drawPane() {

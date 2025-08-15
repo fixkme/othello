@@ -13,8 +13,10 @@ export const protobufPackage = "datas";
 export interface PlayerInfo {
   $type: "datas.PlayerInfo";
   id: number;
+  account: string;
   name: string;
   portrait: string;
+  playPieceType: number;
 }
 
 export interface PieceInfo {
@@ -42,7 +44,7 @@ export interface TableInfo {
 }
 
 function createBasePlayerInfo(): PlayerInfo {
-  return { $type: "datas.PlayerInfo", id: 0, name: "", portrait: "" };
+  return { $type: "datas.PlayerInfo", id: 0, account: "", name: "", portrait: "", playPieceType: 0 };
 }
 
 export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
@@ -52,11 +54,17 @@ export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
     if (message.id !== 0) {
       writer.uint32(8).int64(message.id);
     }
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
+    }
     if (message.name !== "") {
-      writer.uint32(18).string(message.name);
+      writer.uint32(26).string(message.name);
     }
     if (message.portrait !== "") {
-      writer.uint32(26).string(message.portrait);
+      writer.uint32(34).string(message.portrait);
+    }
+    if (message.playPieceType !== 0) {
+      writer.uint32(40).int64(message.playPieceType);
     }
     return writer;
   },
@@ -81,7 +89,7 @@ export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
             break;
           }
 
-          message.name = reader.string();
+          message.account = reader.string();
           continue;
         }
         case 3: {
@@ -89,7 +97,23 @@ export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
             break;
           }
 
+          message.name = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
           message.portrait = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.playPieceType = longToNumber(reader.int64());
           continue;
         }
       }
@@ -105,8 +129,10 @@ export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
     return {
       $type: PlayerInfo.$type,
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      account: isSet(object.account) ? globalThis.String(object.account) : "",
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       portrait: isSet(object.portrait) ? globalThis.String(object.portrait) : "",
+      playPieceType: isSet(object.playPieceType) ? globalThis.Number(object.playPieceType) : 0,
     };
   },
 
@@ -115,11 +141,17 @@ export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
     if (message.id !== 0) {
       obj.id = Math.round(message.id);
     }
+    if (message.account !== "") {
+      obj.account = message.account;
+    }
     if (message.name !== "") {
       obj.name = message.name;
     }
     if (message.portrait !== "") {
       obj.portrait = message.portrait;
+    }
+    if (message.playPieceType !== 0) {
+      obj.playPieceType = Math.round(message.playPieceType);
     }
     return obj;
   },
@@ -130,8 +162,10 @@ export const PlayerInfo: MessageFns<PlayerInfo, "datas.PlayerInfo"> = {
   fromPartial<I extends Exact<DeepPartial<PlayerInfo>, I>>(object: I): PlayerInfo {
     const message = createBasePlayerInfo();
     message.id = object.id ?? 0;
+    message.account = object.account ?? "";
     message.name = object.name ?? "";
     message.portrait = object.portrait ?? "";
+    message.playPieceType = object.playPieceType ?? 0;
     return message;
   },
 };
