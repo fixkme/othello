@@ -8,11 +8,20 @@ import (
 )
 
 type GateServer interface {
+	BroadcastPlayer(context.Context, *CBroadcastPlayer) (*SBroadcastPlayer, error)
 	NoticePlayer(context.Context, *CNoticePlayer) (*SNoticePlayer, error)
 }
 
 func RegisterGateServer(s rpc.ServiceRegistrar, srv GateServer) {
 	s.RegisterService(&Gate_ServiceDesc, srv)
+}
+
+func _Gate_BroadcastPlayer_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CBroadcastPlayer)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GateServer).BroadcastPlayer(ctx, req.(*CBroadcastPlayer))
+	}
+	return arg, h
 }
 
 func _Gate_NoticePlayer_Materializer(srv any) (proto.Message, rpc.Handler) {
@@ -27,6 +36,10 @@ var Gate_ServiceDesc = rpc.ServiceDesc{
 	ServiceName: "gate",
 	HandlerType: (*GateServer)(nil),
 	Methods: []rpc.MethodDesc{
+		{
+			MethodName: "BroadcastPlayer",
+			Handler:    _Gate_BroadcastPlayer_Materializer,
+		},
 		{
 			MethodName: "NoticePlayer",
 			Handler:    _Gate_NoticePlayer_Materializer,

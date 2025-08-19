@@ -14,16 +14,24 @@ import (
 type Service struct {
 }
 
-func getContextValue(ctx context.Context) (val *rpc.Meta, err error) {
-	md, ok := ctx.Value(LogicContextKey).(*rpc.Meta)
+func getMdContextValue(ctx context.Context) (val *rpc.Meta, err error) {
+	md, ok := ctx.Value(RpcMdContext).(*rpc.Meta)
 	if !ok {
 		return nil, errors.New("context does not contain rpc.Meta")
 	}
 	return md, nil
 }
 
+func getRpcContextValue(ctx context.Context) (val *rpc.RpcContext, err error) {
+	rc, ok := ctx.Value(RpcContext).(*rpc.RpcContext)
+	if !ok {
+		return nil, errors.New("context does not contain rpc.RpcContext")
+	}
+	return rc, nil
+}
+
 func getPlayer(ctx context.Context) (player *Player, err error) {
-	md, err := getContextValue(ctx)
+	md, err := getMdContextValue(ctx)
 	if err != nil {
 		return
 	}
@@ -41,7 +49,11 @@ func getPlayer(ctx context.Context) (player *Player, err error) {
 
 func (s *Service) Login(ctx context.Context, in *game.CLogin) (*game.SLogin, error) {
 	mlog.Debug("game handler CLogin:%v", in)
-	md, err := getContextValue(ctx)
+	md, err := getMdContextValue(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rc, err := getRpcContextValue(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +72,10 @@ func (s *Service) Login(ctx context.Context, in *game.CLogin) (*game.SLogin, err
 	}
 	// 记录gateId
 	p.GateId = md.GetStr(values.Rpc_GateId)
+	// 设置session id
+	replyMd := &rpc.Meta{}
+	replyMd.SetInt(values.Rpc_SessionId, p.Id())
+	rc.ReplyMd = replyMd
 
 	resp := &game.SLogin{
 		PlayerData: p.ToPB(),

@@ -1,7 +1,22 @@
 import { _decorator, EventTarget } from 'cc';
+import { BinaryWriter, BinaryReader } from "@bufbuild/protobuf/wire"; 
+import { WsRequestMessage, WsResponseMessage } from '../pb/ws/ws';
+import { MessageType, messageTypeRegistry } from '../pb/typeRegistry';
 const { ccclass } = _decorator;
 
-type WebSocketEvent = 'open' | 'close' | 'error' | 'message' | 'raw_message';
+/**
+ * 消息实例类型（具体消息对象）
+ */
+export type MessageInstance<T extends MessageType> = ReturnType<T['decode']>;
+
+/**
+ * 类型守卫
+ */
+export function isPbMessage<T extends MessageType>(msg: any): msg is T {
+  return msg && typeof msg.$type === 'string' && typeof msg.encode === 'function';
+}
+
+//type WebSocketEvent = 'open' | 'close' | 'error' | 'message' | 'raw_message';
 
 /**
  * 全局WebSocket管理类 (单例模式)
@@ -37,6 +52,8 @@ export class GlobalWebSocket {
     
     // 二进制配置
     private _binaryType: BinaryType = "arraybuffer";
+    // msg id
+    private _msgId: number = 0;
 
     /**
      * 获取单例实例
@@ -96,54 +113,43 @@ export class GlobalWebSocket {
         let data = event.data;
         try {
             // 处理二进制数据
-            if (data instanceof ArrayBuffer) {
-                this._processBinaryData(data);
+            if (!(data instanceof ArrayBuffer)) {
+                console.error('Received non-binary data:', data);
+                return;
+            }
+            const uint8Array = new Uint8Array(data);
+            const wsMsg = WsResponseMessage.decode(uint8Array);
+            if (wsMsg == null ) {
+                console.error('decode WsResponseMessage failed:');
                 return;
             }
             
-            // 处理文本数据
-            if (typeof data === 'string') {
-                data = JSON.parse(data);
-                
-                // 心跳响应处理
-                if (data.cmd === 'pong') {
-                    this._lastPongTime = Date.now();
-                    return;
+            if (wsMsg.uuid.length > 0) {
+                // response
+                const msgType = messageTypeRegistry.get(wsMsg.msgName)
+                if (msgType != null) {
+                    const msg = msgType.decode(wsMsg.payload)
+                    this._eventTarget.emit(wsMsg.msgName, msg)
+                } else {
+                    console.warn(`unknown message type: ${wsMsg.msgName}`)
+                    this._eventTarget.emit("message", wsMsg.msgName)
                 }
             }
-            
-            // 触发特定命令事件
-            if (data.cmd) {
-                this._eventTarget.emit(data.cmd, data);
+            if (wsMsg.notices.length > 0) {
+                // push
+                wsMsg.notices.forEach((notice) => {
+                    const msgType = messageTypeRegistry.get(notice.messageType)
+                    if (msgType != null) {
+                        const msg = msgType.decode(notice.messagePayload)
+                        this._eventTarget.emit(notice.messageType, msg)
+                    } else {
+                        console.warn(`unknown message type: ${notice.messageType}`)
+                        this._eventTarget.emit("message", notice.messageType)
+                    }
+                })
             }
-            
-            // 触发通用消息事件
-            this._eventTarget.emit('message', data);
         } catch (e) {
             console.error('[WebSocket] Message parse error:', e);
-            this._eventTarget.emit('raw_message', event.data);
-        }
-    }
-
-    private _processBinaryData(buffer: ArrayBuffer): void {
-        try {
-            const decoder = new TextDecoder()
-            const content = decoder.decode(buffer);
-            console.log('[WebSocket] recv Binary data:', content);
-            // const view = new DataView(buffer);
-            // const msgType = view.getInt32(0);
-            
-            // switch (msgType) {
-            //     case 1: // 示例: 位置更新
-            //         const x = view.getFloat32(4);
-            //         const y = view.getFloat32(8);
-            //         this._eventTarget.emit('binary_position', {x, y});
-            //         break;
-            //     default:
-            //         this._eventTarget.emit('binary_data', buffer);
-            // }
-        } catch (e) {
-            console.error('[WebSocket] Binary data process error:', e);
         }
     }
 
@@ -176,21 +182,19 @@ export class GlobalWebSocket {
     private _startHeartbeat(): void {
         this._stopHeartbeat();
         
-        this._heartbeatTimer = setInterval(() => {
-            // 检查心跳超时
-            if (Date.now() - this._lastPongTime > this._heartbeatTimeout) {
-                // console.warn('[WebSocket] Heartbeat timeout, reconnecting...');
-                // this.close();
-                // this.connect();
-                return;
-            }
-            
-            // 发送心跳
-            this.send({
-                cmd: 'ping',
-                timestamp: Date.now()
-            });
-        }, this._heartbeatInterval) as unknown as number;
+        if (this._heartbeatInterval > 0) {
+            this._heartbeatTimer = setInterval(() => {
+                // 检查心跳超时
+                if (Date.now() - this._lastPongTime > this._heartbeatTimeout) {
+                    // console.warn('[WebSocket] Heartbeat timeout, reconnecting...');
+                    // this.close();
+                    // this.connect();
+                    return;
+                }
+
+                // 发送心跳
+            }, this._heartbeatInterval) as unknown as number;
+        }
     }
 
     private _stopHeartbeat(): void {
@@ -267,6 +271,43 @@ export class GlobalWebSocket {
             return true;
         } catch (e) {
             console.error('[WebSocket] Send binary error:', e);
+            return false;
+        }
+    }
+
+    /**
+     * 发送protobuf Message
+     * @param msgType CLogin
+     * @param message clogin
+     * @returns 是否成功
+     */
+    sendMessage<T extends MessageType>(
+        msgType: T,
+        message: MessageInstance<T>
+    ): boolean {
+        if (!this._socket || this._socket.readyState !== WebSocket.OPEN) {
+            console.error('[WebSocket] sendMessage error, Socket is not open.');
+            return false;
+        }
+        if (!this._isConnected) {
+            console.error('[WebSocket] sendMessage error, Socket is not connected.');
+            return false;
+        }
+
+        // 序列化消息
+        this._msgId += 1;
+        const wsMsg = WsRequestMessage.create();
+        wsMsg.uuid = this._msgId.toString();
+        wsMsg.msgName = msgType.$type;
+        wsMsg.payload = msgType.encode(message).finish();
+        const wsDatas = WsRequestMessage.encode(wsMsg).finish();
+
+        // 发送
+        try {
+            this._socket?.send(wsDatas.buffer);
+            return true;
+        } catch (e) {
+            console.error('[WebSocket] sendMessage _socket send error:', e);
             return false;
         }
     }

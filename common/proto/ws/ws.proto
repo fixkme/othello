@@ -14,24 +14,20 @@ message PBPackage
 message WsRequestMessage
 {
 	string uuid = 1;		// 消息的唯一id
-    string msgName = 2;		// request的消息名，game.CLogin
+    string msg_name = 2;		// request的消息名，game.CLogin
 	bytes payload = 3;		// 数据
 }
 
 message WsResponseMessage
 {
 	string uuid = 1;		// 和request的uuid对应
-    string msgName = 2; 	// response的消息名，game.SLogin
+    string msg_name = 2; 	// response的消息名，game.SLogin
 	bytes payload = 3; 		// 数据
     int32 error_code = 4;	// 错误码, >0 表示错误
     string error_desc = 5;	// 错误描述, error_code>0时有效
 	repeated PBPackage notices = 6; // 回应带下的推送消息
 }
 
-message WsPushMessage
-{
-	repeated PBPackage notices = 1;
-}
 
 // message WebsocketMessage
 // {

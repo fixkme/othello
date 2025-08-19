@@ -17,12 +17,13 @@ func (s *Service) NoticePlayer(ctx context.Context, in *gate.CNoticePlayer) (_ *
 		mlog.Debug("NoticePlayer notices is empty")
 		return
 	}
+	playerId := in.PlayerId
 	cli := ClientMgr.GetClient(in.PlayerId)
 	if cli == nil {
-		mlog.Debug("NoticePlayer not exist player %v", in.PlayerId)
+		mlog.Debug("NoticePlayer not exist player %v", playerId)
 		return
 	}
-	msg := &ws.WsPushMessage{Notices: in.Notices}
+	msg := &ws.WsResponseMessage{Notices: in.Notices}
 	content, err := proto.Marshal(msg)
 	if err != nil {
 		mlog.Error("NoticePlayer marshal err:%v", err)
@@ -30,7 +31,38 @@ func (s *Service) NoticePlayer(ctx context.Context, in *gate.CNoticePlayer) (_ *
 	}
 	err = cli.conn.Send(content)
 	if err != nil {
-		mlog.Error("NoticePlayer %d err:%v", in.PlayerId, err)
+		mlog.Error("NoticePlayer %d err:%v", playerId, err)
+	}
+	return
+}
+
+func (s *Service) BroadcastPlayer(ctx context.Context, in *gate.CBroadcastPlayer) (_ *gate.SBroadcastPlayer, _ error) {
+	if len(in.PlayerIds) == 0 {
+		mlog.Debug("BroadcastPlayer playerIds is empty")
+		return
+	}
+	if len(in.Notices) == 0 {
+		mlog.Debug("BroadcastPlayer notices is empty")
+		return
+	}
+
+	msg := &ws.WsResponseMessage{Notices: in.Notices}
+	content, err := proto.Marshal(msg)
+	if err != nil {
+		mlog.Error("BroadcastPlayer marshal err:%v", err)
+		return
+	}
+
+	for _, playerId := range in.PlayerIds {
+		cli := ClientMgr.GetClient(playerId)
+		if cli == nil {
+			mlog.Debug("BroadcastPlayer not exist player %v", playerId)
+			continue
+		}
+		err = cli.conn.Send(content)
+		if err != nil {
+			mlog.Error("BroadcastPlayer %d err:%v", playerId, err)
+		}
 	}
 	return
 }

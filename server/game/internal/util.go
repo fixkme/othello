@@ -15,7 +15,7 @@ func NoticePlayer(msg proto.Message, players ...*Player) error {
 	if len(players) == 0 {
 		return nil
 	}
-	msgType := string(msg.ProtoReflect().Descriptor().Name())
+	msgType := string(msg.ProtoReflect().Descriptor().FullName())
 	msgData, err := proto.Marshal(msg)
 	if err != nil {
 		return err

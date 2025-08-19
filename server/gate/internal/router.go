@@ -19,6 +19,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+const (
+	cloginMsgName = "game.CLogin"
+)
+
 type RoutingTask struct {
 	Cli   *WsClient
 	Datas []byte
@@ -95,10 +99,14 @@ type RoutingRpcPassThrough struct {
 
 func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
-	if passData.ReqMsgName == "game.CLogin" {
+	if passData.ReqMsgName == cloginMsgName {
 		cli := passData.Cli
 		cli.PlayerId = rpcReply.RspMd.GetInt(values.Rpc_SessionId)
-		ClientMgr.AddClient(passData.Cli)
+		if cli.PlayerId > 0 {
+			ClientMgr.AddClient(passData.Cli)
+		} else {
+			mlog.Error("ProcessRpcReply slogin no session id, acc:%s, rspMd:%v", cli.Account, rpcReply.RspMd)
+		}
 	}
 	msgName := passData.Service + ".S" + passData.Method
 	rspData := rpcReply.Rsp.([]byte)
@@ -228,11 +236,12 @@ func (p *_LoadBalanceImp) GetOne(cli *WsClient) wsg.RoutingWorker {
 }
 
 func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
-	// fmt.Printf("URL: %v\n", req.URL.String())
-	// fmt.Printf("Header: %v\n", req.Header)
+	params := req.URL.Query()
+	mlog.Debug("OnHandshake http.Request params: %v", params)
+
 	cli := &WsClient{
-		conn: conn,
-		// Account:  req.Header.Get("x-account"),
+		conn:    conn,
+		Account: params.Get("x-account"),
 		// PlayerId: wsg.HttpHeaderGetInt64(req.Header, "x-player-id"),
 		// ServerId: wsg.HttpHeaderGetInt64(req.Header, "x-server-id"),
 	}
@@ -240,6 +249,6 @@ func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
 	router := p.GetOne(cli)
 	conn.BindRoutingWorker(router)
 
-	mlog.Info("player %d Handshake ok", cli.PlayerId)
+	mlog.Info("player [%v] Handshake ok", cli.Account)
 	return nil
 }

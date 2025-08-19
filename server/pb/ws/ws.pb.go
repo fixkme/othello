@@ -77,9 +77,9 @@ func (x *PBPackage) GetMessagePayload() []byte {
 
 type WsRequestMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Uuid          string                 `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`       // 消息的唯一id
-	MsgName       string                 `protobuf:"bytes,2,opt,name=msgName,proto3" json:"msgName,omitempty"` // request的消息名，game.CLogin
-	Payload       []byte                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"` // 数据
+	Uuid          string                 `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`                      // 消息的唯一id
+	MsgName       string                 `protobuf:"bytes,2,opt,name=msg_name,json=msgName,proto3" json:"msg_name,omitempty"` // request的消息名，game.CLogin
+	Payload       []byte                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`                // 数据
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -138,7 +138,7 @@ func (x *WsRequestMessage) GetPayload() []byte {
 type WsResponseMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uuid          string                 `protobuf:"bytes,1,opt,name=uuid,proto3" json:"uuid,omitempty"`                             // 和request的uuid对应
-	MsgName       string                 `protobuf:"bytes,2,opt,name=msgName,proto3" json:"msgName,omitempty"`                       // response的消息名，game.SLogin
+	MsgName       string                 `protobuf:"bytes,2,opt,name=msg_name,json=msgName,proto3" json:"msg_name,omitempty"`        // response的消息名，game.SLogin
 	Payload       []byte                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`                       // 数据
 	ErrorCode     int32                  `protobuf:"varint,4,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"` // 错误码, >0 表示错误
 	ErrorDesc     string                 `protobuf:"bytes,5,opt,name=error_desc,json=errorDesc,proto3" json:"error_desc,omitempty"`  // 错误描述, error_code>0时有效
@@ -219,50 +219,6 @@ func (x *WsResponseMessage) GetNotices() []*PBPackage {
 	return nil
 }
 
-type WsPushMessage struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Notices       []*PBPackage           `protobuf:"bytes,1,rep,name=notices,proto3" json:"notices,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *WsPushMessage) Reset() {
-	*x = WsPushMessage{}
-	mi := &file_ws_ws_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *WsPushMessage) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WsPushMessage) ProtoMessage() {}
-
-func (x *WsPushMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_ws_ws_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WsPushMessage.ProtoReflect.Descriptor instead.
-func (*WsPushMessage) Descriptor() ([]byte, []int) {
-	return file_ws_ws_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *WsPushMessage) GetNotices() []*PBPackage {
-	if x != nil {
-		return x.Notices
-	}
-	return nil
-}
-
 var File_ws_ws_proto protoreflect.FileDescriptor
 
 const file_ws_ws_proto_rawDesc = "" +
@@ -270,22 +226,20 @@ const file_ws_ws_proto_rawDesc = "" +
 	"\vws/ws.proto\x12\x02ws\"W\n" +
 	"\tPBPackage\x12!\n" +
 	"\fmessage_type\x18\x01 \x01(\tR\vmessageType\x12'\n" +
-	"\x0fmessage_payload\x18\x02 \x01(\fR\x0emessagePayload\"Z\n" +
+	"\x0fmessage_payload\x18\x02 \x01(\fR\x0emessagePayload\"[\n" +
 	"\x10WsRequestMessage\x12\x12\n" +
-	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x18\n" +
-	"\amsgName\x18\x02 \x01(\tR\amsgName\x12\x18\n" +
-	"\apayload\x18\x03 \x01(\fR\apayload\"\xc2\x01\n" +
+	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x19\n" +
+	"\bmsg_name\x18\x02 \x01(\tR\amsgName\x12\x18\n" +
+	"\apayload\x18\x03 \x01(\fR\apayload\"\xc3\x01\n" +
 	"\x11WsResponseMessage\x12\x12\n" +
-	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x18\n" +
-	"\amsgName\x18\x02 \x01(\tR\amsgName\x12\x18\n" +
+	"\x04uuid\x18\x01 \x01(\tR\x04uuid\x12\x19\n" +
+	"\bmsg_name\x18\x02 \x01(\tR\amsgName\x12\x18\n" +
 	"\apayload\x18\x03 \x01(\fR\apayload\x12\x1d\n" +
 	"\n" +
 	"error_code\x18\x04 \x01(\x05R\terrorCode\x12\x1d\n" +
 	"\n" +
 	"error_desc\x18\x05 \x01(\tR\terrorDesc\x12'\n" +
-	"\anotices\x18\x06 \x03(\v2\r.ws.PBPackageR\anotices\"8\n" +
-	"\rWsPushMessage\x12'\n" +
-	"\anotices\x18\x01 \x03(\v2\r.ws.PBPackageR\anoticesB(Z&github.com/fixkme/othello/server/pb/wsb\x06proto3"
+	"\anotices\x18\x06 \x03(\v2\r.ws.PBPackageR\anoticesB(Z&github.com/fixkme/othello/server/pb/wsb\x06proto3"
 
 var (
 	file_ws_ws_proto_rawDescOnce sync.Once
@@ -299,21 +253,19 @@ func file_ws_ws_proto_rawDescGZIP() []byte {
 	return file_ws_ws_proto_rawDescData
 }
 
-var file_ws_ws_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_ws_ws_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_ws_ws_proto_goTypes = []any{
 	(*PBPackage)(nil),         // 0: ws.PBPackage
 	(*WsRequestMessage)(nil),  // 1: ws.WsRequestMessage
 	(*WsResponseMessage)(nil), // 2: ws.WsResponseMessage
-	(*WsPushMessage)(nil),     // 3: ws.WsPushMessage
 }
 var file_ws_ws_proto_depIdxs = []int32{
 	0, // 0: ws.WsResponseMessage.notices:type_name -> ws.PBPackage
-	0, // 1: ws.WsPushMessage.notices:type_name -> ws.PBPackage
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_ws_ws_proto_init() }
@@ -327,7 +279,7 @@ func file_ws_ws_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ws_ws_proto_rawDesc), len(file_ws_ws_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -4,7 +4,8 @@ go 1.23.9
 
 require (
 	github.com/cloudwego/netpoll v0.7.0
-	github.com/fixkme/gokit v0.0.0-20250704091733-df0f95b42226
+	github.com/emirpasic/gods v1.18.1
+	github.com/fixkme/gokit v0.0.0-20250819072644-9918a4ca95c9
 	github.com/panjf2000/gnet/v2 v2.9.1
 	go.etcd.io/etcd/client/v3 v3.5.12
 	google.golang.org/protobuf v1.36.5
@@ -15,7 +16,6 @@ require (
 	github.com/cloudwego/gopkg v0.1.4 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
-	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect

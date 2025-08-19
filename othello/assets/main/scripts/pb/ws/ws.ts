@@ -44,11 +44,6 @@ export interface WsResponseMessage {
   notices: PBPackage[];
 }
 
-export interface WsPushMessage {
-  $type: "ws.WsPushMessage";
-  notices: PBPackage[];
-}
-
 function createBasePBPackage(): PBPackage {
   return { $type: "ws.PBPackage", messageType: "", messagePayload: new Uint8Array(0) };
 }
@@ -379,71 +374,6 @@ export const WsResponseMessage: MessageFns<WsResponseMessage, "ws.WsResponseMess
 };
 
 messageTypeRegistry.set(WsResponseMessage.$type, WsResponseMessage);
-
-function createBaseWsPushMessage(): WsPushMessage {
-  return { $type: "ws.WsPushMessage", notices: [] };
-}
-
-export const WsPushMessage: MessageFns<WsPushMessage, "ws.WsPushMessage"> = {
-  $type: "ws.WsPushMessage" as const,
-
-  encode(message: WsPushMessage, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    for (const v of message.notices) {
-      PBPackage.encode(v!, writer.uint32(10).fork()).join();
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): WsPushMessage {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseWsPushMessage();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.notices.push(PBPackage.decode(reader, reader.uint32()));
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): WsPushMessage {
-    return {
-      $type: WsPushMessage.$type,
-      notices: globalThis.Array.isArray(object?.notices) ? object.notices.map((e: any) => PBPackage.fromJSON(e)) : [],
-    };
-  },
-
-  toJSON(message: WsPushMessage): unknown {
-    const obj: any = {};
-    if (message.notices?.length) {
-      obj.notices = message.notices.map((e) => PBPackage.toJSON(e));
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<WsPushMessage>, I>>(base?: I): WsPushMessage {
-    return WsPushMessage.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<WsPushMessage>, I>>(object: I): WsPushMessage {
-    const message = createBaseWsPushMessage();
-    message.notices = object.notices?.map((e) => PBPackage.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-messageTypeRegistry.set(WsPushMessage.$type, WsPushMessage);
 
 function bytesFromBase64(b64: string): Uint8Array {
   const bin = globalThis.atob(b64);

@@ -22,6 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 通知单个玩家
 type CNoticePlayer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
@@ -110,6 +111,95 @@ func (*SNoticePlayer) Descriptor() ([]byte, []int) {
 	return file_gate_gate_ss_proto_rawDescGZIP(), []int{1}
 }
 
+// 广播给多个玩家
+type CBroadcastPlayer struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerIds     []int64                `protobuf:"varint,1,rep,packed,name=player_ids,json=playerIds,proto3" json:"player_ids,omitempty"`
+	Notices       []*ws.PBPackage        `protobuf:"bytes,2,rep,name=notices,proto3" json:"notices,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CBroadcastPlayer) Reset() {
+	*x = CBroadcastPlayer{}
+	mi := &file_gate_gate_ss_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CBroadcastPlayer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CBroadcastPlayer) ProtoMessage() {}
+
+func (x *CBroadcastPlayer) ProtoReflect() protoreflect.Message {
+	mi := &file_gate_gate_ss_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CBroadcastPlayer.ProtoReflect.Descriptor instead.
+func (*CBroadcastPlayer) Descriptor() ([]byte, []int) {
+	return file_gate_gate_ss_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CBroadcastPlayer) GetPlayerIds() []int64 {
+	if x != nil {
+		return x.PlayerIds
+	}
+	return nil
+}
+
+func (x *CBroadcastPlayer) GetNotices() []*ws.PBPackage {
+	if x != nil {
+		return x.Notices
+	}
+	return nil
+}
+
+type SBroadcastPlayer struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SBroadcastPlayer) Reset() {
+	*x = SBroadcastPlayer{}
+	mi := &file_gate_gate_ss_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SBroadcastPlayer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SBroadcastPlayer) ProtoMessage() {}
+
+func (x *SBroadcastPlayer) ProtoReflect() protoreflect.Message {
+	mi := &file_gate_gate_ss_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SBroadcastPlayer.ProtoReflect.Descriptor instead.
+func (*SBroadcastPlayer) Descriptor() ([]byte, []int) {
+	return file_gate_gate_ss_proto_rawDescGZIP(), []int{3}
+}
+
 var File_gate_gate_ss_proto protoreflect.FileDescriptor
 
 const file_gate_gate_ss_proto_rawDesc = "" +
@@ -118,7 +208,12 @@ const file_gate_gate_ss_proto_rawDesc = "" +
 	"\rCNoticePlayer\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12'\n" +
 	"\anotices\x18\x02 \x03(\v2\r.ws.PBPackageR\anotices\"\x0f\n" +
-	"\rSNoticePlayerB*Z(github.com/fixkme/othello/server/pb/gateb\x06proto3"
+	"\rSNoticePlayer\"Z\n" +
+	"\x10CBroadcastPlayer\x12\x1d\n" +
+	"\n" +
+	"player_ids\x18\x01 \x03(\x03R\tplayerIds\x12'\n" +
+	"\anotices\x18\x02 \x03(\v2\r.ws.PBPackageR\anotices\"\x12\n" +
+	"\x10SBroadcastPlayerB*Z(github.com/fixkme/othello/server/pb/gateb\x06proto3"
 
 var (
 	file_gate_gate_ss_proto_rawDescOnce sync.Once
@@ -132,19 +227,22 @@ func file_gate_gate_ss_proto_rawDescGZIP() []byte {
 	return file_gate_gate_ss_proto_rawDescData
 }
 
-var file_gate_gate_ss_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_gate_gate_ss_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_gate_gate_ss_proto_goTypes = []any{
-	(*CNoticePlayer)(nil), // 0: gate.CNoticePlayer
-	(*SNoticePlayer)(nil), // 1: gate.SNoticePlayer
-	(*ws.PBPackage)(nil),  // 2: ws.PBPackage
+	(*CNoticePlayer)(nil),    // 0: gate.CNoticePlayer
+	(*SNoticePlayer)(nil),    // 1: gate.SNoticePlayer
+	(*CBroadcastPlayer)(nil), // 2: gate.CBroadcastPlayer
+	(*SBroadcastPlayer)(nil), // 3: gate.SBroadcastPlayer
+	(*ws.PBPackage)(nil),     // 4: ws.PBPackage
 }
 var file_gate_gate_ss_proto_depIdxs = []int32{
-	2, // 0: gate.CNoticePlayer.notices:type_name -> ws.PBPackage
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 0: gate.CNoticePlayer.notices:type_name -> ws.PBPackage
+	4, // 1: gate.CBroadcastPlayer.notices:type_name -> ws.PBPackage
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_gate_gate_ss_proto_init() }
@@ -158,7 +256,7 @@ func file_gate_gate_ss_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_gate_gate_ss_proto_rawDesc), len(file_gate_gate_ss_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
