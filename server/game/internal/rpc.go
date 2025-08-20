@@ -53,9 +53,9 @@ func RpcHandler(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 		rc.Reply, rc.ReplyErr = logicHandler(ctx, argMsg)
 
 		if rc.ReplyErr == nil {
-			mlog.Info("game handler msg succeed, req_data:%#v, rsp_data:%#v", argMsg, rc.Reply)
+			mlog.Info("game handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.Req.MethodName, argMsg, rc.Reply)
 		} else {
-			mlog.Error("game handler msg failed, req_data:%#v, err:%v", argMsg, rc.ReplyErr)
+			mlog.Error("game handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
 		}
 	}
 

@@ -265,7 +265,7 @@ export class Pane extends Component {
     }
 
     gameEnd() {
-        const winStr = this.logic.blackCount > this.logic.whiteCount ? "黑方胜" : "白方胜";
+        const winStr = this.logic.blackCount > this.logic.whiteCount ? "黑方胜" : (this.logic.blackCount < this.logic.whiteCount ? "白方胜" : "平局");
         console.log(`winer: (${winStr})`);
         const endWidget = instantiate(this.prefabEndWidget)
         endWidget.name = "endWidget";

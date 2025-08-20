@@ -488,12 +488,12 @@ func (x *PPlacePiece) GetOperatePiece() int32 {
 }
 
 type PGameResult struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Winner        int64                  `protobuf:"varint,1,opt,name=winner,proto3" json:"winner,omitempty"`
-	Loser         int64                  `protobuf:"varint,2,opt,name=loser,proto3" json:"loser,omitempty"`
-	IsGiveUp      bool                   `protobuf:"varint,3,opt,name=is_give_up,json=isGiveUp,proto3" json:"is_give_up,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	WinnerPieceType int64                  `protobuf:"varint,1,opt,name=winner_piece_type,json=winnerPieceType,proto3" json:"winner_piece_type,omitempty"`
+	LoserPieceType  int64                  `protobuf:"varint,2,opt,name=loser_piece_type,json=loserPieceType,proto3" json:"loser_piece_type,omitempty"`
+	IsGiveUp        bool                   `protobuf:"varint,3,opt,name=is_give_up,json=isGiveUp,proto3" json:"is_give_up,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *PGameResult) Reset() {
@@ -526,16 +526,16 @@ func (*PGameResult) Descriptor() ([]byte, []int) {
 	return file_game_player_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *PGameResult) GetWinner() int64 {
+func (x *PGameResult) GetWinnerPieceType() int64 {
 	if x != nil {
-		return x.Winner
+		return x.WinnerPieceType
 	}
 	return 0
 }
 
-func (x *PGameResult) GetLoser() int64 {
+func (x *PGameResult) GetLoserPieceType() int64 {
 	if x != nil {
-		return x.Loser
+		return x.LoserPieceType
 	}
 	return 0
 }
@@ -583,10 +583,10 @@ const file_game_player_proto_rawDesc = "" +
 	"piece_type\x18\x01 \x01(\x05R\tpieceType\x12\f\n" +
 	"\x01x\x18\x02 \x01(\x05R\x01x\x12\f\n" +
 	"\x01y\x18\x03 \x01(\x05R\x01y\x12#\n" +
-	"\roperate_piece\x18\x04 \x01(\x05R\foperatePiece\"Y\n" +
-	"\vPGameResult\x12\x16\n" +
-	"\x06winner\x18\x01 \x01(\x03R\x06winner\x12\x14\n" +
-	"\x05loser\x18\x02 \x01(\x03R\x05loser\x12\x1c\n" +
+	"\roperate_piece\x18\x04 \x01(\x05R\foperatePiece\"\x81\x01\n" +
+	"\vPGameResult\x12*\n" +
+	"\x11winner_piece_type\x18\x01 \x01(\x03R\x0fwinnerPieceType\x12(\n" +
+	"\x10loser_piece_type\x18\x02 \x01(\x03R\x0eloserPieceType\x12\x1c\n" +
 	"\n" +
 	"is_give_up\x18\x03 \x01(\bR\bisGiveUpB*Z(github.com/fixkme/othello/server/pb/gameb\x06proto3"
 

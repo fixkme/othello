@@ -1,8 +1,11 @@
 import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
     EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button,
-    Prefab, instantiate, view, Animation,
-    AudioSource} from 'cc';
+    Prefab, instantiate, view, Animation, AudioSource} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
+import { GlobalWebSocket } from '../common/WebSocket';
+import { CEnterGame, CPlacePiece, PGameResult, PPlacePiece, PPlayerEnterGame, SEnterGame } from '../pb/game/player';
+import { PlayerInfo, TableInfo } from '../pb/datas/player_data';
+import { NetworkManager } from '../common/NetworkManager';
 const { ccclass, property } = _decorator;
 
 
@@ -31,9 +34,8 @@ export class GameOnline extends Component {
 
     private selfPieceType: PiecesType = PiecesType.BLACK; //玩家自己的
     private opponentPieceType: PiecesType = PiecesType.WHITE; //对手的
-    // 人机难度
-    private robotDifficulty: number = 1;
-    private robotContinue = false;
+    private selfPlayer: PlayerInfo = null; //自己信息
+    private oppoPlayer: PlayerInfo = null; //对手信息
 
     @property(SpriteFrame)
     private blackSprite: SpriteFrame | null = null;
@@ -45,6 +47,11 @@ export class GameOnline extends Component {
     @property(Label)
     private whiteScore: Label | null = null;
 
+    @property(Label)
+    private blackPlayerName: Label | null = null;
+    @property(Label)
+    private whitePlayerName: Label | null = null;
+
     @property(Button)
     private buttonRenew: Button = null!;
     @property(Button)
@@ -55,15 +62,48 @@ export class GameOnline extends Component {
     @property(Prefab)
     private prefabEndWidget: Prefab = null!;
 
+    private _ws: GlobalWebSocket = null;
+
     onLoad () {
+        this._ws = GlobalWebSocket.getInstance();
     }
 
     start() {
-        this.initGame();
-        // 绑定事件
+        this.drawPane();
+        // 注册消息事件
+        // 自己进入房间
+        this._ws.on(SEnterGame.$type, this.onSelfEnterGame, this)
+        // 其他玩家进入
+        this._ws.on(PPlayerEnterGame.$type, this.onOtherEnterGame, this)
+        // 棋子落下
+        this._ws.on(PPlacePiece.$type, this.onPlacePieceMsg, this)
+        // 游戏结束
+        this._ws.on(PGameResult.$type, this.onGameResult, this)
+
+        // 发送进入游戏的消息
+        if (this._ws.isConnected()) {
+            const cEnterGame = CEnterGame.create();
+            if (this._ws.sendMessage(CEnterGame, cEnterGame)) {
+                console.log("发送进入游戏消息成功");
+            }
+        } else {
+            console.warn("WebSocket not connected.");
+        }
+
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.buttonRenew.node.on(Button.EventType.CLICK, this.onButtonRenewClick, this);
         this.buttonRetract.node.on(Button.EventType.CLICK, this.onButtonRetractClick, this);
+    }
+
+    onDestroy() {
+        this.buttonRenew.node.off(Button.EventType.CLICK, this.onButtonRenewClick, this);
+        this.buttonRetract.node.off(Button.EventType.CLICK, this.onButtonRetractClick, this);
+        this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+
+        this._ws.off(SEnterGame.$type, this.onSelfEnterGame, this)
+        this._ws.off(PPlayerEnterGame.$type, this.onOtherEnterGame, this)
+        this._ws.off(PPlacePiece.$type, this.onPlacePieceMsg, this)
+        this._ws.off(PGameResult.$type, this.onGameResult, this)
     }
 
     update(deltaTime: number) {
@@ -74,14 +114,48 @@ export class GameOnline extends Component {
         
     }
     
-    initGame() {
-        this.drawPane();
+    initGame(tb: TableInfo) {
+        if (!tb) {
+            console.log("initGame: table info is null");
+            return;
+        }
+        this.selfPlayer = NetworkManager.getInstance().playerInfo
+        console.log("initGame: selfPlayer: ", this.selfPlayer);
+        console.log("initGame: selfPlayer: ", this.selfPlayer.id, tb.ownerPlayer.id);
+        
+        if (this.selfPlayer.id == tb.ownerPlayer.id) {
+            this.selfPieceType = tb.ownerPlayer.playPieceType;
+            if (tb.oppoPlayer) {
+                this.oppoPlayer = tb.oppoPlayer;
+                this.opponentPieceType = tb.oppoPlayer.playPieceType;
+            }
+        } else {
+            this.selfPieceType = tb.oppoPlayer.playPieceType;
+            this.oppoPlayer = tb.ownerPlayer;
+            this.opponentPieceType = tb.ownerPlayer.playPieceType;
+        }
+        // 展示玩家信息
+        this.showPlayerInfo();
+
         this.logic = new Logic();
-        this.placePiece(3, 3, PiecesType.BLACK, false);
-        this.placePiece(3, 4, PiecesType.WHITE, false);
-        this.placePiece(4, 3, PiecesType.WHITE, false);
-        this.placePiece(4, 4, PiecesType.BLACK, false);
-        //this.node.getComponent(AudioSource).play();
+        this.logic.setOperator(tb.turn);
+        tb.pieces.forEach(p => {
+            this.placePiece(p.x, p.y, p.color, false);
+        });
+    }
+
+    showPlayerInfo() {
+        if (this.selfPieceType === PiecesType.BLACK) {
+            this.blackPlayerName.string = this.selfPlayer.name
+            if (this.oppoPlayer) {
+                this.whitePlayerName.string = this.oppoPlayer.name
+            }
+        } else if (this.selfPieceType === PiecesType.WHITE) {
+            this.whitePlayerName.string = this.selfPlayer.name
+            if (this.oppoPlayer) {
+                this.blackPlayerName.string = this.oppoPlayer.name
+            }
+        }
     }
 
     drawPane() {
@@ -155,55 +229,56 @@ export class GameOnline extends Component {
             !this.logic.canPlacePiece(i, j, selfPieceType)) {
             return;
         }
-        this.logic.changeOperator()
-
-        this.logic.record();
-        if (this.putPiece(i, j, selfPieceType)) {
-            return;
-        }
-
-        // 机器人
-        this.processRobot();
+        // 发送落子请求
+        const cplacePiece = CPlacePiece.create();
+        cplacePiece.x = i;
+        cplacePiece.y = j;
+        cplacePiece.pieceType = selfPieceType;
+        this._ws.sendMessage(CPlacePiece, cplacePiece);
     }
 
-    processRobot() {
-        const difficulty = this.robotDifficulty;
-        const robotPieceType = -this.selfPieceType;
-        const op = -robotPieceType;
-        let loc = this.logic.getBestLocation(robotPieceType, difficulty)
-        if (loc) {
-            console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
-            this.scheduleOnce(function () {
-                if (this.putPiece(loc.x, loc.y, robotPieceType)) {
-                    return;
-                }
-                this.logic.changeOperator()
-                if (!this.logic.canPlace(op)) {
-                    this.logic.changeOperator()
-                    this.robotContinue = true;
-                } else {
-                    this.robotContinue = false;
-                }
-            }, 0.5);
+    onSelfEnterGame(data: any) {
+        const senterGame = data as SEnterGame
+        this.initGame(senterGame.tableInfo); 
+    }
+
+    onOtherEnterGame(data: any) {
+        const pmsg = data as PPlayerEnterGame;
+        this.oppoPlayer = pmsg.playerInfo;
+        this.opponentPieceType = pmsg.playerInfo.playPieceType;
+        this.showPlayerInfo();
+    }
+
+    onPlacePieceMsg(data: any) {
+        const pmsg = data as PPlacePiece;
+        this.putPiece(pmsg.x, pmsg.y, pmsg.pieceType);
+        this.logic.setOperator(pmsg.operatePiece);
+    }
+
+    onGameResult(data: any) {
+        const pmsg = data as PGameResult;
+        console.log("game result:", pmsg);
+        //this.checkGameEnd();
+        this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        
+        let t = pmsg.winnerPieceType;
+        let winStr = "";
+        if (pmsg.isGiveUp) {
+            winStr = t == PiecesType.BLACK ? "白棋认输" : "黑棋认输";
         } else {
-            console.log(`getBestLocation max : null`);
-            if (this.logic.canPlace(op)) {
-                this.logic.changeOperator()
-            } else {
-                this.gameEnd();
-            }
+            winStr = t == PiecesType.BLACK ? "黑方胜" : (t == PiecesType.WHITE ? "白方胜" : "平局")
         }
+        this.gameEnd(winStr)
     }
 
-    putPiece(i: number, j: number, t: PiecesType): boolean {
+    putPiece(i: number, j: number, t: PiecesType) {
         this.placePiece(i, j, t, true);
         const list = this.logic.reverse(i, j, t)
         list.forEach(element => {
             this.reversePiece(element.i, element.j, element.t);
         });
         this.blackScore.string = this.logic.blackCount.toString()
-        this.whiteScore.string = this.logic.whiteCount.toString()
-        return this.checkGameEnd();
+        this.whiteScore.string = this.logic.whiteCount.toString() 
     }
 
     reversePiece(i: number, j: number, t: PiecesType) {
@@ -237,13 +312,13 @@ export class GameOnline extends Component {
     checkGameEnd(): boolean {
         if (this.logic.checkEnd()) {
             this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-            this.gameEnd()
+            const winStr = this.logic.blackCount > this.logic.whiteCount ? "黑方胜" : "白方胜";
+            this.gameEnd(winStr)
             return true;
         }
     }
 
-    gameEnd() {
-        const winStr = this.logic.blackCount > this.logic.whiteCount ? "黑方胜" : "白方胜";
+    gameEnd(winStr: string) {
         console.log(`winer: (${winStr})`);
         const endWidget = instantiate(this.prefabEndWidget)
         endWidget.name = "endWidget";
@@ -273,7 +348,6 @@ export class GameOnline extends Component {
     // 重来
     onButtonRenewClick() {
         this.unscheduleAllCallbacks();
-        this.robotContinue = false;
         for (let i = 0; i < Logic.rowSize; i++) {
             for (let j = 0; j < Logic.colSize; j++) {
                 if (this.pieces[i][j]) {
@@ -296,7 +370,6 @@ export class GameOnline extends Component {
             return;
         }
         this.unscheduleAllCallbacks();
-        this.robotContinue = false;
         const {removes, changes} = this.logic.undo();
         removes.forEach(item => {
             let node = this.pieces[item.i][item.j]

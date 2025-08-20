@@ -130,27 +130,21 @@ func (g *Global) PlayerLeaveGame(p *Player) error {
 		p.LeaveGame()
 	} else {
 		// 游戏中离开、认输
-		global.GameOver(tb, p, true)
+		global.GameOver(tb, p.PlayPieceType(), true)
 	}
 	return nil
 }
 
-func (g *Global) GameOver(tb *Table, loser *Player, isGiveUp bool) {
-	var winner *Player
-	if loser == tb.OwnerPlayer {
-		winner = tb.OppoPlayer
-	} else {
-		winner = tb.OwnerPlayer
-	}
+func (g *Global) GameOver(tb *Table, loser_piece_type PieceType, isGiveUp bool) {
 	msg := &game.PGameResult{
-		Winner:   winner.Id(),
-		Loser:    loser.Id(),
-		IsGiveUp: isGiveUp,
+		WinnerPieceType: -int64(loser_piece_type),
+		LoserPieceType:  int64(loser_piece_type),
+		IsGiveUp:        isGiveUp,
 	}
-	NoticePlayer(msg, loser, winner)
+	NoticePlayer(msg, tb.OwnerPlayer, tb.OppoPlayer)
 
 	// 删除
-	loser.LeaveGame()
-	winner.LeaveGame()
+	tb.OwnerPlayer.LeaveGame()
+	tb.OppoPlayer.LeaveGame()
 	g.RemoveTable(tb.Id)
 }

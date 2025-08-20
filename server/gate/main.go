@@ -24,7 +24,7 @@ func start() {
 		panic(err)
 	}
 
-	rpcModule := framework.CreateRpcModule("game_rpc", nil, nil)
+	rpcModule := framework.CreateRpcModule("gate_rpc", nil, nil)
 	internal.RpcModule = rpcModule
 	app.DefaultApp().Run(
 		internal.NewGateModule(),

@@ -69,8 +69,8 @@ export interface PPlacePiece {
 
 export interface PGameResult {
   $type: "game.PGameResult";
-  winner: number;
-  loser: number;
+  winnerPieceType: number;
+  loserPieceType: number;
   isGiveUp: boolean;
 }
 
@@ -768,18 +768,18 @@ export const PPlacePiece: MessageFns<PPlacePiece, "game.PPlacePiece"> = {
 messageTypeRegistry.set(PPlacePiece.$type, PPlacePiece);
 
 function createBasePGameResult(): PGameResult {
-  return { $type: "game.PGameResult", winner: 0, loser: 0, isGiveUp: false };
+  return { $type: "game.PGameResult", winnerPieceType: 0, loserPieceType: 0, isGiveUp: false };
 }
 
 export const PGameResult: MessageFns<PGameResult, "game.PGameResult"> = {
   $type: "game.PGameResult" as const,
 
   encode(message: PGameResult, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.winner !== 0) {
-      writer.uint32(8).int64(message.winner);
+    if (message.winnerPieceType !== 0) {
+      writer.uint32(8).int64(message.winnerPieceType);
     }
-    if (message.loser !== 0) {
-      writer.uint32(16).int64(message.loser);
+    if (message.loserPieceType !== 0) {
+      writer.uint32(16).int64(message.loserPieceType);
     }
     if (message.isGiveUp !== false) {
       writer.uint32(24).bool(message.isGiveUp);
@@ -799,7 +799,7 @@ export const PGameResult: MessageFns<PGameResult, "game.PGameResult"> = {
             break;
           }
 
-          message.winner = longToNumber(reader.int64());
+          message.winnerPieceType = longToNumber(reader.int64());
           continue;
         }
         case 2: {
@@ -807,7 +807,7 @@ export const PGameResult: MessageFns<PGameResult, "game.PGameResult"> = {
             break;
           }
 
-          message.loser = longToNumber(reader.int64());
+          message.loserPieceType = longToNumber(reader.int64());
           continue;
         }
         case 3: {
@@ -830,19 +830,19 @@ export const PGameResult: MessageFns<PGameResult, "game.PGameResult"> = {
   fromJSON(object: any): PGameResult {
     return {
       $type: PGameResult.$type,
-      winner: isSet(object.winner) ? globalThis.Number(object.winner) : 0,
-      loser: isSet(object.loser) ? globalThis.Number(object.loser) : 0,
+      winnerPieceType: isSet(object.winnerPieceType) ? globalThis.Number(object.winnerPieceType) : 0,
+      loserPieceType: isSet(object.loserPieceType) ? globalThis.Number(object.loserPieceType) : 0,
       isGiveUp: isSet(object.isGiveUp) ? globalThis.Boolean(object.isGiveUp) : false,
     };
   },
 
   toJSON(message: PGameResult): unknown {
     const obj: any = {};
-    if (message.winner !== 0) {
-      obj.winner = Math.round(message.winner);
+    if (message.winnerPieceType !== 0) {
+      obj.winnerPieceType = Math.round(message.winnerPieceType);
     }
-    if (message.loser !== 0) {
-      obj.loser = Math.round(message.loser);
+    if (message.loserPieceType !== 0) {
+      obj.loserPieceType = Math.round(message.loserPieceType);
     }
     if (message.isGiveUp !== false) {
       obj.isGiveUp = message.isGiveUp;
@@ -855,8 +855,8 @@ export const PGameResult: MessageFns<PGameResult, "game.PGameResult"> = {
   },
   fromPartial<I extends Exact<DeepPartial<PGameResult>, I>>(object: I): PGameResult {
     const message = createBasePGameResult();
-    message.winner = object.winner ?? 0;
-    message.loser = object.loser ?? 0;
+    message.winnerPieceType = object.winnerPieceType ?? 0;
+    message.loserPieceType = object.loserPieceType ?? 0;
     message.isGiveUp = object.isGiveUp ?? false;
     return message;
   },

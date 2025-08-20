@@ -75,8 +75,10 @@ export class StartGame extends Component {
     start() {
         this.btnStartRobot.node.on(Button.EventType.CLICK, this.onBtnStartRobotClick, this);
         this.btnStartPlayer.node.on(Button.EventType.CLICK, this.onBtnStartPlayerClick, this);
+        this.btnStartFriend.node.on(Button.EventType.CLICK, this.onBtnStartFriendClick, this);
     }
 
+    // 人机对战
     onBtnStartRobotClick() {
         const bundle = assetManager.getBundle(PkgNames.Common)
         bundle.load("prefabs/Popup", (err, asset) => {
@@ -91,6 +93,7 @@ export class StartGame extends Component {
         })
     }
 
+    // 联机对战
     onBtnStartPlayerClick() {
         //ws 连接 TODO
         //进入联机场景
@@ -109,6 +112,11 @@ export class StartGame extends Component {
                 pane.getComponent(GameOnline).initData(GameType.PLAYER, null)
             });
         });
+    }
+
+    // 好友对战
+    onBtnStartFriendClick() {
+
     }
 }
 

@@ -45,7 +45,7 @@ message PPlacePiece {
 }
 
 message PGameResult {
-    int64 winner = 1;
-    int64 loser = 2;
+    int64 winner_piece_type = 1;
+    int64 loser_piece_type = 2;
     bool is_give_up = 3;
 }

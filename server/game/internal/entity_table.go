@@ -3,6 +3,7 @@ package internal
 import (
 	"errors"
 
+	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/util/time"
 	"github.com/fixkme/othello/server/pb/datas"
 	"github.com/fixkme/othello/server/pb/game"
@@ -88,14 +89,17 @@ func (tb *Table) Init() {
 func (tb *Table) PackPB() *datas.PBTableInfo {
 	info := &datas.PBTableInfo{
 		Id:          tb.Id,
-		OwnerId:     tb.OwnerPlayer.Id(),
-		OppoId:      tb.OppoPlayer.Id(),
 		Turn:        int32(tb.Operator),
 		BlackCount:  tb.BlackCount,
 		WhiteCount:  tb.WhiteCount,
 		CreatedTime: tb.CreateTime,
-		Players:     make([]*datas.PBPlayerInfo, 0, 2),
 		Pieces:      make([]*datas.PBPieceInfo, 0, rowSize*colSize),
+	}
+	if tb.OwnerPlayer != nil {
+		info.OwnerPlayer = tb.OwnerPlayer.GetModelPlayerInfo().ToPB()
+	}
+	if tb.OppoPlayer != nil {
+		info.OppoPlayer = tb.OppoPlayer.GetModelPlayerInfo().ToPB()
 	}
 	for i := 0; i < rowSize; i++ {
 		for j := 0; j < colSize; j++ {
@@ -106,6 +110,7 @@ func (tb *Table) PackPB() *datas.PBTableInfo {
 }
 
 func (tb *Table) MatchPlayer(p *Player) {
+	p.GetModelPlayerInfo().SetPlayPieceType(int64(PieceType_White))
 	p.PlayingTable = tb
 	tb.OppoPlayer = p
 }
@@ -118,24 +123,33 @@ func (tb *Table) PlacePiece(x, y int, t PieceType) error {
 		return errors.New("location cant reverse piece")
 	}
 
+	// 放下棋子
 	//tb.Record()
 	tb.AddPiece(x, y, t)
 	tb.Reverse(x, y, t)
-	tb.TurnOperator()
-
+	// 对方能否有棋可翻转
+	if tb.CanPlace(-t) {
+		tb.TurnOperator()
+		mlog.Debug("change operator to %d", tb.Operator)
+	} else {
+		mlog.Debug("%d no piece can reverse", -t)
+	}
+	// 广播落子结果
 	msg := &game.PPlacePiece{
 		PieceType: int32(t), X: int32(x), Y: int32(y), OperatePiece: int32(tb.Operator),
 	}
 	NoticePlayer(msg, tb.OwnerPlayer, tb.OppoPlayer)
 	// 检查游戏是否达到结束条件
 	if tb.CheckEnd() {
-		var loser *Player
-		if tb.OwnerPlayer.PlayPieceType() == t {
-			loser = tb.OppoPlayer
+		var loser_piece_type PieceType
+		if tb.BlackCount > tb.WhiteCount {
+			loser_piece_type = PieceType_White
+		} else if tb.BlackCount < tb.WhiteCount {
+			loser_piece_type = PieceType_Black
 		} else {
-			loser = tb.OwnerPlayer
+			loser_piece_type = PieceType_None
 		}
-		global.GameOver(tb, loser, false)
+		global.GameOver(tb, loser_piece_type, false)
 	}
 
 	return nil
@@ -150,7 +164,7 @@ func (tb *Table) Reset() {
 	tb.BlackCount = 0
 	tb.WhiteCount = 0
 	tb.AddPiece(3, 3, PieceType_Black)
-	tb.AddPiece(3, 3, PieceType_White)
+	tb.AddPiece(3, 4, PieceType_White)
 	tb.AddPiece(4, 3, PieceType_White)
 	tb.AddPiece(4, 4, PieceType_Black)
 	tb.SetOperator(PieceType_Black)

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -34,6 +35,11 @@ type RoutingWorkerImp struct {
 }
 
 func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
+	defer func() {
+		if err := recover(); err != nil {
+			mlog.Error("RoutingWorkerImp RoutingMsg panic: %v\n%s", err, debug.Stack())
+		}
+	}()
 	client := task.Cli
 	// 反序列化数据
 	wsMessage := &ws.WsRequestMessage{}
@@ -98,6 +104,11 @@ type RoutingRpcPassThrough struct {
 }
 
 func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
+	defer func() {
+		if err := recover(); err != nil {
+			mlog.Error("RoutingWorkerImp ProcessRpcReply panic: %v\n%s", err, debug.Stack())
+		}
+	}()
 	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
 	if passData.ReqMsgName == cloginMsgName {
 		cli := passData.Cli

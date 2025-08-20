@@ -30,16 +30,17 @@ export interface TableInfo {
   $type: "datas.TableInfo";
   id: number;
   /** 房主 */
-  ownerId: number;
+  ownerPlayer:
+    | PlayerInfo
+    | undefined;
   /** 对手 */
-  oppoId: number;
+  oppoPlayer: PlayerInfo | undefined;
   status: number;
   /** 当前操作方 */
   turn: number;
   blackCount: number;
   whiteCount: number;
   pieces: PieceInfo[];
-  players: PlayerInfo[];
   createdTime: number;
 }
 
@@ -273,14 +274,13 @@ function createBaseTableInfo(): TableInfo {
   return {
     $type: "datas.TableInfo",
     id: 0,
-    ownerId: 0,
-    oppoId: 0,
+    ownerPlayer: undefined,
+    oppoPlayer: undefined,
     status: 0,
     turn: 0,
     blackCount: 0,
     whiteCount: 0,
     pieces: [],
-    players: [],
     createdTime: 0,
   };
 }
@@ -292,11 +292,11 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     if (message.id !== 0) {
       writer.uint32(8).int64(message.id);
     }
-    if (message.ownerId !== 0) {
-      writer.uint32(16).int64(message.ownerId);
+    if (message.ownerPlayer !== undefined) {
+      PlayerInfo.encode(message.ownerPlayer, writer.uint32(18).fork()).join();
     }
-    if (message.oppoId !== 0) {
-      writer.uint32(24).int64(message.oppoId);
+    if (message.oppoPlayer !== undefined) {
+      PlayerInfo.encode(message.oppoPlayer, writer.uint32(26).fork()).join();
     }
     if (message.status !== 0) {
       writer.uint32(32).int32(message.status);
@@ -312,9 +312,6 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     }
     for (const v of message.pieces) {
       PieceInfo.encode(v!, writer.uint32(66).fork()).join();
-    }
-    for (const v of message.players) {
-      PlayerInfo.encode(v!, writer.uint32(74).fork()).join();
     }
     if (message.createdTime !== 0) {
       writer.uint32(80).int64(message.createdTime);
@@ -338,19 +335,19 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
           continue;
         }
         case 2: {
-          if (tag !== 16) {
+          if (tag !== 18) {
             break;
           }
 
-          message.ownerId = longToNumber(reader.int64());
+          message.ownerPlayer = PlayerInfo.decode(reader, reader.uint32());
           continue;
         }
         case 3: {
-          if (tag !== 24) {
+          if (tag !== 26) {
             break;
           }
 
-          message.oppoId = longToNumber(reader.int64());
+          message.oppoPlayer = PlayerInfo.decode(reader, reader.uint32());
           continue;
         }
         case 4: {
@@ -393,14 +390,6 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
           message.pieces.push(PieceInfo.decode(reader, reader.uint32()));
           continue;
         }
-        case 9: {
-          if (tag !== 74) {
-            break;
-          }
-
-          message.players.push(PlayerInfo.decode(reader, reader.uint32()));
-          continue;
-        }
         case 10: {
           if (tag !== 80) {
             break;
@@ -422,14 +411,13 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     return {
       $type: TableInfo.$type,
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
-      ownerId: isSet(object.ownerId) ? globalThis.Number(object.ownerId) : 0,
-      oppoId: isSet(object.oppoId) ? globalThis.Number(object.oppoId) : 0,
+      ownerPlayer: isSet(object.ownerPlayer) ? PlayerInfo.fromJSON(object.ownerPlayer) : undefined,
+      oppoPlayer: isSet(object.oppoPlayer) ? PlayerInfo.fromJSON(object.oppoPlayer) : undefined,
       status: isSet(object.status) ? globalThis.Number(object.status) : 0,
       turn: isSet(object.turn) ? globalThis.Number(object.turn) : 0,
       blackCount: isSet(object.blackCount) ? globalThis.Number(object.blackCount) : 0,
       whiteCount: isSet(object.whiteCount) ? globalThis.Number(object.whiteCount) : 0,
       pieces: globalThis.Array.isArray(object?.pieces) ? object.pieces.map((e: any) => PieceInfo.fromJSON(e)) : [],
-      players: globalThis.Array.isArray(object?.players) ? object.players.map((e: any) => PlayerInfo.fromJSON(e)) : [],
       createdTime: isSet(object.createdTime) ? globalThis.Number(object.createdTime) : 0,
     };
   },
@@ -439,11 +427,11 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     if (message.id !== 0) {
       obj.id = Math.round(message.id);
     }
-    if (message.ownerId !== 0) {
-      obj.ownerId = Math.round(message.ownerId);
+    if (message.ownerPlayer !== undefined) {
+      obj.ownerPlayer = PlayerInfo.toJSON(message.ownerPlayer);
     }
-    if (message.oppoId !== 0) {
-      obj.oppoId = Math.round(message.oppoId);
+    if (message.oppoPlayer !== undefined) {
+      obj.oppoPlayer = PlayerInfo.toJSON(message.oppoPlayer);
     }
     if (message.status !== 0) {
       obj.status = Math.round(message.status);
@@ -460,9 +448,6 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     if (message.pieces?.length) {
       obj.pieces = message.pieces.map((e) => PieceInfo.toJSON(e));
     }
-    if (message.players?.length) {
-      obj.players = message.players.map((e) => PlayerInfo.toJSON(e));
-    }
     if (message.createdTime !== 0) {
       obj.createdTime = Math.round(message.createdTime);
     }
@@ -475,14 +460,17 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
   fromPartial<I extends Exact<DeepPartial<TableInfo>, I>>(object: I): TableInfo {
     const message = createBaseTableInfo();
     message.id = object.id ?? 0;
-    message.ownerId = object.ownerId ?? 0;
-    message.oppoId = object.oppoId ?? 0;
+    message.ownerPlayer = (object.ownerPlayer !== undefined && object.ownerPlayer !== null)
+      ? PlayerInfo.fromPartial(object.ownerPlayer)
+      : undefined;
+    message.oppoPlayer = (object.oppoPlayer !== undefined && object.oppoPlayer !== null)
+      ? PlayerInfo.fromPartial(object.oppoPlayer)
+      : undefined;
     message.status = object.status ?? 0;
     message.turn = object.turn ?? 0;
     message.blackCount = object.blackCount ?? 0;
     message.whiteCount = object.whiteCount ?? 0;
     message.pieces = object.pieces?.map((e) => PieceInfo.fromPartial(e)) || [];
-    message.players = object.players?.map((e) => PlayerInfo.fromPartial(e)) || [];
     message.createdTime = object.createdTime ?? 0;
     return message;
   },

@@ -1,6 +1,6 @@
-import { _decorator, Component } from 'cc';
+import { _decorator, Component, director } from 'cc';
 import { GlobalWebSocket } from './WebSocket';
-import { CLogin } from '../pb/game/player';
+import { CLogin, SLogin } from '../pb/game/player';
 import { PlayerInfo } from '../pb/datas/player_data';
 const { ccclass } = _decorator;
 
@@ -26,10 +26,11 @@ export class NetworkManager extends Component {
 
         NetworkManager._instance = this;
 
-        // 测试代码， 随机生成账号
+        // 测试代码，随机生成账号
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
-        for (let i = 0; i < length; i++) {
+        let acc_len = 16;
+        for (let i = 0; i < acc_len; i++) {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         this.account = "acc_"  + result
@@ -37,6 +38,7 @@ export class NetworkManager extends Component {
         // 设置为常驻节点
         if (!this.node._persistNode) {
             this.node._persistNode = true;
+            director.addPersistRootNode(this.node)
         }
 
         // 初始化WebSocket连接
@@ -62,7 +64,7 @@ export class NetworkManager extends Component {
         this._ws.on('message', this._onUnknownMessage, this);
 
         // 注册游戏特定事件
-        this._ws.on('game.SLogin', this._onLoginResponse, this);
+        this._ws.on(SLogin.$type, this._onLoginResponse, this);
     }
 
     private _unregisterEventHandlers(): void {
@@ -99,10 +101,10 @@ export class NetworkManager extends Component {
     }
 
     private _onLoginResponse(data: any): void {
-        const v = data as PlayerInfo
-        this.playerInfo = v
+        const msg = data as SLogin
+        this.playerInfo = msg.playerData.modelPlayerInfo
         this.isLogined = true
-        console.log('[Network] Login succeed, playerInfo:', v);
+        console.log('[Network] Login succeed, playerInfo:', this.playerInfo);
     }
 
     onDestroy() {

@@ -120,30 +120,38 @@ export class GlobalWebSocket {
             const uint8Array = new Uint8Array(data);
             const wsMsg = WsResponseMessage.decode(uint8Array);
             if (wsMsg == null ) {
-                console.error('decode WsResponseMessage failed:');
+                console.error('[WebSocket] decode WsResponseMessage failed:');
                 return;
             }
             
             if (wsMsg.uuid.length > 0) {
                 // response
-                const msgType = messageTypeRegistry.get(wsMsg.msgName)
-                if (msgType != null) {
-                    const msg = msgType.decode(wsMsg.payload)
-                    this._eventTarget.emit(wsMsg.msgName, msg)
+                if (wsMsg.errorCode > 0) {
+                    console.error(`${wsMsg.msgName} error: ${wsMsg.errorCode}, ${wsMsg.errorDesc}`);
+                    // TODO: 展示错误信息
+                    return;
                 } else {
-                    console.warn(`unknown message type: ${wsMsg.msgName}`)
-                    this._eventTarget.emit("message", wsMsg.msgName)
+                    const respMsgType = messageTypeRegistry.get(wsMsg.msgName)
+                    if (respMsgType != null) {
+                        const response = respMsgType.decode(wsMsg.payload)
+                        console.log(`[WebSocket] recv message: ${wsMsg.msgName},`, respMsgType.toJSON(response))
+                        this._eventTarget.emit(wsMsg.msgName, response)
+                    } else {
+                        console.warn(`[WebSocket] unknown message type: ${wsMsg.msgName}`)
+                        this._eventTarget.emit("message", wsMsg.msgName)
+                    }
                 }
             }
             if (wsMsg.notices.length > 0) {
                 // push
                 wsMsg.notices.forEach((notice) => {
-                    const msgType = messageTypeRegistry.get(notice.messageType)
-                    if (msgType != null) {
-                        const msg = msgType.decode(notice.messagePayload)
-                        this._eventTarget.emit(notice.messageType, msg)
+                    const pushMsgType = messageTypeRegistry.get(notice.messageType)
+                    if (pushMsgType != null) {
+                        const pmsg = pushMsgType.decode(notice.messagePayload)
+                        console.log(`[WebSocket] recv message: ${wsMsg.msgName},`, pushMsgType.toJSON(pmsg))
+                        this._eventTarget.emit(notice.messageType, pmsg)
                     } else {
-                        console.warn(`unknown message type: ${notice.messageType}`)
+                        console.warn(`[WebSocket] unknown message type: ${notice.messageType}`)
                         this._eventTarget.emit("message", notice.messageType)
                     }
                 })
@@ -284,20 +292,21 @@ export class GlobalWebSocket {
     sendMessage<T extends MessageType>(
         msgType: T,
         message: MessageInstance<T>
-    ): boolean {
+    ): string {
         if (!this._socket || this._socket.readyState !== WebSocket.OPEN) {
             console.error('[WebSocket] sendMessage error, Socket is not open.');
-            return false;
+            return null;
         }
         if (!this._isConnected) {
             console.error('[WebSocket] sendMessage error, Socket is not connected.');
-            return false;
+            return null;
         }
 
         // 序列化消息
         this._msgId += 1;
+        const msgId = this._msgId.toString()
         const wsMsg = WsRequestMessage.create();
-        wsMsg.uuid = this._msgId.toString();
+        wsMsg.uuid = msgId;
         wsMsg.msgName = msgType.$type;
         wsMsg.payload = msgType.encode(message).finish();
         const wsDatas = WsRequestMessage.encode(wsMsg).finish();
@@ -305,10 +314,11 @@ export class GlobalWebSocket {
         // 发送
         try {
             this._socket?.send(wsDatas.buffer);
-            return true;
+            console.log("[WebSocket] send message: ", wsMsg.msgName)
+            return msgId;
         } catch (e) {
             console.error('[WebSocket] sendMessage _socket send error:', e);
-            return false;
+            return null;
         }
     }
 
