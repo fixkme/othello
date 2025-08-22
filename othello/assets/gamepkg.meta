@@ -8,6 +8,7 @@
   "userData": {
     "isBundle": true,
     "bundleName": "gamepkg",
-    "priority": 2
+    "priority": 2,
+    "bundleFilterConfig": []
   }
 }

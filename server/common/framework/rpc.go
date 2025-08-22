@@ -32,11 +32,12 @@ func CreateRpcModule(name string, dispatcher rpc.DispatchHash, handlerFunc rpc.R
 	}
 	listenAddr := env.GetEnvStr(env.APP_RpcListenAddr)
 	serverOpt := &rpc.ServerOpt{
-		ListenAddr:     listenAddr,
-		PollerNum:      4,
-		ProcessorSize:  7,
-		DispatcherFunc: dispatcher,
-		HandlerFunc:    handlerFunc,
+		ListenAddr:        listenAddr,
+		PollerNum:         4,
+		ProcessorSize:     7,
+		ProcessorTaskSize: 1024,
+		DispatcherFunc:    dispatcher,
+		HandlerFunc:       handlerFunc,
 	}
 	etcdAddrs := env.GetEnvStr(env.APP_EtcdEndpoints)
 	etcdOpt := &etcd.EtcdOpt{
@@ -106,9 +107,9 @@ func RpcHandlerFunc(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 		rc.ReplyErr = err
 	}
 	if rc.ReplyErr == nil {
-		mlog.Info("rpc handler msg succeed, req_data:%v, rsp_data:%v", argMsg, rc.Reply)
+		mlog.Info("rpc handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.Req.MethodName, argMsg, rc.Reply)
 	} else {
-		mlog.Error("rpc handler msg failed, req_data:%v, err:%v", argMsg, rc.ReplyErr)
+		mlog.Error("rpc handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
 	}
 	ser(rc, false)
 }

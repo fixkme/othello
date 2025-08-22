@@ -1,0 +1,22 @@
+{
+    "files.exclude": {
+        "**/*.js.map": true,
+        "**/*.js": { "when": "$(basename).ts"}
+    },
+    "workbench.editor.enablePreview": true,
+    "workbench.editor.showTabs": "multiple",
+    "go.testFlags": ["-count=1"],
+    "go.coverageDecorator": "none",
+    "dotnet.dotnetPath":"/usr/local/share/dotnet",
+    "dotnetAcquisitionExtension.existingDotnetPath": [
+        {"extensionId": "ms-dotnettools.csharp", "path": "/usr/local/share/dotnet/dotnet"},
+        {"extensionId": "ms-dotnettools.vscode-dotnet-runtime", "path": "/usr/local/share/dotnet/dotnet"}
+    ],
+    "dlvLoadConfig": {
+        "followPointers": true,
+        "maxVariableRecurse": 1,
+        "maxStringLen": 1024,  
+        "maxArrayValues": 64,
+        "maxStructFields": -1
+    }
+}

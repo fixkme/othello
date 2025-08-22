@@ -1,8 +1,9 @@
 import { _decorator, Component, Prefab, director, Button, assetManager, AssetManager, instantiate } from 'cc';
 import { RobotMenu } from './RobotMenu';
-import { GameType, PkgNames } from '../common/ConstValue';
+import { GameType, PkgNames, SecneName } from '../common/ConstValue';
 import { Popup } from './Popup';
 import { GameOnline } from '../gameplay/GameOnline';
+import { NetworkManager } from '../common/NetworkManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('StartGame')
@@ -21,8 +22,8 @@ export class StartGame extends Component {
     public targetBundle: AssetManager.Bundle = null;
     public robotScenePreloaded: boolean = false;
     public onlineScenePreloaded: boolean = false;
-    public readonly gameRobotScene: string = "game_robot";
-    public readonly gameOnlineScene: string = "game_online";
+    public readonly gameRobotScene: string = SecneName.GameRobot;
+    public readonly gameOnlineScene: string = SecneName.GameOnline;
 
 
     protected onLoad(): void {
@@ -95,9 +96,13 @@ export class StartGame extends Component {
 
     // 联机对战
     onBtnStartPlayerClick() {
-        //ws 连接 TODO
+        //是否已经登录
+        if (!NetworkManager.getInstance().isLogined) {
+            console.log("未登录不能进入联机玩法");
+            return;
+        }
         //进入联机场景
-        if (!this.robotScenePreloaded) {
+        if (!this.onlineScenePreloaded) {
             console.warn('game联机场景尚未预加载完成');
             return;
         }

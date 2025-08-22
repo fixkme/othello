@@ -1,7 +1,8 @@
 import { _decorator, Component, director } from 'cc';
 import { GlobalWebSocket } from './WebSocket';
-import { CLogin, SLogin } from '../pb/game/player';
+import { CEnterGame, CLogin, SLogin } from '../pb/game/player';
 import { PlayerInfo } from '../pb/datas/player_data';
+import { SecneName } from './ConstValue';
 const { ccclass } = _decorator;
 
 @ccclass('NetworkManager')
@@ -75,7 +76,7 @@ export class NetworkManager extends Component {
     }
 
     private _onConnected(event: Event): void {
-        console.log('[Network] Connected to server');
+        console.log('[Network] succeed to connect to server');
 
         // 登录
         const clogin = CLogin.create()
@@ -84,12 +85,13 @@ export class NetworkManager extends Component {
         if (ok) {
             console.log('[Network] succeed to send clogin message');
         } else {
-            console.log('[Network] failed to send clogin message');
+            console.error('[Network] failed to send clogin message');
         }
     }
 
     private _onDisconnected(event: CloseEvent): void {
         console.log('[Network] Disconnected from server');
+        this.isLogined = false;
     }
 
     private _onError(event: Event): void {
@@ -104,6 +106,14 @@ export class NetworkManager extends Component {
         const msg = data as SLogin
         this.playerInfo = msg.playerData.modelPlayerInfo
         this.isLogined = true
+        if (msg.tableId > 0) {
+            const currentSceneName = director.getScene().name
+            console.info(`[Network] login in ${currentSceneName} scene`)
+            if ( currentSceneName == SecneName.GameOnline) {
+                const cEnterGame = CEnterGame.create();
+                this._ws.sendMessage(CEnterGame, cEnterGame)
+            }
+        }
         console.log('[Network] Login succeed, playerInfo:', this.playerInfo);
     }
 

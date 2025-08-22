@@ -26,18 +26,10 @@
             },
             "configMode": "overwrite",
             "overwriteSettings": {
-              "alipay-mini-game": {},
-              "bytedance-mini-game": {},
-              "fb-instant-games": {},
-              "huawei-quick-game": {},
-              "migu-mini-game": {},
-              "oppo-mini-game": {},
-              "taobao-mini-game": {},
-              "vivo-mini-game": {},
               "wechatgame": {
-                "isRemote": false
-              },
-              "xiaomi-quick-game": {}
+                "isRemote": false,
+                "compressionType": "subpackage"
+              }
             }
           }
         }

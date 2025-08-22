@@ -11,7 +11,7 @@
   },
   {
     "__type__": "cc.Scene",
-    "_name": "main",
+    "_name": "game_robot",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,

@@ -50,19 +50,21 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 		return
 	}
 	// 检查是否登录
-	if client.PlayerId == 0 && wsMessage.MsgName != "game.CLogin" {
-		mlog.Error("first msg must game.CLogin")
+	if client.PlayerId == 0 && wsMessage.MsgName != cloginMsgName {
+		mlog.Error("first msg must is %s", cloginMsgName)
 		client.conn.Close()
 		return
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
-			mlog.Error("routing player %d panic: %v", client.PlayerId, r)
+			mlog.Error("routing player %s,%d panic: %v", client.Account, client.PlayerId, r)
 			err = errors.New("routing panic")
 		}
 		if err != nil {
-			replyClientResponse(client, wsMessage.Uuid, "", nil, nil, err)
+			mlog.Error("routing player %s,%d error: %v", client.Account, client.PlayerId, err)
+			respMsgName := strings.Replace(wsMessage.MsgName, ".C", ".S", 1)
+			replyClientResponse(client, wsMessage.Uuid, respMsgName, nil, nil, err)
 		}
 	}()
 
@@ -74,7 +76,7 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 	service, method := v2[0], v2[1][1:]
 	serviceNode := getServiceNodeName(client, service)
 	// 路由数据到game或其他
-	RpcModule.GetRpcImp().Call(serviceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
+	_, err = RpcModule.GetRpcImp().Call(serviceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
 		md := &rpc.Meta{}
 		md.AddStr(values.Rpc_GateId, RpcNodeName)
 		if client.PlayerId != 0 {
@@ -110,7 +112,10 @@ func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 		}
 	}()
 	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
-	if passData.ReqMsgName == cloginMsgName {
+	//respMsgName := strings.Replace(passData.ReqMsgName, ".C", ".S", 1)
+	respMsgName := passData.Service + ".S" + passData.Method
+	rpcErr := rpcReply.Err
+	if rpcErr == nil && passData.ReqMsgName == cloginMsgName {
 		cli := passData.Cli
 		cli.PlayerId = rpcReply.RspMd.GetInt(values.Rpc_SessionId)
 		if cli.PlayerId > 0 {
@@ -119,13 +124,12 @@ func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 			mlog.Error("ProcessRpcReply slogin no session id, acc:%s, rspMd:%v", cli.Account, rpcReply.RspMd)
 		}
 	}
-	msgName := passData.Service + ".S" + passData.Method
-	rspData := rpcReply.Rsp.([]byte)
-	replyClientResponse(passData.Cli, passData.Uuid, msgName, rpcReply.RspMd, rspData, rpcReply.Err)
+	rspData, _ := rpcReply.Rsp.([]byte)
+	replyClientResponse(passData.Cli, passData.Uuid, respMsgName, rpcReply.RspMd, rspData, rpcErr)
 }
 
 func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, rspData []byte, callErr error) {
-	wsRsp := &ws.WsResponseMessage{Uuid: uuid}
+	wsRsp := &ws.WsResponseMessage{Uuid: uuid, MsgName: msgName}
 	if callErr != nil {
 		codeErr, ok := callErr.(errs.CodeError)
 		if ok {
@@ -136,7 +140,6 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 			wsRsp.ErrorDesc = callErr.Error()
 		}
 	} else {
-		wsRsp.MsgName = msgName
 		if offsets := rspMd.IntValues(values.Rpc_NoticeOffset); len(offsets) > 0 {
 			// response
 			wsRsp.Payload = rspData[:offsets[0]]

@@ -36,4 +36,4 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
-//replace github.com/fixkme/gokit => ../../gokit
+replace github.com/fixkme/gokit => ../../gokit

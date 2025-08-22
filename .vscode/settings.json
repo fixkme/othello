@@ -1,0 +1,28 @@
+{
+    "go.goroot": "/usr/local/go",
+    "go.gopath": "/Users/dragonplus/go",
+    "go.useLanguageServer": true,
+    "go.toolsManagement.autoUpdate": true,
+    "go.delveConfig": {
+        "dlvLoadConfig": {
+            "followPointers": true,
+            "maxVariableRecurse": 1,
+            "maxStringLen": 64,
+            "maxArrayValues": 64,
+            "maxStructFields": -1
+        }
+    },
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.server.useOmnisharp": true,
+    "editor.tokenColorCustomizations": {
+    // "textMateRules": [
+    //     {
+    //         "scope": "variable",
+    //         "settings": {
+    //             "foreground": "#FF0000" // 红色，仅作为示例
+    //         }
+    //     }
+    // ]
+    },
+    "omnisharp.dotnetPath": "/usr/local/share/dotnet"
+}

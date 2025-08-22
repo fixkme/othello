@@ -54,8 +54,12 @@ func (g *Global) GetTable(tableId int64) *Table {
 }
 
 func (g *Global) CreatePlayer(acc string) *Player {
-	g.playerIdGen++
-	pid := g.playerIdGen
+	pid, ex := g.accPlayers[acc]
+	if !ex {
+		g.playerIdGen++
+		pid = g.playerIdGen
+	}
+
 	player := &Player{
 		MPlayerModel: models.NewMPlayerModel(),
 	}
@@ -70,12 +74,11 @@ func (g *Global) CreatePlayer(acc string) *Player {
 }
 
 func (g *Global) RemovePlayer(playerId int64) {
-	p, ok := g.players[playerId]
+	_, ok := g.players[playerId]
 	if !ok {
 		return
 	}
 	delete(g.players, playerId)
-	delete(g.accPlayers, p.GetModelPlayerInfo().GetAccount())
 }
 
 func (g *Global) CreateTable(p *Player) *Table {

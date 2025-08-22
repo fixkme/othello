@@ -120,10 +120,10 @@ export class GlobalWebSocket {
             const uint8Array = new Uint8Array(data);
             const wsMsg = WsResponseMessage.decode(uint8Array);
             if (wsMsg == null ) {
-                console.error('[WebSocket] decode WsResponseMessage failed:');
+                console.error('[WebSocket] decode WsResponseMessage failed');
                 return;
             }
-            
+
             if (wsMsg.uuid.length > 0) {
                 // response
                 if (wsMsg.errorCode > 0) {

@@ -2,7 +2,13 @@
 export const PkgNames = {
     Common: 'commonpkg',
     Game: 'gamepkg',
-} 
+}
+
+export const SecneName = {
+    Start: 'start',
+    GameRobot: 'game_robot',
+    GameOnline: 'game_online',
+}
 
 export enum GameType {
     ROBOT = 0, // 人机对战
