@@ -1,11 +1,13 @@
 import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
     EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button,
-    Prefab, instantiate, view, Animation, AudioSource} from 'cc';
+    Prefab, instantiate, view, Animation, AudioSource, assetManager, director} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 import { GlobalWebSocket } from '../common/WebSocket';
-import { CEnterGame, CPlacePiece, PGameResult, PPlacePiece, PPlayerEnterGame, SEnterGame } from '../pb/game/player';
+import { CEnterGame, CLeaveGame, CPlacePiece, PGameResult, PPlacePiece,
+    PPlayerEnterGame, SEnterGame } from '../pb/game/player';
 import { PlayerInfo, TableInfo } from '../pb/datas/player_data';
 import { NetworkManager } from '../common/NetworkManager';
+import { PkgNames, SecneName } from '../common/ConstValue';
 const { ccclass, property } = _decorator;
 
 
@@ -56,6 +58,8 @@ export class GameOnline extends Component {
     private buttonRenew: Button = null!;
     @property(Button)
     private buttonRetract: Button = null!;
+    @property(Button)
+    private buttonReturn: Button = null!;
 
     @property(Prefab)
     private prefabPiece: Prefab = null!;
@@ -93,13 +97,10 @@ export class GameOnline extends Component {
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.buttonRenew.node.on(Button.EventType.CLICK, this.onButtonRenewClick, this);
         this.buttonRetract.node.on(Button.EventType.CLICK, this.onButtonRetractClick, this);
+        this.buttonReturn.node.on(Button.EventType.CLICK, this.onButtonReturnClick, this);
     }
 
     onDestroy() {
-        this.buttonRenew.node.off(Button.EventType.CLICK, this.onButtonRenewClick, this);
-        this.buttonRetract.node.off(Button.EventType.CLICK, this.onButtonRetractClick, this);
-        this.node.off(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-
         this._ws.off(SEnterGame.$type, this.onSelfEnterGame, this)
         this._ws.off(PPlayerEnterGame.$type, this.onOtherEnterGame, this)
         this._ws.off(PPlacePiece.$type, this.onPlacePieceMsg, this)
@@ -327,6 +328,7 @@ export class GameOnline extends Component {
         endWidget.getChildByName("Label").getComponent(Label).string = winStr;
         endWidget.getChildByName("Button").getComponent(Button).node.on(Button.EventType.CLICK, () => {
             endWidget.destroy();
+            this.returnStartScene()
         }, this);
         this.node.parent.addChild(endWidget);
     }
@@ -383,6 +385,20 @@ export class GameOnline extends Component {
         this.blackScore.string = this.logic.blackCount.toString()
         this.whiteScore.string = this.logic.whiteCount.toString()
         this.logic.setOperator(PiecesType.BLACK)
+    }
+
+    // 返回
+    onButtonReturnClick() {
+        this.returnStartScene()
+    }
+
+    returnStartScene() {
+        director.loadScene(SecneName.Start, (err, scene) => {
+            if (err) {
+                console.error('start场景加载失败:', err);
+                return;
+            }
+        })
     }
 
 }

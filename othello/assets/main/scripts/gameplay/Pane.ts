@@ -1,9 +1,8 @@
 import { _decorator, Component, Sprite, SpriteFrame, Graphics, 
     EventTouch, Node, UITransform, Vec3, v2, Vec2, Label, Button,
-    Prefab, instantiate, view, Animation,
-    AudioSource} from 'cc';
+    Prefab, instantiate, view, Animation, AudioSource, director} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
-import { GameType } from '../common/ConstValue';
+import { GameType, SecneName } from '../common/ConstValue';
 const { ccclass, property } = _decorator;
 
 
@@ -32,7 +31,7 @@ export class Pane extends Component {
     
     private gameType: GameType = GameType.ROBOT; 
     private selfPieceType: PiecesType = PiecesType.BLACK; //玩家自己的
-    private opponentPieceType: PiecesType = PiecesType.WHITE; //对手的
+    //private opponentPieceType: PiecesType = PiecesType.WHITE; //对手的
     // 人机难度
     private robotDifficulty: number = 1;
     private robotContinue = false;
@@ -51,6 +50,8 @@ export class Pane extends Component {
     private buttonRenew: Button = null!;
     @property(Button)
     private buttonRetract: Button = null!;
+    @property(Button)
+    private buttonReturn: Button = null!;
 
     @property(Prefab)
     private prefabPiece: Prefab = null!;
@@ -66,6 +67,7 @@ export class Pane extends Component {
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.buttonRenew.node.on(Button.EventType.CLICK, this.onButtonRenewClick, this);
         this.buttonRetract.node.on(Button.EventType.CLICK, this.onButtonRetractClick, this);
+        this.buttonReturn.node.on(Button.EventType.CLICK, this.onButtonReturnClick, this);
     }
 
     update(deltaTime: number) {
@@ -100,7 +102,7 @@ export class Pane extends Component {
                 if (this.selfPieceType == PiecesType.WHITE) {
                     this.scheduleOnce(function () {
                         this.robotContinue = true;
-                    }, 3);
+                    }, 2);
                 }
                 break;
         }
@@ -195,6 +197,7 @@ export class Pane extends Component {
         let loc = this.logic.getBestLocation(robotPieceType, difficulty)
         if (loc) {
             console.log(`getBestLocation max : (${loc.x}, ${loc.y})`);
+            this.robotContinue = false;
             this.scheduleOnce(function () {
                 if (this.putPiece(loc.x, loc.y, robotPieceType)) {
                     return;
@@ -203,8 +206,6 @@ export class Pane extends Component {
                 if (!this.logic.canPlace(op)) {
                     this.logic.changeOperator()
                     this.robotContinue = true;
-                } else {
-                    this.robotContinue = false;
                 }
             }, 0.5);
         } else {
@@ -299,7 +300,7 @@ export class Pane extends Component {
         for (let i = 0; i < Logic.rowSize; i++) {
             for (let j = 0; j < Logic.colSize; j++) {
                 if (this.pieces[i][j]) {
-                    this.pieces[i][j].destroy();
+                    this.node.removeChild(this.pieces[i][j]);
                     this.pieces[i][j] = null;
                 }
             }
@@ -310,6 +311,12 @@ export class Pane extends Component {
         this.placePiece(4, 3, PiecesType.WHITE, false);
         this.placePiece(4, 4, PiecesType.BLACK, false);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        
+        if (this.selfPieceType == PiecesType.WHITE) {
+            this.scheduleOnce(function () {
+                this.robotContinue = true;
+            }, 2);
+        }
     }
 
     // 悔棋
@@ -323,7 +330,8 @@ export class Pane extends Component {
         removes.forEach(item => {
             let node = this.pieces[item.i][item.j]
             if (node) {
-                node.destroy();
+                this.node.removeChild(node);
+                this.pieces[item.i][item.j] = null;
             }
         });
         changes.forEach(item => {
@@ -331,7 +339,21 @@ export class Pane extends Component {
         });
         this.blackScore.string = this.logic.blackCount.toString()
         this.whiteScore.string = this.logic.whiteCount.toString()
-        this.logic.setOperator(PiecesType.BLACK)
+        this.logic.setOperator(this.selfPieceType)
+    }
+
+    // 返回
+    onButtonReturnClick() {
+        this.returnStartScene()
+    }
+
+    returnStartScene() {
+        director.loadScene(SecneName.Start, (err, scene) => {
+            if (err) {
+                console.error('start场景加载失败:', err);
+                return;
+            }
+        })
     }
 
 }
