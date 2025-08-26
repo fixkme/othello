@@ -1,17 +1,19 @@
 package internal
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/emirpasic/gods/utils"
+	"github.com/fixkme/gokit/db/mongo/delta"
+	"github.com/fixkme/othello/server/common/shared"
 	"github.com/fixkme/othello/server/pb/game"
-	"github.com/fixkme/othello/server/pb/models"
 )
 
 type Global struct {
-	playerIdGen int64
-	tableIdGen  int64
+	// playerIdGen int64
+	// tableIdGen  int64
 
 	timerCallbacks map[string]func(data any, now int64)
 
@@ -20,20 +22,38 @@ type Global struct {
 	tables         map[int64]*Table   // tableId -> Table
 	matching       *redblacktree.Tree // 等待匹配
 	offlinePlayers map[int64]int64    // pid => time
+
+	playerMonitor *delta.DeltaMonitor[int64]
 }
 
 var global *Global
 
 func init() {
 	global = &Global{
-		playerIdGen:    0,
-		tableIdGen:     0,
+		timerCallbacks: make(map[string]func(data any, now int64)),
 		accPlayers:     make(map[string]int64),
 		players:        make(map[int64]*Player),
 		tables:         make(map[int64]*Table),
 		matching:       redblacktree.NewWith(utils.Int64Comparator),
 		offlinePlayers: make(map[int64]int64),
 	}
+}
+
+func (g *Global) Init() error {
+	g.registerTimerCallback(&SaveDataTimer{}, g.onSaveDataTimer)
+	g.playerMonitor = delta.NewDeltaMonitor[int64](shared.MongoClient, dbName, playerCollName)
+	g.playerMonitor.Start(context.Background())
+	if err := g.loadDatas(); err != nil {
+		return err
+	}
+	if err := g.createSaveDataTimer(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *Global) OnRetire() {
+	g.playerMonitor.Stop()
 }
 
 func (g *Global) GetPlayerByAccount(acc string) *Player {
@@ -53,16 +73,18 @@ func (g *Global) GetTable(tableId int64) *Table {
 	return g.tables[tableId]
 }
 
-func (g *Global) CreatePlayer(acc string) *Player {
+func (g *Global) CreatePlayer(acc string) (*Player, error) {
 	pid, ex := g.accPlayers[acc]
 	if !ex {
-		g.playerIdGen++
-		pid = g.playerIdGen
+		id, err := g.GeneId(idName_Player)
+		if err != nil {
+			return nil, err
+		}
+		pid = id
 	}
 
-	player := &Player{
-		MPlayerModel: models.NewMPlayerModel(),
-	}
+	player := NewPlayer(pid, nil)
+	player.BindMonitor(g.playerMonitor)
 	player.SetPlayerId(pid)
 	pinfo := player.GetModelPlayerInfo()
 	pinfo.SetId(pid)
@@ -70,7 +92,8 @@ func (g *Global) CreatePlayer(acc string) *Player {
 	pinfo.SetName("player_" + strconv.Itoa(int(pid)))
 	g.players[pid] = player
 	g.accPlayers[acc] = pid
-	return player
+	g.playerMonitor.SaveEntity(player)
+	return player, nil
 }
 
 func (g *Global) RemovePlayer(playerId int64) {
@@ -81,12 +104,15 @@ func (g *Global) RemovePlayer(playerId int64) {
 	delete(g.players, playerId)
 }
 
-func (g *Global) CreateTable(p *Player) *Table {
-	g.tableIdGen++
-	tb := NewTable(g.tableIdGen, p)
+func (g *Global) CreateTable(p *Player) (*Table, error) {
+	id, err := g.GeneId(idName_Table)
+	if err != nil {
+		return nil, err
+	}
+	tb := NewTable(id, p)
 	tb.Init()
 	g.tables[tb.Id] = tb
-	return tb
+	return tb, nil
 }
 
 func (g *Global) RemoveTable(tid int64) {

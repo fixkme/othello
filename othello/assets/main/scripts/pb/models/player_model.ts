@@ -18,12 +18,13 @@ export const protobufPackage = "models";
 export interface PlayerModel {
   $type: "models.PlayerModel";
   playerId: number;
+  account: string;
   /** 玩家信息 */
   modelPlayerInfo: PlayerInfo | undefined;
 }
 
 function createBasePlayerModel(): PlayerModel {
-  return { $type: "models.PlayerModel", playerId: 0, modelPlayerInfo: undefined };
+  return { $type: "models.PlayerModel", playerId: 0, account: "", modelPlayerInfo: undefined };
 }
 
 export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
@@ -33,8 +34,11 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
     if (message.playerId !== 0) {
       writer.uint32(8).int64(message.playerId);
     }
+    if (message.account !== "") {
+      writer.uint32(18).string(message.account);
+    }
     if (message.modelPlayerInfo !== undefined) {
-      PlayerInfo.encode(message.modelPlayerInfo, writer.uint32(18).fork()).join();
+      PlayerInfo.encode(message.modelPlayerInfo, writer.uint32(26).fork()).join();
     }
     return writer;
   },
@@ -59,6 +63,14 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
             break;
           }
 
+          message.account = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
           message.modelPlayerInfo = PlayerInfo.decode(reader, reader.uint32());
           continue;
         }
@@ -75,6 +87,7 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
     return {
       $type: PlayerModel.$type,
       playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
+      account: isSet(object.account) ? globalThis.String(object.account) : "",
       modelPlayerInfo: isSet(object.modelPlayerInfo) ? PlayerInfo.fromJSON(object.modelPlayerInfo) : undefined,
     };
   },
@@ -83,6 +96,9 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
     const obj: any = {};
     if (message.playerId !== 0) {
       obj.playerId = Math.round(message.playerId);
+    }
+    if (message.account !== "") {
+      obj.account = message.account;
     }
     if (message.modelPlayerInfo !== undefined) {
       obj.modelPlayerInfo = PlayerInfo.toJSON(message.modelPlayerInfo);
@@ -96,6 +112,7 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
   fromPartial<I extends Exact<DeepPartial<PlayerModel>, I>>(object: I): PlayerModel {
     const message = createBasePlayerModel();
     message.playerId = object.playerId ?? 0;
+    message.account = object.account ?? "";
     message.modelPlayerInfo = (object.modelPlayerInfo !== undefined && object.modelPlayerInfo !== null)
       ? PlayerInfo.fromPartial(object.modelPlayerInfo)
       : undefined;

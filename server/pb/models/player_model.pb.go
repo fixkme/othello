@@ -28,8 +28,9 @@ const (
 type PBPlayerModel struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId int64                  `protobuf:"varint,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	Account  string                 `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
 	// 玩家信息
-	ModelPlayerInfo *datas.PBPlayerInfo `protobuf:"bytes,2,opt,name=model_player_info,json=modelPlayerInfo,proto3" json:"model_player_info,omitempty"`
+	ModelPlayerInfo *datas.PBPlayerInfo `protobuf:"bytes,3,opt,name=model_player_info,json=modelPlayerInfo,proto3" json:"model_player_info,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -71,6 +72,13 @@ func (x *PBPlayerModel) GetPlayerId() int64 {
 	return 0
 }
 
+func (x *PBPlayerModel) GetAccount() string {
+	if x != nil {
+		return x.Account
+	}
+	return ""
+}
+
 func (x *PBPlayerModel) GetModelPlayerInfo() *datas.PBPlayerInfo {
 	if x != nil {
 		return x.ModelPlayerInfo
@@ -82,10 +90,11 @@ var File_models_player_model_proto protoreflect.FileDescriptor
 
 const file_models_player_model_proto_rawDesc = "" +
 	"\n" +
-	"\x19models/player_model.proto\x12\x06models\x1a\x17pbext/options_ext.proto\x1a\x17datas/player_data.proto\"o\n" +
+	"\x19models/player_model.proto\x12\x06models\x1a\x17pbext/options_ext.proto\x1a\x17datas/player_data.proto\"\x89\x01\n" +
 	"\vPlayerModel\x12\x1b\n" +
-	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12=\n" +
-	"\x11model_player_info\x18\x02 \x01(\v2\x11.datas.PlayerInfoR\x0fmodelPlayerInfo:\x04\x80\xb5\x18\x01B,Z*github.com/fixkme/othello/server/pb/modelsb\x06proto3"
+	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x18\n" +
+	"\aaccount\x18\x02 \x01(\tR\aaccount\x12=\n" +
+	"\x11model_player_info\x18\x03 \x01(\v2\x11.datas.PlayerInfoR\x0fmodelPlayerInfo:\x04\x80\xb5\x18\x01B,Z*github.com/fixkme/othello/server/pb/modelsb\x06proto3"
 
 var (
 	file_models_player_model_proto_rawDescOnce sync.Once

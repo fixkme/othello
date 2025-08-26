@@ -35,16 +35,22 @@ func (m *LogicModule) OnInit() error {
 	timer.Start(m.quit)
 	m.timerCaller = global.onTimerTrigger
 	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, 1)
-	err := RpcModule.GetRpcImp().RegisterService(serviceNodeName, func(rpcSrv *rpc.Server, nodeName string) error {
+	err := RpcModule.GetRpcImp().RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
 		mlog.Info("RegisterService succeed %v", nodeName)
 		game.RegisterGameServer(rpcSrv, &Service{})
 		return nil
 	})
-
+	if err := global.Init(); err != nil {
+		return fmt.Errorf("init global failed err:%v", err)
+	}
 	return err
 }
 
 func (m *LogicModule) Run() {
+	defer func() {
+		global.OnRetire()
+	}()
+
 	for {
 		select {
 		case <-m.quit:

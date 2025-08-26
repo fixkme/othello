@@ -64,7 +64,10 @@ func (s *Service) Login(ctx context.Context, in *game.CLogin) (*game.SLogin, err
 	}
 	p := global.GetPlayerByAccount(acct)
 	if p == nil {
-		p = global.CreatePlayer(acct)
+		p, err = global.CreatePlayer(acct)
+		if err != nil {
+			return nil, err
+		}
 	}
 	var inTable int64
 	if p.PlayingTable != nil {
@@ -98,7 +101,10 @@ func (s *Service) EnterGame(ctx context.Context, in *game.CEnterGame) (*game.SEn
 		// 创建或匹配
 		tb = global.CheckMatchTable(p)
 		if tb == nil {
-			tb = global.CreateTable(p)
+			tb, err = global.CreateTable(p)
+			if err != nil {
+				return nil, err
+			}
 			global.AddMatching(tb)
 		}
 		resp.TableInfo = tb.PackPB()

@@ -5,7 +5,26 @@ import (
 	"strings"
 
 	"github.com/fixkme/gokit/mlog"
+	"github.com/fixkme/gokit/util/time"
 )
+
+type SaveDataTimer struct {
+}
+
+func (g *Global) createSaveDataTimer() error {
+	const interval = 60000 //ms
+	now := time.NowMs()
+	if _, err := logicModule.CreateTimer(now+interval, &SaveDataTimer{}); err != nil {
+		mlog.Error("createSaveDataTimer err:%v", err)
+	}
+	return nil
+}
+
+func (g *Global) onSaveDataTimer(_ any, now int64) {
+	mlog.Debug("onSaveDataTimer")
+	g.playerMonitor.SaveChangedDatas()
+	g.createSaveDataTimer()
+}
 
 func (g *Global) registerTimerCallback(event any, callback func(data any, now int64)) {
 	name := GetEventName(event)

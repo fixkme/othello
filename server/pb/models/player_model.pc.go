@@ -18,13 +18,14 @@ import (
 // 玩家数据
 type MPlayerModel struct {
 	playerId int64
+	account  string
 	// 玩家信息
 	modelPlayerInfo *datas.MPlayerInfo
 
 	// 自己本身的同步key,由父对象指定
 	selfSyncID string
 	// 本对象所有属性的同步key数组
-	fieldSyncIDs [2]string
+	fieldSyncIDs [3]string
 	// 收集字典,每帧清空同步
 	collector pbext.ICollector
 	// 监测变化回调
@@ -36,7 +37,8 @@ func NewMPlayerModel() *MPlayerModel {
 	m := &MPlayerModel{}
 	m.modelPlayerInfo = datas.NewMPlayerInfo()
 	m.fieldSyncIDs[0] = "player_id"
-	m.fieldSyncIDs[1] = "model_player_info"
+	m.fieldSyncIDs[1] = "account"
+	m.fieldSyncIDs[2] = "model_player_info"
 	return m
 }
 
@@ -56,8 +58,9 @@ func (m *MPlayerModel) SetCollector(syncID string, collector pbext.ICollector, c
 		syncID = syncID + "."
 	}
 	m.fieldSyncIDs[0] = syncID + "player_id"
-	m.fieldSyncIDs[1] = syncID + "model_player_info"
-	m.modelPlayerInfo.SetCollector(m.fieldSyncIDs[1], collector, cb)
+	m.fieldSyncIDs[1] = syncID + "account"
+	m.fieldSyncIDs[2] = syncID + "model_player_info"
+	m.modelPlayerInfo.SetCollector(m.fieldSyncIDs[2], collector, cb)
 }
 
 // 检查数值变化函数
@@ -81,6 +84,7 @@ func (m *MPlayerModel) ToPB() *PBPlayerModel {
 	}
 	pb := NewPBPlayerModel()
 	pb.PlayerId = m.playerId
+	pb.Account = m.account
 	pb.ModelPlayerInfo = m.modelPlayerInfo.ToPB()
 	return pb
 }
@@ -91,6 +95,7 @@ func (m *MPlayerModel) InitFromPB(pb *PBPlayerModel) {
 		return
 	}
 	m.playerId = pb.PlayerId
+	m.account = pb.Account
 	m.modelPlayerInfo.InitFromPB(pb.ModelPlayerInfo)
 }
 
@@ -100,6 +105,9 @@ func (m *MPlayerModel) String() string {
 	strBuilder.WriteString("{")
 	strBuilder.WriteString("playerId:")
 	strBuilder.WriteString(fmt.Sprintf("%v", m.playerId))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("account:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.account))
 	strBuilder.WriteString(", ")
 	strBuilder.WriteString("modelPlayerInfo:")
 	strBuilder.WriteString(m.modelPlayerInfo.String())
@@ -123,14 +131,23 @@ func (m *MPlayerModel) AddPlayerId(add int64) int64 {
 	return m.playerId
 }
 
+func (m *MPlayerModel) GetAccount() string {
+	return m.account
+}
+
+func (m *MPlayerModel) SetAccount(value string) {
+	m.checkDirty(m.account, value, m.fieldSyncIDs[1], true)
+	m.account = value
+}
+
 // 玩家信息
 func (m *MPlayerModel) GetModelPlayerInfo() *datas.MPlayerInfo {
 	return m.modelPlayerInfo
 }
 
 func (m *MPlayerModel) SetModelPlayerInfo(value *datas.MPlayerInfo) {
-	if m.checkDirty(m.modelPlayerInfo, value, m.fieldSyncIDs[1], true) {
-		value.SetCollector(m.fieldSyncIDs[1], m.collector, m.changedCb)
+	if m.checkDirty(m.modelPlayerInfo, value, m.fieldSyncIDs[2], true) {
+		value.SetCollector(m.fieldSyncIDs[2], m.collector, m.changedCb)
 	}
 	m.modelPlayerInfo = value
 }

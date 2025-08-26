@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"github.com/fixkme/gokit/db/mongo/delta"
 	"github.com/fixkme/othello/server/pb/models"
 )
 
@@ -8,6 +9,31 @@ type Player struct {
 	*models.MPlayerModel
 	GateId       string
 	PlayingTable *Table
+
+	*delta.DeltaCollector[int64] `json:"-"`
+}
+
+func NewPlayer(id int64, modelData *models.MPlayerModel) *Player {
+	p := &Player{
+		DeltaCollector: delta.NewDeltaCollector(id),
+	}
+	if modelData != nil {
+		p.MPlayerModel = modelData
+	} else {
+		p.MPlayerModel = models.NewMPlayerModel()
+	}
+	return p
+}
+
+func (p *Player) BindMonitor(m delta.IDeltaMonitor[int64]) {
+	cb := func(_ string) {
+		if p.IsDataChange() {
+			return
+		}
+		p.SetDataChange(true)
+		m.OnCollect(p)
+	}
+	p.SetCollector("", p, cb)
 }
 
 func (p *Player) Id() int64 {

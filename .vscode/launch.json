@@ -33,6 +33,7 @@
                 "RPC_LISTEN_ADDR":":5001", 
                 "RPC_ADDR":"10.8.9.1:5001",
                 "ETC_ENDPOINTS": "10.8.9.1:2379",
+                "MONGO_URL": "mongodb://localhost:27017",
             },
             "debugAdapter": "legacy",
             "dlvFlags": [
