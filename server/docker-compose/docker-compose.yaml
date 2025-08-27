@@ -32,6 +32,7 @@ services:
       - RPC_LISTEN_ADDR=:2333
       - RPC_ADDR=game:2333
       - ETC_ENDPOINTS=etcd:2379
+      - MONGO_URL=mongodb://localhost:27017
     command: ["./docker-compose/entrypoint.sh", "game", "run"]
     depends_on:
       - etcd
@@ -55,3 +56,14 @@ services:
       - --advertise-client-urls=http://0.0.0.0:2379
       - --listen-client-urls=http://0.0.0.0:2379
       - --initial-cluster=node1=http://0.0.0.0:2380
+  # mongodb
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ${MONGODB_DATA}:/data/db
+    ports:
+      - "27017:27017"
+    # environment: 
+    #   MONGO_INITDB_ROOT_USERNAME: root #第一次启动容器时创建一个具有 root 权限的初始用户
+    #   MONGO_INITDB_ROOT_PASSWORD: 123456
