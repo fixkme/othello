@@ -40,7 +40,7 @@ func (s *GateServer) OnInit() error {
 	listenAddr := env.GetEnvStr(env.APP_GateListenAddr)
 	opt := &wsg.ServerOptions{
 		Options:       gnetOpt,
-		Addr:          fmt.Sprintf("tcp4://%s", listenAddr), // "tcp://:7070",
+		Addr:          fmt.Sprintf("tcp4://%s", listenAddr), // "tcp4://:7070",
 		OnHandshake:   func(conn *wsg.Conn, r *http.Request) error { return s.routerPool.OnHandshake(conn, r) },
 		OnClientClose: s.OnClientClose,
 		OnServerShutdown: func(_ gnet.Engine) {

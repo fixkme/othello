@@ -58,7 +58,7 @@ func RpcHandler(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 			mlog.Error("game handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
 		}
 	}
-
+	//mlog.Debug("game push handler method:%s", rc.Req.MethodName)
 	if err := logicModule.PushLogicFunc(fn); err != nil {
 		mlog.Error("game rpc handler push logic func failed: %v", err)
 		rc.ReplyErr = err

@@ -87,9 +87,9 @@ export class GlobalWebSocket {
         try {
             this._socket = new WebSocket(this._url);
             this._socket.binaryType = this._binaryType;
-            this._socket.onopen = this._onOpen.bind(this);
-            this._socket.onmessage = this._onMessage.bind(this);
             this._socket.onerror = this._onError.bind(this);
+            this._socket.onmessage = this._onMessage.bind(this);
+            this._socket.onopen = this._onOpen.bind(this);
             this._socket.onclose = this._onClose.bind(this);
         } catch (e) {
             console.error('[WebSocket] Connection error:', e);
@@ -110,6 +110,7 @@ export class GlobalWebSocket {
     }
 
     private _onMessage(event: MessageEvent): void {
+        console.debug('[WebSocket] Received message');
         let data = event.data;
         try {
             // 处理二进制数据

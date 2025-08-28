@@ -12,7 +12,7 @@ type SaveDataTimer struct {
 }
 
 func (g *Global) createSaveDataTimer() error {
-	const interval = 60000 //ms
+	const interval = 30000 //ms
 	now := time.NowMs()
 	if _, err := logicModule.CreateTimer(now+interval, &SaveDataTimer{}); err != nil {
 		mlog.Error("createSaveDataTimer err:%v", err)

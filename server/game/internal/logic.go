@@ -54,12 +54,12 @@ func (m *LogicModule) Run() {
 	for {
 		select {
 		case <-m.quit:
+			mlog.Debug("game LogicModule quit")
 			return
 		case fn := <-m.fnChan:
 			fn()
 		case promise := <-m.timerCbChan:
 			m.timerCaller(promise.Data, promise.NowTs)
-			return
 		}
 	}
 }

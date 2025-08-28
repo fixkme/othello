@@ -30,7 +30,7 @@ func client(msg proto.Message, out proto.Message) {
 		panic(err)
 	}
 	key, _ := generateWebSocketKey()
-	content := "GET /chat HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: " + key + "\r\n" +
+	content := "GET /ws?x-account=acc_test HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: " + key + "\r\n" +
 		"x-player-id: " + strconv.Itoa(10) + "\r\n\r\n"
 	if _, err = conn.Write([]byte(content)); err != nil {
 		panic(err)
