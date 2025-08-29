@@ -10,7 +10,7 @@ export class NetworkManager extends Component {
     private static _instance: NetworkManager;
     private _ws: GlobalWebSocket = GlobalWebSocket.getInstance();
 
-    private readonly WS_URL = "ws://127.0.0.1:7070/ws";
+    private readonly WS_URL = "ws://10.8.9.1:7070/ws";
     private account: string = "";
     public playerInfo: PlayerInfo = null;
     public isLogined: boolean = false;
