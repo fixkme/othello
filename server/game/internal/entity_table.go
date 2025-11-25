@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util/time"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/pb/datas"
 	"github.com/fixkme/othello/server/pb/game"
 )
@@ -82,7 +82,7 @@ func NewTable(tid int64, p *Player) *Table {
 }
 
 func (tb *Table) Init() {
-	tb.CreateTime = time.NowMs()
+	tb.CreateTime = util.NowMs()
 	tb.Reset()
 }
 

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util/app"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common/framework"
 	"github.com/fixkme/othello/server/gate/internal"
 )
@@ -26,7 +26,7 @@ func start() {
 
 	rpcModule := framework.CreateRpcModule("gate_rpc", nil, nil)
 	internal.RpcModule = rpcModule
-	app.DefaultApp().Run(
+	util.DefaultApp().Run(
 		internal.NewGateModule(),
 		rpcModule,
 		internal.NewLogicModule(),

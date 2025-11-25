@@ -3,17 +3,17 @@ package internal
 import (
 	"fmt"
 
+	"github.com/fixkme/gokit/clock"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/gokit/util/app"
-	"github.com/fixkme/gokit/util/timer"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common/const/values"
 	"github.com/fixkme/othello/server/pb/game"
 )
 
 type LogicModule struct {
 	fnChan      chan func()
-	timerCbChan chan *timer.Promise
+	timerCbChan chan *clock.Promise
 	timerCaller func(data any, now int64)
 	quit        chan struct{}
 	name        string
@@ -21,10 +21,10 @@ type LogicModule struct {
 
 var logicModule *LogicModule
 
-func NewLogicModule() app.Module {
+func NewLogicModule() util.Module {
 	logicModule = &LogicModule{
 		fnChan:      make(chan func(), 1024),
-		timerCbChan: make(chan *timer.Promise, 1024),
+		timerCbChan: make(chan *clock.Promise, 1024),
 		quit:        make(chan struct{}, 1),
 		name:        "game_logic",
 	}
@@ -32,7 +32,7 @@ func NewLogicModule() app.Module {
 }
 
 func (m *LogicModule) OnInit() error {
-	timer.Start(m.quit)
+	clock.Start(m.quit)
 	m.timerCaller = global.onTimerTrigger
 	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, 1)
 	err := RpcModule.GetRpcImp().RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
@@ -73,11 +73,11 @@ func (m *LogicModule) Name() string {
 }
 
 func (m *LogicModule) CreateTimer(when int64, data any) (timerId int64, err error) {
-	return timer.NewTimer(when, data, m.timerCbChan, nil)
+	return clock.NewTimer(when, data, m.timerCbChan, nil)
 }
 
 func (m *LogicModule) CancelTimer(timerId int64) {
-	timer.CancelTimer(timerId)
+	clock.CancelTimer(timerId)
 }
 
 func (m *LogicModule) PushLogicFunc(f func()) error {

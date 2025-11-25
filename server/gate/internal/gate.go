@@ -7,7 +7,7 @@ import (
 
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/gokit/util/app"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/gokit/wsg"
 	"github.com/fixkme/othello/server/common/const/env"
 	"github.com/fixkme/othello/server/common/const/values"
@@ -24,7 +24,7 @@ type GateServer struct {
 	retired    bool // server是否Shutdown
 }
 
-func NewGateModule() app.Module {
+func NewGateModule() util.Module {
 	m := &GateServer{
 		name: "gate",
 	}

@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util/app"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common/const/env"
 	"github.com/fixkme/othello/server/common/framework"
 	"github.com/fixkme/othello/server/common/shared"
@@ -35,7 +35,7 @@ func start() {
 
 	rpcModule := framework.CreateRpcModule("game_rpc", internal.DispatcherFunc, internal.RpcHandler)
 	internal.RpcModule = rpcModule
-	app.DefaultApp().Run(
+	util.DefaultApp().Run(
 		rpcModule,
 		internal.NewLogicModule(),
 	)

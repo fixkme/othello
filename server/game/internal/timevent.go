@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util/time"
+	"github.com/fixkme/gokit/util"
 )
 
 type SaveDataTimer struct {
@@ -13,7 +13,7 @@ type SaveDataTimer struct {
 
 func (g *Global) createSaveDataTimer() error {
 	const interval = 30000 //ms
-	now := time.NowMs()
+	now := util.NowMs()
 	if _, err := logicModule.CreateTimer(now+interval, &SaveDataTimer{}); err != nil {
 		mlog.Error("createSaveDataTimer err:%v", err)
 	}

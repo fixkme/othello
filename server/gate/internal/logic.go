@@ -8,14 +8,14 @@ import (
 	"github.com/fixkme/othello/server/pb/gate"
 
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util/app"
+	"github.com/fixkme/gokit/util"
 )
 
 type LogicModule struct {
 	name string
 }
 
-func NewLogicModule() app.Module {
+func NewLogicModule() util.Module {
 	return &LogicModule{
 		name: "logic",
 	}

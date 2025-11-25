@@ -11,9 +11,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fixkme/gokit/errs"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/gokit/util/errs"
 	"github.com/fixkme/gokit/wsg"
 	"github.com/fixkme/othello/server/common/const/values"
 	"github.com/fixkme/othello/server/pb/ws"
