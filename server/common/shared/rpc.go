@@ -22,7 +22,7 @@ func SyncCall(ctx context.Context, cc *rpc.ClientConn, req proto.Message, outRsp
 }
 
 // 异步调用，不需要回应
-func AsyncCall(ctx context.Context, cc *rpc.ClientConn, req proto.Message) (err error) {
+func AsyncCallWithoutResp(ctx context.Context, cc *rpc.ClientConn, req proto.Message) (err error) {
 	opt := &rpc.CallOption{
 		Async: true,
 	}

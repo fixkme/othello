@@ -98,10 +98,23 @@ func DispatcherFunc(conn netpoll.Connection, rpcReq *rpc.RpcRequestMessage) int 
 	return rand.Int()
 }
 
+var (
+	Unmarshaler = proto.UnmarshalOptions{
+		AllowPartial:   true, //跳过required字段检查，因为根本没有required字段
+		DiscardUnknown: false,
+		RecursionLimit: 100,
+		NoLazyDecoding: true, //禁用lazy解码，1、没有lazy标志的字段，2、开启lazy字段解码会导致buff延长生命周期
+	}
+	Marshaler = proto.MarshalOptions{
+		AllowPartial:  true,
+		Deterministic: false, // 结果序列化不需要唯一（顺序保证）
+	}
+)
+
 // 默认RpcHandler
-func RpcHandlerFunc(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
+func RpcHandlerFunc(rc *rpc.RpcContext) {
 	argMsg, logicHandler := rc.Method(rc.SrvImpl)
-	if err := proto.Unmarshal(rc.Req.Payload, argMsg); err == nil {
+	if err := Unmarshaler.Unmarshal(rc.Req.Payload, argMsg); err == nil {
 		rc.Reply, rc.ReplyErr = logicHandler(context.Background(), argMsg)
 	} else {
 		rc.ReplyErr = err
@@ -111,5 +124,5 @@ func RpcHandlerFunc(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 	} else {
 		mlog.Error("rpc handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
 	}
-	ser(rc, false)
+	rc.SerializeResponse(&Marshaler)
 }

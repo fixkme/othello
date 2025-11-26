@@ -27,7 +27,7 @@ func NoticePlayer(msg proto.Message, players ...*Player) error {
 			Notices:  []*ws.PBPackage{{MessageType: msgType, MessagePayload: msgData}},
 		}
 		_, err = rpcImp.Call(p.GateId, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
-			if err := shared.AsyncCall(ctx, cc, pmsg); err != nil {
+			if err := shared.AsyncCallWithoutResp(ctx, cc, pmsg); err != nil {
 				return nil, err
 			}
 			return nil, nil

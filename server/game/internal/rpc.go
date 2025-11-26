@@ -33,12 +33,13 @@ func DispatcherFunc(conn netpoll.Connection, rpcReq *rpc.RpcRequestMessage) int 
 	return rand.Int()
 }
 
-func RpcHandler(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
+func RpcHandler(rc *rpc.RpcContext) {
 	ctx := prepareContext(rc)
 	argMsg, logicHandler := rc.Method(rc.SrvImpl)
 	if err := proto.Unmarshal(rc.Req.Payload, argMsg); err != nil {
 		rc.ReplyErr = err
-		ser(rc, false)
+		rc.SerializeResponse(nil)
+		return
 	}
 
 	fn := func() {
@@ -47,7 +48,7 @@ func RpcHandler(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 				mlog.Error("game rpc handler panic: %v\n%s", err, debug.Stack())
 				rc.ReplyErr = errors.New("rpc handler exception")
 			}
-			ser(rc, false)
+			rc.SerializeResponse(&framework.Marshaler)
 		}()
 
 		rc.Reply, rc.ReplyErr = logicHandler(ctx, argMsg)
@@ -62,7 +63,7 @@ func RpcHandler(rc *rpc.RpcContext, ser rpc.ServerSerializer) {
 	if err := logicModule.PushLogicFunc(fn); err != nil {
 		mlog.Error("game rpc handler push logic func failed: %v", err)
 		rc.ReplyErr = err
-		ser(rc, false)
+		rc.SerializeResponse(nil)
 	}
 }
 

@@ -89,7 +89,7 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 		// 通知game玩家下线
 		gameServiceNode := getServiceNodeName(cli, values.Service_Game)
 		_, callErr := RpcModule.GetRpcImp().Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
-			_err := shared.AsyncCall(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
+			_err := shared.AsyncCallWithoutResp(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
 			return nil, _err
 		})
 		if callErr != nil {
