@@ -11,6 +11,7 @@ import (
 	"github.com/fixkme/gokit/wsg"
 	"github.com/fixkme/othello/server/common/const/env"
 	"github.com/fixkme/othello/server/common/const/values"
+	"github.com/fixkme/othello/server/common/framework"
 	"github.com/fixkme/othello/server/common/shared"
 	"github.com/fixkme/othello/server/pb/game"
 	"github.com/panjf2000/gnet/v2"
@@ -88,7 +89,7 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 		ClientMgr.RemoveClient(pid)
 		// 通知game玩家下线
 		gameServiceNode := getServiceNodeName(cli, values.Service_Game)
-		_, callErr := RpcModule.GetRpcImp().Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
+		_, callErr := framework.Rpc.Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
 			_err := shared.AsyncCallWithoutResp(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
 			return nil, _err
 		})

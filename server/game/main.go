@@ -33,10 +33,9 @@ func start() {
 		return
 	}
 
-	rpcModule := framework.CreateRpcModule("game_rpc", internal.DispatcherFunc, internal.RpcHandler)
-	internal.RpcModule = rpcModule
+	framework.InitRpcModule("game_rpc", internal.DispatcherFunc, internal.RpcHandler)
 	util.DefaultApp().Run(
-		rpcModule,
+		framework.Rpc,
 		internal.NewLogicModule(),
 	)
 

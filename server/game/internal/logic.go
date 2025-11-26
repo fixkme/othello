@@ -8,6 +8,7 @@ import (
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common/const/values"
+	"github.com/fixkme/othello/server/common/framework"
 	"github.com/fixkme/othello/server/pb/game"
 )
 
@@ -35,7 +36,7 @@ func (m *LogicModule) OnInit() error {
 	clock.Start(m.quit)
 	m.timerCaller = global.onTimerTrigger
 	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, 1)
-	err := RpcModule.GetRpcImp().RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
+	err := framework.Rpc.RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
 		mlog.Info("RegisterService succeed %v", nodeName)
 		game.RegisterGameServer(rpcSrv, &Service{})
 		return nil

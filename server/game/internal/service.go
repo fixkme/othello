@@ -15,7 +15,7 @@ type Service struct {
 }
 
 func getMdContextValue(ctx context.Context) (val *rpc.Meta, err error) {
-	md, ok := ctx.Value(RpcMdContext).(*rpc.Meta)
+	md, ok := ctx.Value(values.RpcMdContext).(*rpc.Meta)
 	if !ok {
 		return nil, errors.New("context does not contain rpc.Meta")
 	}
@@ -23,7 +23,7 @@ func getMdContextValue(ctx context.Context) (val *rpc.Meta, err error) {
 }
 
 func getRpcContextValue(ctx context.Context) (val *rpc.RpcContext, err error) {
-	rc, ok := ctx.Value(RpcContext).(*rpc.RpcContext)
+	rc, ok := ctx.Value(values.RpcContext).(*rpc.RpcContext)
 	if !ok {
 		return nil, errors.New("context does not contain rpc.RpcContext")
 	}

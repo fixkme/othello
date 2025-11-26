@@ -16,6 +16,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var (
+	Rpc         *RpcModule
+	RpcNodeName string
+)
+
 type RpcModule struct {
 	serverOpt *rpc.ServerOpt
 	etcdOpt   *etcd.EtcdOpt
@@ -23,7 +28,7 @@ type RpcModule struct {
 	name      string
 }
 
-func CreateRpcModule(name string, dispatcher rpc.DispatchHash, handlerFunc rpc.RpcHandler) *RpcModule {
+func InitRpcModule(name string, dispatcher rpc.DispatchHash, handlerFunc rpc.RpcHandler) {
 	if dispatcher == nil {
 		dispatcher = DispatcherFunc
 	}
@@ -49,15 +54,23 @@ func CreateRpcModule(name string, dispatcher rpc.DispatchHash, handlerFunc rpc.R
 			AutoSyncInterval:     15 * time.Second,
 		},
 	}
-	return &RpcModule{
+	Rpc = &RpcModule{
 		serverOpt: serverOpt,
 		etcdOpt:   etcdOpt,
 		name:      name,
 	}
 }
 
-func (m *RpcModule) GetRpcImp() *rpc.RpcImp {
-	return m.rpcer
+func (m *RpcModule) Call(serviceName string, cb rpc.RPCReq) (proto.Message, error) {
+	return m.rpcer.Call(serviceName, cb)
+}
+
+func (m *RpcModule) RegisterService(serviceName string, cb func(rpcSrv rpc.ServiceRegistrar, nodeName string) error) error {
+	return m.rpcer.RegisterService(serviceName, cb)
+}
+
+func (m *RpcModule) RegisterServiceOnlyOne(serviceName string, cb func(rpcSrv rpc.ServiceRegistrar, nodeName string) error) error {
+	return m.rpcer.RegisterServiceOnlyOne(serviceName, cb)
 }
 
 func (m *RpcModule) OnInit() error {

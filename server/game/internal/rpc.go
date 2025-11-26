@@ -14,15 +14,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var RpcModule *framework.RpcModule
-
-type LogicContextKeyType string
-
-const (
-	RpcContext   LogicContextKeyType = "RpcContext"
-	RpcMdContext LogicContextKeyType = "RpcMdContext"
-)
-
 func DispatcherFunc(conn netpoll.Connection, rpcReq *rpc.RpcRequestMessage) int {
 	md := rpcReq.GetMd()
 	if md != nil {
@@ -68,7 +59,7 @@ func RpcHandler(rc *rpc.RpcContext) {
 }
 
 func prepareContext(rc *rpc.RpcContext) (ctx context.Context) {
-	ctx = context.WithValue(context.Background(), RpcContext, rc)
-	ctx = context.WithValue(ctx, RpcMdContext, rc.Req.Md)
+	ctx = context.WithValue(context.Background(), values.RpcContext, rc)
+	ctx = context.WithValue(ctx, values.RpcMdContext, rc.Req.Md)
 	return
 }

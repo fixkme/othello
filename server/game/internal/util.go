@@ -5,6 +5,7 @@ import (
 
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
+	"github.com/fixkme/othello/server/common/framework"
 	"github.com/fixkme/othello/server/common/shared"
 	"github.com/fixkme/othello/server/pb/gate"
 	"github.com/fixkme/othello/server/pb/ws"
@@ -20,13 +21,12 @@ func NoticePlayer(msg proto.Message, players ...*Player) error {
 	if err != nil {
 		return err
 	}
-	rpcImp := RpcModule.GetRpcImp()
 	for _, p := range players {
 		pmsg := &gate.CNoticePlayer{
 			PlayerId: p.Id(),
 			Notices:  []*ws.PBPackage{{MessageType: msgType, MessagePayload: msgData}},
 		}
-		_, err = rpcImp.Call(p.GateId, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
+		_, err = framework.Rpc.Call(p.GateId, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
 			if err := shared.AsyncCallWithoutResp(ctx, cc, pmsg); err != nil {
 				return nil, err
 			}

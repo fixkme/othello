@@ -24,11 +24,10 @@ func start() {
 		panic(err)
 	}
 
-	rpcModule := framework.CreateRpcModule("gate_rpc", nil, nil)
-	internal.RpcModule = rpcModule
+	framework.InitRpcModule("gate_rpc", nil, nil)
 	util.DefaultApp().Run(
 		internal.NewGateModule(),
-		rpcModule,
+		framework.Rpc,
 		internal.NewLogicModule(),
 	)
 

@@ -12,3 +12,10 @@ const (
 	Service_Gate = "gate"
 	Service_Game = "game"
 )
+
+type LogicContextKeyType string
+
+const (
+	RpcContext   LogicContextKeyType = "RpcContext"
+	RpcMdContext LogicContextKeyType = "RpcMdContext"
+)
