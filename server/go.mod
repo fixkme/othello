@@ -5,7 +5,7 @@ go 1.23.9
 require (
 	github.com/cloudwego/netpoll v0.7.0
 	github.com/emirpasic/gods v1.18.1
-	github.com/fixkme/gokit v0.0.0-20251126092705-c6213594626a
+	github.com/fixkme/gokit v0.0.0-20251126103715-3a8526c632b6
 	github.com/panjf2000/gnet/v2 v2.9.1
 	go.etcd.io/etcd/client/v3 v3.5.12
 	go.mongodb.org/mongo-driver v1.13.4

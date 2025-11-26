@@ -23,7 +23,7 @@ func start() {
 	wg := &sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	if err := mlog.UseDefaultLogger(ctx, wg, "./logs", "game", "debug", true); err != nil {
+	if err := mlog.UseDefaultLogger(ctx, wg, "./logs", "game", mlog.DebugLevel, true); err != nil {
 		fmt.Println("UseDefaultLogger err:", err)
 		return
 	}
