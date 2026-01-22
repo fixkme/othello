@@ -5,12 +5,14 @@ go 1.23.9
 require (
 	github.com/cloudwego/netpoll v0.7.0
 	github.com/emirpasic/gods v1.18.1
-	github.com/fixkme/gokit v0.0.0-20251202031244-af9a5b3978b6
+	github.com/fixkme/gokit v0.0.0-20260122035715-f7a64ccfdb4d
 	github.com/panjf2000/gnet/v2 v2.9.1
 	go.etcd.io/etcd/client/v3 v3.5.12
 	go.mongodb.org/mongo-driver v1.13.4
 	google.golang.org/protobuf v1.36.5
 )
+
+replace github.com/fixkme/gokit => ../../gokit
 
 require (
 	github.com/armon/go-radix v1.0.0 // indirect
@@ -45,5 +47,3 @@ require (
 	google.golang.org/grpc v1.71.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
-
-replace github.com/fixkme/gokit => ../../gokit
