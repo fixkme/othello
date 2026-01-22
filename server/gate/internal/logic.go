@@ -25,13 +25,13 @@ func NewLogicModule() util.Module {
 func (m *LogicModule) OnInit() error {
 	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Gate, 1)
 	err := framework.Rpc.RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
-		mlog.Info("RegisterService succeed %v", nodeName)
+		mlog.Infof("RegisterService succeed %v", nodeName)
 		framework.RpcNodeName = nodeName
 		gate.RegisterGateServer(rpcSrv, &Service{})
 		return nil
 	})
 	if err != nil {
-		mlog.Error("RegisterService failed %v", err)
+		mlog.Errorf("RegisterService failed %v", err)
 		return err
 	}
 	return nil

@@ -46,7 +46,7 @@ func (g *Global) loadDatas() error {
 		g.players[pbData.PlayerId] = p
 		g.accPlayers[pbData.Account] = pbData.PlayerId
 	}
-	mlog.Info("load player data finished, size:%d", len(g.players))
+	mlog.Infof("load player data finished, size:%d", len(g.players))
 	return nil
 }
 

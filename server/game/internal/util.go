@@ -33,7 +33,7 @@ func NoticePlayer(msg proto.Message, players ...*Player) error {
 			return nil, nil
 		})
 		if err != nil {
-			mlog.Error("NotifyPlayer %d error: %v", p.Id(), err)
+			mlog.Errorf("NotifyPlayer %d error: %v", p.Id(), err)
 		}
 	}
 	return nil

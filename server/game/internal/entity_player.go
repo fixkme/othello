@@ -25,17 +25,6 @@ func NewPlayer(id int64, modelData *models.MPlayerModel) *Player {
 	return p
 }
 
-func (p *Player) BindMonitor(m delta.IDeltaMonitor[int64]) {
-	cb := func(_ string) {
-		if p.IsDataChange() {
-			return
-		}
-		p.SetDataChange(true)
-		m.OnCollect(p)
-	}
-	p.SetCollector("", p, cb)
-}
-
 func (p *Player) Id() int64 {
 	return p.MPlayerModel.GetPlayerId()
 }

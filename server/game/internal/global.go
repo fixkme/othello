@@ -84,7 +84,7 @@ func (g *Global) CreatePlayer(acc string) (*Player, error) {
 	}
 
 	player := NewPlayer(pid, nil)
-	player.BindMonitor(g.playerMonitor)
+	player.BindMonitor(g.playerMonitor, player)
 	player.SetPlayerId(pid)
 	player.SetAccount(acc)
 	pinfo := player.GetModelPlayerInfo()

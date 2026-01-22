@@ -130,9 +130,9 @@ func (tb *Table) PlacePiece(x, y int, t PieceType) error {
 	// 对方能否有棋可翻转
 	if tb.CanPlace(-t) {
 		tb.TurnOperator()
-		mlog.Debug("change operator to %d", tb.Operator)
+		mlog.Debugf("change operator to %d", tb.Operator)
 	} else {
-		mlog.Debug("%d no piece can reverse", -t)
+		mlog.Debugf("%d no piece can reverse", -t)
 	}
 	// 广播落子结果
 	msg := &game.PPlacePiece{

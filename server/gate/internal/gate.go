@@ -40,37 +40,38 @@ func (s *GateServer) OnInit() error {
 	}
 	listenAddr := env.GetEnvStr(env.APP_GateListenAddr)
 	opt := &wsg.ServerOptions{
-		Options:       gnetOpt,
-		Addr:          fmt.Sprintf("tcp4://%s", listenAddr), // "tcp4://:7070",
-		OnHandshake:   func(conn *wsg.Conn, r *http.Request) error { return s.routerPool.OnHandshake(conn, r) },
-		OnClientClose: s.OnClientClose,
+		Options:          gnetOpt,
+		Addr:             fmt.Sprintf("tcp4://%s", listenAddr), // "tcp4://:7070",
+		HandshakeTimeout: 5000,
+		OnHandshake:      func(conn *wsg.Conn, r *http.Request) error { return s.routerPool.OnHandshake(conn, r) },
+		OnClientClose:    s.OnClientClose,
 		OnServerShutdown: func(_ gnet.Engine) {
 			s.routerPool.Stop()
-			mlog.Info("gate server shutdowned")
+			mlog.Infof("gate server shutdowned")
 		},
 	}
 	s.wsServer = wsg.NewServer(opt)
 	s.routerPool = newRouterPool(4, 1024)
-	mlog.Info("gate server listenAddr: (%s)", listenAddr)
+	mlog.Infof("gate server listenAddr: (%s)", listenAddr)
 	return nil
 }
 
 func (s *GateServer) Run() {
 	s.routerPool.Start()
 	if err := s.wsServer.Run(); err != nil {
-		mlog.Error("GateServer Run error: %v", err)
+		mlog.Errorf("GateServer Run error: %v", err)
 		panic(err)
 	}
-	mlog.Info("gate server exit run")
+	mlog.Infof("gate server exit run")
 }
 
 func (s *GateServer) OnDestroy() {
-	mlog.Info("gate server stop")
+	mlog.Infof("gate server stop")
 	s.retired = true
 	if err := s.wsServer.Stop(context.Background()); err != nil {
-		mlog.Error("wsServer Stop error:%v", err)
+		mlog.Errorf("wsServer Stop error:%v", err)
 	}
-	mlog.Info("gate server stoped")
+	mlog.Infof("gate server stoped")
 }
 
 func (s *GateServer) Name() string {
@@ -82,9 +83,13 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 		// 主动关闭ws server
 		return
 	}
-	cli := conn.GetSession().(*WsClient)
+	cli, ok := conn.GetSession().(*WsClient)
+	if !ok {
+		mlog.Infof("OnClientClose when handshake %v", conn.RemoteAddr().String())
+		return
+	}
 	pid := cli.PlayerId
-	mlog.Info("player ws closed, acc:%s, pid:%d, addr:%s, reason:%v", cli.Account, pid, conn.RemoteAddr().String(), err)
+	mlog.Infof("player ws closed, acc:%s, pid:%d, addr:%s, reason:%v", cli.Account, pid, conn.RemoteAddr().String(), err)
 	if pid > 0 {
 		ClientMgr.RemoveClient(pid)
 		// 通知game玩家下线
@@ -94,7 +99,7 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 			return nil, _err
 		})
 		if callErr != nil {
-			mlog.Error("player %d call PlayerOffline failed, %v", pid, callErr)
+			mlog.Errorf("player %d call PlayerOffline failed, %v", pid, callErr)
 		}
 	}
 }

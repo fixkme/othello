@@ -37,7 +37,7 @@ func (m *LogicModule) OnInit() error {
 	m.timerCaller = global.onTimerTrigger
 	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, 1)
 	err := framework.Rpc.RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
-		mlog.Info("RegisterService succeed %v", nodeName)
+		mlog.Infof("RegisterService succeed %v", nodeName)
 		game.RegisterGameServer(rpcSrv, &Service{})
 		return nil
 	})
@@ -55,7 +55,7 @@ func (m *LogicModule) Run() {
 	for {
 		select {
 		case <-m.quit:
-			mlog.Debug("game LogicModule quit")
+			mlog.Debugf("game LogicModule quit")
 			return
 		case fn := <-m.fnChan:
 			fn()

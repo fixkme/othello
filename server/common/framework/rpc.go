@@ -92,7 +92,7 @@ func (m *RpcModule) Run() {
 func (m *RpcModule) OnDestroy() {
 	err := m.rpcer.Stop()
 	if err != nil {
-		mlog.Error("%v module stop error: %v", m.name, err)
+		mlog.Errorf("%v module stop error: %v", m.name, err)
 	}
 }
 
@@ -133,9 +133,9 @@ func RpcHandlerFunc(rc *rpc.RpcContext) {
 		rc.ReplyErr = err
 	}
 	if rc.ReplyErr == nil {
-		mlog.Info("rpc handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.Req.MethodName, argMsg, rc.Reply)
+		mlog.Infof("rpc handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.Req.MethodName, argMsg, rc.Reply)
 	} else {
-		mlog.Error("rpc handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
+		mlog.Errorf("rpc handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
 	}
 	rc.SerializeResponse(&Marshaler)
 }

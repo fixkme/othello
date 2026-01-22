@@ -38,7 +38,7 @@ type RoutingWorkerImp struct {
 func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 	defer func() {
 		if err := recover(); err != nil {
-			mlog.Error("RoutingWorkerImp RoutingMsg panic: %v\n%s", err, debug.Stack())
+			mlog.Errorf("RoutingWorkerImp RoutingMsg panic: %v\n%s", err, debug.Stack())
 		}
 	}()
 	client := task.Cli
@@ -46,24 +46,24 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 	wsMessage := &ws.WsRequestMessage{}
 	err := proto.Unmarshal(task.Datas, wsMessage)
 	if err != nil {
-		mlog.Error("proto.Unmarshal wsReq err:%v", err)
+		mlog.Errorf("proto.Unmarshal wsReq err:%v", err)
 		client.conn.Close()
 		return
 	}
 	// 检查是否登录
 	if client.PlayerId == 0 && wsMessage.MsgName != cloginMsgName {
-		mlog.Error("first msg must is %s", cloginMsgName)
+		mlog.Errorf("first msg must is %s", cloginMsgName)
 		client.conn.Close()
 		return
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
-			mlog.Error("routing player %s,%d panic: %v", client.Account, client.PlayerId, r)
+			mlog.Errorf("routing player %s,%d panic: %v", client.Account, client.PlayerId, r)
 			err = errors.New("routing panic")
 		}
 		if err != nil {
-			mlog.Error("routing player %s,%d error: %v", client.Account, client.PlayerId, err)
+			mlog.Errorf("routing player %s,%d error: %v", client.Account, client.PlayerId, err)
 			respMsgName := strings.Replace(wsMessage.MsgName, ".C", ".S", 1)
 			replyClientResponse(client, wsMessage.Uuid, respMsgName, nil, nil, err)
 		}
@@ -91,7 +91,7 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 			PassThrough:  &RoutingRpcPassThrough{Cli: client, ReqMsgName: wsMessage.MsgName, Uuid: wsMessage.Uuid, Service: service, Method: method},
 		}
 		if _, _, _err := cc.Invoke(ctx, service, method, wsMessage.Payload, nil, callOpt); _err != nil {
-			mlog.Error("routing invoke error: %v", _err)
+			mlog.Errorf("routing invoke error: %v", _err)
 			return nil, _err
 		}
 		return nil, nil
@@ -109,7 +109,7 @@ type RoutingRpcPassThrough struct {
 func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 	defer func() {
 		if err := recover(); err != nil {
-			mlog.Error("RoutingWorkerImp ProcessRpcReply panic: %v\n%s", err, debug.Stack())
+			mlog.Errorf("RoutingWorkerImp ProcessRpcReply panic: %v\n%s", err, debug.Stack())
 		}
 	}()
 	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
@@ -122,7 +122,7 @@ func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 		if cli.PlayerId > 0 {
 			ClientMgr.AddClient(passData.Cli)
 		} else {
-			mlog.Error("ProcessRpcReply slogin no session id, acc:%s, rspMd:%v", cli.Account, rpcReply.RspMd)
+			mlog.Errorf("ProcessRpcReply slogin no session id, acc:%s, rspMd:%v", cli.Account, rpcReply.RspMd)
 		}
 	}
 	rspData, _ := rpcReply.Rsp.([]byte)
@@ -130,7 +130,7 @@ func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 }
 
 func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, rspData []byte, callErr error) {
-	mlog.Debug("ProcessRpcReply replyClientResponse:%s, msg:%s, callErr:%v, rspDataSize:%d", cli.Account, msgName, callErr, len(rspData))
+	mlog.Debugf("ProcessRpcReply replyClientResponse:%s, msg:%s, callErr:%v, rspDataSize:%d", cli.Account, msgName, callErr, len(rspData))
 	wsRsp := &ws.WsResponseMessage{Uuid: uuid, MsgName: msgName}
 	if callErr != nil {
 		codeErr, ok := callErr.(errs.CodeError)
@@ -155,7 +155,7 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 					pushData = rspData[offsets[i]:offsets[i+1]]
 				}
 				if err := proto.Unmarshal(pushData, wsNotice); err != nil {
-					mlog.Error("Unmarshal ws.PBPackage error: %v", err)
+					mlog.Errorf("Unmarshal ws.PBPackage error: %v", err)
 					return
 				}
 				wsRsp.Notices = append(wsRsp.Notices, wsNotice)
@@ -167,12 +167,12 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 
 	datas, err := proto.Marshal(wsRsp)
 	if err != nil {
-		mlog.Error("marshal wsRsp error: %v", err)
+		mlog.Errorf("marshal wsRsp error: %v", err)
 		return
 	}
 	err = cli.conn.Send(datas)
 	if err != nil {
-		mlog.Error("send wsRsp error: %v", err)
+		mlog.Errorf("send wsRsp error: %v", err)
 	}
 }
 
@@ -195,7 +195,7 @@ func (r *RoutingWorkerImp) PushData(session any, datas []byte) {
 func (r *RoutingWorkerImp) Run(wg *sync.WaitGroup, quit chan struct{}) {
 	defer func() {
 		wg.Done()
-		mlog.Info("RoutingWorkerImp exit")
+		mlog.Infof("RoutingWorkerImp exit")
 	}()
 	for {
 		select {
@@ -253,7 +253,7 @@ func (p *_LoadBalanceImp) GetOne(cli *WsClient) wsg.RoutingWorker {
 
 func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
 	params := req.URL.Query()
-	mlog.Debug("OnHandshake http.Request params: %v", params)
+	mlog.Debugf("OnHandshake http.Request params: %v", params)
 
 	cli := &WsClient{
 		conn:    conn,
@@ -265,6 +265,6 @@ func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
 	router := p.GetOne(cli)
 	conn.BindRoutingWorker(router)
 
-	mlog.Info("player [%v] Handshake ok", cli.Account)
+	mlog.Infof("player [%v] Handshake ok", cli.Account)
 	return nil
 }

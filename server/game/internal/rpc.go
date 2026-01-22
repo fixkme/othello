@@ -36,7 +36,7 @@ func RpcHandler(rc *rpc.RpcContext) {
 	fn := func() {
 		defer func() {
 			if err := recover(); err != nil {
-				mlog.Error("game rpc handler panic: %v\n%s", err, debug.Stack())
+				mlog.Errorf("game rpc handler panic: %v\n%s", err, debug.Stack())
 				rc.ReplyErr = errors.New("rpc handler exception")
 			}
 			rc.SerializeResponse(&framework.Marshaler)
@@ -45,14 +45,14 @@ func RpcHandler(rc *rpc.RpcContext) {
 		rc.Reply, rc.ReplyErr = logicHandler(ctx, argMsg)
 
 		if rc.ReplyErr == nil {
-			mlog.Info("game handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.Req.MethodName, argMsg, rc.Reply)
+			mlog.Infof("game handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.Req.MethodName, argMsg, rc.Reply)
 		} else {
-			mlog.Error("game handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
+			mlog.Errorf("game handler msg failed, method:%s, req_data:%v, err:%v", rc.Req.MethodName, argMsg, rc.ReplyErr)
 		}
 	}
-	//mlog.Debug("game push handler method:%s", rc.Req.MethodName)
+	//mlog.Debugf("game push handler method:%s", rc.Req.MethodName)
 	if err := logicModule.PushLogicFunc(fn); err != nil {
-		mlog.Error("game rpc handler push logic func failed: %v", err)
+		mlog.Errorf("game rpc handler push logic func failed: %v", err)
 		rc.ReplyErr = err
 		rc.SerializeResponse(nil)
 	}

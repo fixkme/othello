@@ -48,7 +48,7 @@ func getPlayer(ctx context.Context) (player *Player, err error) {
 }
 
 func (s *Service) Login(ctx context.Context, in *game.CLogin) (*game.SLogin, error) {
-	mlog.Debug("game handler CLogin:%v", in)
+	mlog.Debugf("game handler CLogin:%v", in)
 	md, err := getMdContextValue(ctx)
 	if err != nil {
 		return nil, err

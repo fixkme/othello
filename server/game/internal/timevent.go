@@ -15,13 +15,13 @@ func (g *Global) createSaveDataTimer() error {
 	const interval = 30000 //ms
 	now := util.NowMs()
 	if _, err := logicModule.CreateTimer(now+interval, &SaveDataTimer{}); err != nil {
-		mlog.Error("createSaveDataTimer err:%v", err)
+		mlog.Errorf("createSaveDataTimer err:%v", err)
 	}
 	return nil
 }
 
 func (g *Global) onSaveDataTimer(_ any, now int64) {
-	mlog.Debug("onSaveDataTimer")
+	mlog.Debugf("onSaveDataTimer")
 	g.playerMonitor.SaveChangedDatas()
 	g.createSaveDataTimer()
 }
@@ -35,7 +35,7 @@ func (g *Global) onTimerTrigger(event any, now int64) {
 	name := GetEventName(event)
 	cb, ok := g.timerCallbacks[name]
 	if !ok {
-		mlog.Error("timer callback not register %v", name)
+		mlog.Errorf("timer callback not register %v", name)
 		return
 	}
 	cb(event, now)
