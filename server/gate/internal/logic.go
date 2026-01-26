@@ -1,32 +1,29 @@
 package internal
 
 import (
-	"fmt"
-
+	"github.com/fixkme/gokit/framework/app"
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/othello/server/common/const/values"
-	"github.com/fixkme/othello/server/common/framework"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/pb/gate"
 
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util"
 )
 
 type LogicModule struct {
 	name string
 }
 
-func NewLogicModule() util.Module {
+func NewLogicModule() app.Module {
 	return &LogicModule{
 		name: "logic",
 	}
 }
 
 func (m *LogicModule) OnInit() error {
-	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Gate, 1)
-	err := framework.Rpc.RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
+	err := core.Rpc.RegisterServiceOnlyOne(values.Service_Gate, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
 		mlog.Infof("RegisterService succeed %v", nodeName)
-		framework.RpcNodeName = nodeName
+		GateNodeId = nodeName
 		gate.RegisterGateServer(rpcSrv, &Service{})
 		return nil
 	})
@@ -34,14 +31,14 @@ func (m *LogicModule) OnInit() error {
 		mlog.Errorf("RegisterService failed %v", err)
 		return err
 	}
-	return nil
+	return err
 }
 
 func (m *LogicModule) Run() {
 
 }
 
-func (m *LogicModule) OnDestroy() {
+func (m *LogicModule) Destroy() {
 
 }
 

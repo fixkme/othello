@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -25,7 +26,7 @@ func TestLogin(t *testing.T) {
 	}
 
 	select {
-	//case <-time.After(time.Second * 300):
+	case <-time.After(time.Second * 300):
 	}
 
 }
@@ -61,7 +62,7 @@ func client(pid int, msg proto.Message, out proto.Message) {
 	if _, err = conn.Write([]byte(content)); err != nil {
 		panic(err)
 	}
-	time.Sleep(time.Second * time.Duration(10))
+	//time.Sleep(time.Second * time.Duration(10))
 	if _, err = conn.Write([]byte("\r\n")); err != nil {
 		panic(err)
 	}
@@ -124,7 +125,7 @@ func client(pid int, msg proto.Message, out proto.Message) {
 		}
 		fmt.Println(msgName, ":", prototext.Format(out))
 	}
-	//os.Exit(0)
+	os.Exit(0)
 }
 
 // 客户端生成 WebSocket key

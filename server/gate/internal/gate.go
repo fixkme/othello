@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/fixkme/gokit/framework/app"
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/gokit/wsg"
-	"github.com/fixkme/othello/server/common/const/env"
-	"github.com/fixkme/othello/server/common/const/values"
-	"github.com/fixkme/othello/server/common/framework"
-	"github.com/fixkme/othello/server/common/shared"
+	"github.com/fixkme/othello/server/common/env"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/pb/game"
 	"github.com/panjf2000/gnet/v2"
 	"google.golang.org/protobuf/proto"
@@ -25,7 +24,7 @@ type GateServer struct {
 	retired    bool // server是否Shutdown
 }
 
-func NewGateModule() util.Module {
+func NewGateModule() app.Module {
 	m := &GateServer{
 		name: "gate",
 	}
@@ -65,7 +64,7 @@ func (s *GateServer) Run() {
 	mlog.Infof("gate server exit run")
 }
 
-func (s *GateServer) OnDestroy() {
+func (s *GateServer) Destroy() {
 	mlog.Infof("gate server stop")
 	s.retired = true
 	if err := s.wsServer.Stop(context.Background()); err != nil {
@@ -94,8 +93,8 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 		ClientMgr.RemoveClient(pid)
 		// 通知game玩家下线
 		gameServiceNode := getServiceNodeName(cli, values.Service_Game)
-		_, callErr := framework.Rpc.Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
-			_err := shared.AsyncCallWithoutResp(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
+		_, callErr := core.Rpc.Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
+			_err := rpc.AsyncCallWithoutResp(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
 			return nil, _err
 		})
 		if callErr != nil {

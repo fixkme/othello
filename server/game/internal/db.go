@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/othello/server/common/shared"
 	"github.com/fixkme/othello/server/pb/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -25,7 +25,7 @@ type IdSeq struct {
 }
 
 func (g *Global) loadDatas() error {
-	coll := shared.MongoClient.Database(dbName).Collection(playerCollName)
+	coll := core.Mongo.Client().Database(dbName).Collection(playerCollName)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	cur, err := coll.Find(ctx, bson.M{})
@@ -51,7 +51,7 @@ func (g *Global) loadDatas() error {
 }
 
 func (g *Global) GeneId(idName string) (id int64, err error) {
-	coll := shared.MongoClient.Database(dbName).Collection(idCollName)
+	coll := core.Mongo.Client().Database(dbName).Collection(idCollName)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	after := options.After

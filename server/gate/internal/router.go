@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/fixkme/gokit/errs"
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/gokit/wsg"
-	"github.com/fixkme/othello/server/common/const/values"
-	"github.com/fixkme/othello/server/common/framework"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/pb/ws"
 	"google.golang.org/protobuf/proto"
 )
@@ -77,9 +77,9 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 	service, method := v2[0], v2[1][1:]
 	serviceNode := getServiceNodeName(client, service)
 	// 路由数据到game或其他
-	_, err = framework.Rpc.Call(serviceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
+	_, err = core.Rpc.Call(serviceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
 		md := &rpc.Meta{}
-		md.AddStr(values.Rpc_GateId, framework.RpcNodeName)
+		md.AddStr(values.Rpc_GateId, GateNodeId)
 		if client.PlayerId != 0 {
 			md.AddInt(values.Rpc_SessionId, client.PlayerId)
 		}

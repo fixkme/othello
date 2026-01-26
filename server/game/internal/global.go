@@ -7,7 +7,7 @@ import (
 	"github.com/emirpasic/gods/trees/redblacktree"
 	"github.com/emirpasic/gods/utils"
 	"github.com/fixkme/gokit/db/mongo/delta"
-	"github.com/fixkme/othello/server/common/shared"
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/othello/server/pb/game"
 )
 
@@ -41,7 +41,7 @@ func init() {
 
 func (g *Global) Init() error {
 	g.registerTimerCallback(&SaveDataTimer{}, g.onSaveDataTimer)
-	g.playerMonitor = delta.NewDeltaMonitor[int64](shared.MongoClient, dbName, playerCollName)
+	g.playerMonitor = delta.NewDeltaMonitor[int64](core.Mongo.Client(), dbName, playerCollName)
 	g.playerMonitor.Start(context.Background())
 	if err := g.loadDatas(); err != nil {
 		return err

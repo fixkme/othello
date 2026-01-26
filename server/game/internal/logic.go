@@ -1,14 +1,16 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/fixkme/gokit/clock"
+	"github.com/fixkme/gokit/framework/app"
+	"github.com/fixkme/gokit/framework/config"
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/gokit/util"
-	"github.com/fixkme/othello/server/common/const/values"
-	"github.com/fixkme/othello/server/common/framework"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/pb/game"
 )
 
@@ -22,7 +24,7 @@ type LogicModule struct {
 
 var logicModule *LogicModule
 
-func NewLogicModule() util.Module {
+func NewLogicModule() app.Module {
 	logicModule = &LogicModule{
 		fnChan:      make(chan func(), 1024),
 		timerCbChan: make(chan *clock.Promise, 1024),
@@ -33,10 +35,13 @@ func NewLogicModule() util.Module {
 }
 
 func (m *LogicModule) OnInit() error {
+	if config.Config.ServerId == 0 {
+		return errors.New("config server_id not set")
+	}
 	clock.Start(m.quit)
 	m.timerCaller = global.onTimerTrigger
-	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, 1)
-	err := framework.Rpc.RegisterService(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
+	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, config.Config.ServerId)
+	err := core.Rpc.RegisterServiceOnlyOne(serviceNodeName, func(rpcSrv rpc.ServiceRegistrar, nodeName string) error {
 		mlog.Infof("RegisterService succeed %v", nodeName)
 		game.RegisterGameServer(rpcSrv, &Service{})
 		return nil
@@ -65,7 +70,11 @@ func (m *LogicModule) Run() {
 	}
 }
 
-func (m *LogicModule) OnDestroy() {
+func (m *LogicModule) Destroy() {
+	serviceNodeName := fmt.Sprintf("%s.%d", values.Service_Game, config.Config.ServerId)
+	if err := core.Rpc.UnregisterService(serviceNodeName); err != nil {
+		mlog.Errorf("Rpc.UnregisterService failed, %s, %v", serviceNodeName, err)
+	}
 	close(m.quit)
 }
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/othello/server/common/const/values"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/pb/game"
 )
 
@@ -15,7 +15,7 @@ type Service struct {
 }
 
 func getMdContextValue(ctx context.Context) (val *rpc.Meta, err error) {
-	md, ok := ctx.Value(values.RpcMdContext).(*rpc.Meta)
+	md, ok := ctx.Value(values.RpcContext_Meta).(*rpc.Meta)
 	if !ok {
 		return nil, errors.New("context does not contain rpc.Meta")
 	}

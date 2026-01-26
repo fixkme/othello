@@ -2,40 +2,26 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
-	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util"
-	"github.com/fixkme/othello/server/common/const/env"
-	"github.com/fixkme/othello/server/common/framework"
-	"github.com/fixkme/othello/server/common/shared"
+	"github.com/fixkme/gokit/framework/app"
+	"github.com/fixkme/gokit/framework/core"
+	"github.com/fixkme/othello/server/common"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/game/internal"
 )
 
 func main() {
-	start()
+	run()
 }
 
-func start() {
-	fmt.Println("start game server")
-
+func run() {
 	wg := &sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	if err := mlog.UseDefaultLogger(ctx, wg, "./logs", "game", mlog.DebugLevel, true); err != nil {
-		fmt.Println("UseDefaultLogger err:", err)
-		return
-	}
+	common.StartApp(ctx, wg, values.Service_Game, internal.RpcHandler)
 
-	if err := shared.InitMongo(env.GetEnvStr(env.APP_MongoUrl)); err != nil {
-		fmt.Println("InitMongo err:", err)
-		return
-	}
-
-	framework.InitRpcModule("game_rpc", internal.DispatcherFunc, internal.RpcHandler)
-	util.DefaultApp().Run(
-		framework.Rpc,
+	app.DefaultApp().Run(
+		core.Rpc,
 		internal.NewLogicModule(),
 	)
 

@@ -2,32 +2,27 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
-	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/util"
-	"github.com/fixkme/othello/server/common/framework"
+	"github.com/fixkme/gokit/framework/app"
+	"github.com/fixkme/gokit/framework/core"
+	"github.com/fixkme/othello/server/common"
+	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/gate/internal"
 )
 
 func main() {
-	start()
+	run()
 }
 
-func start() {
-	fmt.Println("start gate server")
-
+func run() {
 	wg := &sync.WaitGroup{}
 	ctx, cancel := context.WithCancel(context.Background())
-	if err := mlog.UseDefaultLogger(ctx, wg, "./logs", "gate", mlog.DebugLevel, true); err != nil {
-		panic(err)
-	}
+	common.StartApp(ctx, wg, values.Service_Gate, nil)
 
-	framework.InitRpcModule("gate_rpc", nil, nil)
-	util.DefaultApp().Run(
+	app.DefaultApp().Run(
 		internal.NewGateModule(),
-		framework.Rpc,
+		core.Rpc,
 		internal.NewLogicModule(),
 	)
 

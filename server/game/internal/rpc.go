@@ -3,26 +3,14 @@ package internal
 import (
 	"context"
 	"errors"
-	"math/rand"
 	"runtime/debug"
 
-	"github.com/cloudwego/netpoll"
+	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
-	"github.com/fixkme/othello/server/common/const/values"
-	"github.com/fixkme/othello/server/common/framework"
+	"github.com/fixkme/othello/server/common/values"
 	"google.golang.org/protobuf/proto"
 )
-
-func DispatcherFunc(conn netpoll.Connection, rpcReq *rpc.RpcRequestMessage) int {
-	md := rpcReq.GetMd()
-	if md != nil {
-		if v := md.GetInt(values.Rpc_SessionId); v != 0 {
-			return int(v)
-		}
-	}
-	return rand.Int()
-}
 
 func RpcHandler(rc *rpc.RpcContext) {
 	ctx := prepareContext(rc)
@@ -39,7 +27,7 @@ func RpcHandler(rc *rpc.RpcContext) {
 				mlog.Errorf("game rpc handler panic: %v\n%s", err, debug.Stack())
 				rc.ReplyErr = errors.New("rpc handler exception")
 			}
-			rc.SerializeResponse(&framework.Marshaler)
+			rc.SerializeResponse(&core.MsgMarshaler)
 		}()
 
 		rc.Reply, rc.ReplyErr = logicHandler(ctx, argMsg)
@@ -60,6 +48,6 @@ func RpcHandler(rc *rpc.RpcContext) {
 
 func prepareContext(rc *rpc.RpcContext) (ctx context.Context) {
 	ctx = context.WithValue(context.Background(), values.RpcContext, rc)
-	ctx = context.WithValue(ctx, values.RpcMdContext, rc.Req.Md)
+	ctx = context.WithValue(ctx, values.RpcContext_Meta, rc.Req.Md)
 	return
 }
