@@ -5,15 +5,18 @@ import (
 	"errors"
 	"runtime/debug"
 
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/othello/server/common/values"
+	"github.com/fixkme/othello/server/game/internal/entity"
+	"github.com/fixkme/othello/server/game/internal/system"
 	"google.golang.org/protobuf/proto"
 )
 
 func RpcHandler(rc *rpc.RpcContext) {
-	ctx := prepareContext(rc)
+	ctx, agent := prepareContext(rc)
 	argMsg, logicHandler := rc.Method(rc.SrvImpl)
 	if err := proto.Unmarshal(rc.Req.Payload, argMsg); err != nil {
 		rc.ReplyErr = err
@@ -39,15 +42,32 @@ func RpcHandler(rc *rpc.RpcContext) {
 		}
 	}
 	//mlog.Debugf("game push handler method:%s", rc.Req.MethodName)
-	if err := logicModule.PushLogicFunc(fn); err != nil {
-		mlog.Errorf("game rpc handler push logic func failed: %v", err)
-		rc.ReplyErr = err
+	if agent != nil {
+		if err := agent.TryRunFunc(fn); err != nil {
+			logger.Errorf("rpc handler push agent func failed, %v", err)
+			rc.ReplyErr = errors.New("rpc handler push agent func failed")
+			rc.SerializeResponse(nil)
+		}
+		return
+	}
+	if err := system.Global.AsyncExec(fn); err != nil {
+		logger.Errorf("rpc handler push logic func failed, err:%v", err)
+		rc.ReplyErr = errors.New("rpc handler push logic func failed")
 		rc.SerializeResponse(nil)
+		return
 	}
 }
 
-func prepareContext(rc *rpc.RpcContext) (ctx context.Context) {
+func prepareContext(rc *rpc.RpcContext) (ctx context.Context, agent *entity.RoomAgent) {
 	ctx = context.WithValue(context.Background(), values.RpcContext, rc)
-	ctx = context.WithValue(ctx, values.RpcContext_Meta, rc.Req.Md)
+	if md := rc.Req.Md; md != nil {
+		ctx = context.WithValue(ctx, values.RpcContext_Meta, md)
+		if playerId := md.GetInt(values.Rpc_PlayerId); playerId != 0 {
+			agent, _ = system.Global.SyncGetTargetRoomByPlayer(ctx, playerId)
+			if agent != nil {
+				ctx = context.WithValue(ctx, values.RpcContext_RoomAgent, agent)
+			}
+		}
+	}
 	return
 }

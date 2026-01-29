@@ -8,7 +8,6 @@ package game
 
 import (
 	datas "github.com/fixkme/othello/server/pb/datas"
-	models "github.com/fixkme/othello/server/pb/models"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -23,168 +22,28 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type CLogin struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Account       string                 `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CLogin) Reset() {
-	*x = CLogin{}
-	mi := &file_game_player_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CLogin) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CLogin) ProtoMessage() {}
-
-func (x *CLogin) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CLogin.ProtoReflect.Descriptor instead.
-func (*CLogin) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *CLogin) GetAccount() string {
-	if x != nil {
-		return x.Account
-	}
-	return ""
-}
-
-type SLogin struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerData    *models.PBPlayerModel  `protobuf:"bytes,1,opt,name=player_data,json=playerData,proto3" json:"player_data,omitempty"`
-	ServerTz      int64                  `protobuf:"varint,2,opt,name=server_tz,json=serverTz,proto3" json:"server_tz,omitempty"`
-	TableId       int64                  `protobuf:"varint,3,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"` // >0表示在房间中
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SLogin) Reset() {
-	*x = SLogin{}
-	mi := &file_game_player_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SLogin) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SLogin) ProtoMessage() {}
-
-func (x *SLogin) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SLogin.ProtoReflect.Descriptor instead.
-func (*SLogin) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *SLogin) GetPlayerData() *models.PBPlayerModel {
-	if x != nil {
-		return x.PlayerData
-	}
-	return nil
-}
-
-func (x *SLogin) GetServerTz() int64 {
-	if x != nil {
-		return x.ServerTz
-	}
-	return 0
-}
-
-func (x *SLogin) GetTableId() int64 {
-	if x != nil {
-		return x.TableId
-	}
-	return 0
-}
-
-type CEnterGame struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CEnterGame) Reset() {
-	*x = CEnterGame{}
-	mi := &file_game_player_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CEnterGame) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CEnterGame) ProtoMessage() {}
-
-func (x *CEnterGame) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CEnterGame.ProtoReflect.Descriptor instead.
-func (*CEnterGame) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{2}
-}
-
-type SEnterGame struct {
+type PReadyGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TableInfo     *datas.PBTableInfo     `protobuf:"bytes,1,opt,name=table_info,json=tableInfo,proto3" json:"table_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SEnterGame) Reset() {
-	*x = SEnterGame{}
-	mi := &file_game_player_proto_msgTypes[3]
+func (x *PReadyGame) Reset() {
+	*x = PReadyGame{}
+	mi := &file_game_player_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SEnterGame) String() string {
+func (x *PReadyGame) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SEnterGame) ProtoMessage() {}
+func (*PReadyGame) ProtoMessage() {}
 
-func (x *SEnterGame) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[3]
+func (x *PReadyGame) ProtoReflect() protoreflect.Message {
+	mi := &file_game_player_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -195,40 +54,39 @@ func (x *SEnterGame) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SEnterGame.ProtoReflect.Descriptor instead.
-func (*SEnterGame) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use PReadyGame.ProtoReflect.Descriptor instead.
+func (*PReadyGame) Descriptor() ([]byte, []int) {
+	return file_game_player_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SEnterGame) GetTableInfo() *datas.PBTableInfo {
+func (x *PReadyGame) GetTableInfo() *datas.PBTableInfo {
 	if x != nil {
 		return x.TableInfo
 	}
 	return nil
 }
 
-type PPlayerEnterGame struct {
+type CReadyGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlayerInfo    *datas.PBPlayerInfo    `protobuf:"bytes,1,opt,name=player_info,json=playerInfo,proto3" json:"player_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PPlayerEnterGame) Reset() {
-	*x = PPlayerEnterGame{}
-	mi := &file_game_player_proto_msgTypes[4]
+func (x *CReadyGame) Reset() {
+	*x = CReadyGame{}
+	mi := &file_game_player_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PPlayerEnterGame) String() string {
+func (x *CReadyGame) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PPlayerEnterGame) ProtoMessage() {}
+func (*CReadyGame) ProtoMessage() {}
 
-func (x *PPlayerEnterGame) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[4]
+func (x *CReadyGame) ProtoReflect() protoreflect.Message {
+	mi := &file_game_player_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,39 +97,32 @@ func (x *PPlayerEnterGame) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PPlayerEnterGame.ProtoReflect.Descriptor instead.
-func (*PPlayerEnterGame) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use CReadyGame.ProtoReflect.Descriptor instead.
+func (*CReadyGame) Descriptor() ([]byte, []int) {
+	return file_game_player_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *PPlayerEnterGame) GetPlayerInfo() *datas.PBPlayerInfo {
-	if x != nil {
-		return x.PlayerInfo
-	}
-	return nil
-}
-
-type CLeaveGame struct {
+type SReadyGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CLeaveGame) Reset() {
-	*x = CLeaveGame{}
-	mi := &file_game_player_proto_msgTypes[5]
+func (x *SReadyGame) Reset() {
+	*x = SReadyGame{}
+	mi := &file_game_player_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CLeaveGame) String() string {
+func (x *SReadyGame) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CLeaveGame) ProtoMessage() {}
+func (*SReadyGame) ProtoMessage() {}
 
-func (x *CLeaveGame) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[5]
+func (x *SReadyGame) ProtoReflect() protoreflect.Message {
+	mi := &file_game_player_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -282,32 +133,32 @@ func (x *CLeaveGame) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CLeaveGame.ProtoReflect.Descriptor instead.
-func (*CLeaveGame) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{5}
+// Deprecated: Use SReadyGame.ProtoReflect.Descriptor instead.
+func (*SReadyGame) Descriptor() ([]byte, []int) {
+	return file_game_player_proto_rawDescGZIP(), []int{2}
 }
 
-type SLeaveGame struct {
+type PStartGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SLeaveGame) Reset() {
-	*x = SLeaveGame{}
-	mi := &file_game_player_proto_msgTypes[6]
+func (x *PStartGame) Reset() {
+	*x = PStartGame{}
+	mi := &file_game_player_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SLeaveGame) String() string {
+func (x *PStartGame) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SLeaveGame) ProtoMessage() {}
+func (*PStartGame) ProtoMessage() {}
 
-func (x *SLeaveGame) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[6]
+func (x *PStartGame) ProtoReflect() protoreflect.Message {
+	mi := &file_game_player_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -318,9 +169,9 @@ func (x *SLeaveGame) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SLeaveGame.ProtoReflect.Descriptor instead.
-func (*SLeaveGame) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{6}
+// Deprecated: Use PStartGame.ProtoReflect.Descriptor instead.
+func (*PStartGame) Descriptor() ([]byte, []int) {
+	return file_game_player_proto_rawDescGZIP(), []int{3}
 }
 
 type CPlacePiece struct {
@@ -334,7 +185,7 @@ type CPlacePiece struct {
 
 func (x *CPlacePiece) Reset() {
 	*x = CPlacePiece{}
-	mi := &file_game_player_proto_msgTypes[7]
+	mi := &file_game_player_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +197,7 @@ func (x *CPlacePiece) String() string {
 func (*CPlacePiece) ProtoMessage() {}
 
 func (x *CPlacePiece) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[7]
+	mi := &file_game_player_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +210,7 @@ func (x *CPlacePiece) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CPlacePiece.ProtoReflect.Descriptor instead.
 func (*CPlacePiece) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{7}
+	return file_game_player_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CPlacePiece) GetPieceType() int32 {
@@ -391,7 +242,7 @@ type SPlacePiece struct {
 
 func (x *SPlacePiece) Reset() {
 	*x = SPlacePiece{}
-	mi := &file_game_player_proto_msgTypes[8]
+	mi := &file_game_player_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -403,7 +254,7 @@ func (x *SPlacePiece) String() string {
 func (*SPlacePiece) ProtoMessage() {}
 
 func (x *SPlacePiece) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[8]
+	mi := &file_game_player_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -416,7 +267,7 @@ func (x *SPlacePiece) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SPlacePiece.ProtoReflect.Descriptor instead.
 func (*SPlacePiece) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{8}
+	return file_game_player_proto_rawDescGZIP(), []int{5}
 }
 
 type PPlacePiece struct {
@@ -431,7 +282,7 @@ type PPlacePiece struct {
 
 func (x *PPlacePiece) Reset() {
 	*x = PPlacePiece{}
-	mi := &file_game_player_proto_msgTypes[9]
+	mi := &file_game_player_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -443,7 +294,7 @@ func (x *PPlacePiece) String() string {
 func (*PPlacePiece) ProtoMessage() {}
 
 func (x *PPlacePiece) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[9]
+	mi := &file_game_player_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -456,7 +307,7 @@ func (x *PPlacePiece) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PPlacePiece.ProtoReflect.Descriptor instead.
 func (*PPlacePiece) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{9}
+	return file_game_player_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PPlacePiece) GetPieceType() int32 {
@@ -498,7 +349,7 @@ type PGameResult struct {
 
 func (x *PGameResult) Reset() {
 	*x = PGameResult{}
-	mi := &file_game_player_proto_msgTypes[10]
+	mi := &file_game_player_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -510,7 +361,7 @@ func (x *PGameResult) String() string {
 func (*PGameResult) ProtoMessage() {}
 
 func (x *PGameResult) ProtoReflect() protoreflect.Message {
-	mi := &file_game_player_proto_msgTypes[10]
+	mi := &file_game_player_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -523,7 +374,7 @@ func (x *PGameResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PGameResult.ProtoReflect.Descriptor instead.
 func (*PGameResult) Descriptor() ([]byte, []int) {
-	return file_game_player_proto_rawDescGZIP(), []int{10}
+	return file_game_player_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PGameResult) GetWinnerPieceType() int64 {
@@ -551,27 +402,17 @@ var File_game_player_proto protoreflect.FileDescriptor
 
 const file_game_player_proto_rawDesc = "" +
 	"\n" +
-	"\x11game/player.proto\x12\x04game\x1a\x19models/player_model.proto\x1a\x17datas/player_data.proto\"\"\n" +
-	"\x06CLogin\x12\x18\n" +
-	"\aaccount\x18\x01 \x01(\tR\aaccount\"v\n" +
-	"\x06SLogin\x124\n" +
-	"\vplayer_data\x18\x01 \x01(\v2\x13.models.PlayerModelR\n" +
-	"playerData\x12\x1b\n" +
-	"\tserver_tz\x18\x02 \x01(\x03R\bserverTz\x12\x19\n" +
-	"\btable_id\x18\x03 \x01(\x03R\atableId\"\f\n" +
+	"\x11game/player.proto\x12\x04game\x1a\x17datas/player_data.proto\"=\n" +
 	"\n" +
-	"CEnterGame\"=\n" +
+	"PReadyGame\x12/\n" +
 	"\n" +
-	"SEnterGame\x12/\n" +
+	"table_info\x18\x01 \x01(\v2\x10.datas.TableInfoR\ttableInfo\"\f\n" +
 	"\n" +
-	"table_info\x18\x01 \x01(\v2\x10.datas.TableInfoR\ttableInfo\"F\n" +
-	"\x10PPlayerEnterGame\x122\n" +
-	"\vplayer_info\x18\x01 \x01(\v2\x11.datas.PlayerInfoR\n" +
-	"playerInfo\"\f\n" +
+	"CReadyGame\"\f\n" +
 	"\n" +
-	"CLeaveGame\"\f\n" +
+	"SReadyGame\"\f\n" +
 	"\n" +
-	"SLeaveGame\"H\n" +
+	"PStartGame\"H\n" +
 	"\vCPlacePiece\x12\x1d\n" +
 	"\n" +
 	"piece_type\x18\x01 \x01(\x05R\tpieceType\x12\f\n" +
@@ -602,32 +443,25 @@ func file_game_player_proto_rawDescGZIP() []byte {
 	return file_game_player_proto_rawDescData
 }
 
-var file_game_player_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_game_player_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_game_player_proto_goTypes = []any{
-	(*CLogin)(nil),               // 0: game.CLogin
-	(*SLogin)(nil),               // 1: game.SLogin
-	(*CEnterGame)(nil),           // 2: game.CEnterGame
-	(*SEnterGame)(nil),           // 3: game.SEnterGame
-	(*PPlayerEnterGame)(nil),     // 4: game.PPlayerEnterGame
-	(*CLeaveGame)(nil),           // 5: game.CLeaveGame
-	(*SLeaveGame)(nil),           // 6: game.SLeaveGame
-	(*CPlacePiece)(nil),          // 7: game.CPlacePiece
-	(*SPlacePiece)(nil),          // 8: game.SPlacePiece
-	(*PPlacePiece)(nil),          // 9: game.PPlacePiece
-	(*PGameResult)(nil),          // 10: game.PGameResult
-	(*models.PBPlayerModel)(nil), // 11: models.PlayerModel
-	(*datas.PBTableInfo)(nil),    // 12: datas.TableInfo
-	(*datas.PBPlayerInfo)(nil),   // 13: datas.PlayerInfo
+	(*PReadyGame)(nil),        // 0: game.PReadyGame
+	(*CReadyGame)(nil),        // 1: game.CReadyGame
+	(*SReadyGame)(nil),        // 2: game.SReadyGame
+	(*PStartGame)(nil),        // 3: game.PStartGame
+	(*CPlacePiece)(nil),       // 4: game.CPlacePiece
+	(*SPlacePiece)(nil),       // 5: game.SPlacePiece
+	(*PPlacePiece)(nil),       // 6: game.PPlacePiece
+	(*PGameResult)(nil),       // 7: game.PGameResult
+	(*datas.PBTableInfo)(nil), // 8: datas.TableInfo
 }
 var file_game_player_proto_depIdxs = []int32{
-	11, // 0: game.SLogin.player_data:type_name -> models.PlayerModel
-	12, // 1: game.SEnterGame.table_info:type_name -> datas.TableInfo
-	13, // 2: game.PPlayerEnterGame.player_info:type_name -> datas.PlayerInfo
-	3,  // [3:3] is the sub-list for method output_type
-	3,  // [3:3] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	8, // 0: game.PReadyGame.table_info:type_name -> datas.TableInfo
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_game_player_proto_init() }
@@ -641,7 +475,7 @@ func file_game_player_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_player_proto_rawDesc), len(file_game_player_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

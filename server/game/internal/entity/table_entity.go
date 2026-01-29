@@ -1,12 +1,8 @@
-package internal
+package entity
 
 import (
-	"errors"
-
-	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/pb/datas"
-	"github.com/fixkme/othello/server/pb/game"
 )
 
 type PieceType int8
@@ -59,6 +55,7 @@ var weights = [][]int{
 type Table struct {
 	//*datas.PBTableInfo
 	Id          int64
+	Status      datas.TableStatus
 	OwnerPlayer *Player
 	OppoPlayer  *Player
 	Chesses     *[rowSize][colSize]PieceType
@@ -69,37 +66,45 @@ type Table struct {
 	CreateTime  int64
 }
 
-func NewTable(tid int64, p *Player) *Table {
+func NewTable(tid int64) *Table {
 	tb := &Table{
 		Id:          tid,
-		OwnerPlayer: p,
+		Status:      datas.TableStatus_TS_New,
+		OwnerPlayer: nil,
 		Chesses:     &[rowSize][colSize]PieceType{},
 		Previous:    nil,
 	}
-	p.PlayingTable = tb
-	p.GetModelPlayerInfo().SetPlayPieceType(int64(PieceType_Black)) //创建房间的人为黑棋
+
 	return tb
 }
 
-func (tb *Table) Init() {
+func (tb *Table) Init(initPlayers []*datas.PBPlayerInfo) {
+	p1 := NewPlayer(initPlayers[0])
+	p1.SetPlayPieceType(int64(PieceType_Black)) //创建房间的人为黑棋
+	tb.OwnerPlayer = p1
+	if initPlayers[1] != nil {
+		p2 := NewPlayer(initPlayers[1])
+		p2.SetPlayPieceType(int64(PieceType_White))
+		tb.OppoPlayer = p2
+	}
 	tb.CreateTime = util.NowMs()
 	tb.Reset()
 }
 
 func (tb *Table) PackPB() *datas.PBTableInfo {
 	info := &datas.PBTableInfo{
-		Id:          tb.Id,
-		Turn:        int32(tb.Operator),
-		BlackCount:  tb.BlackCount,
-		WhiteCount:  tb.WhiteCount,
-		CreatedTime: tb.CreateTime,
-		Pieces:      make([]*datas.PBPieceInfo, 0, rowSize*colSize),
+		Id:         tb.Id,
+		Turn:       int32(tb.Operator),
+		BlackCount: tb.BlackCount,
+		WhiteCount: tb.WhiteCount,
+		CreateTime: tb.CreateTime,
+		Pieces:     make([]*datas.PBPieceInfo, 0, rowSize*colSize),
 	}
 	if tb.OwnerPlayer != nil {
-		info.OwnerPlayer = tb.OwnerPlayer.GetModelPlayerInfo().ToPB()
+		info.OwnerPlayer = tb.OwnerPlayer.PBPlayerInfo
 	}
 	if tb.OppoPlayer != nil {
-		info.OppoPlayer = tb.OppoPlayer.GetModelPlayerInfo().ToPB()
+		info.OppoPlayer = tb.OppoPlayer.PBPlayerInfo
 	}
 	for i := 0; i < rowSize; i++ {
 		for j := 0; j < colSize; j++ {
@@ -110,49 +115,8 @@ func (tb *Table) PackPB() *datas.PBTableInfo {
 }
 
 func (tb *Table) MatchPlayer(p *Player) {
-	p.GetModelPlayerInfo().SetPlayPieceType(int64(PieceType_White))
-	p.PlayingTable = tb
+	p.SetPlayPieceType(int64(PieceType_White))
 	tb.OppoPlayer = p
-}
-
-func (tb *Table) PlacePiece(x, y int, t PieceType) error {
-	if !tb.IsOperator(t) {
-		return errors.New("operator not match")
-	}
-	if !tb.CanPlacePiece(x, y, t) {
-		return errors.New("location cant reverse piece")
-	}
-
-	// 放下棋子
-	//tb.Record()
-	tb.AddPiece(x, y, t)
-	tb.Reverse(x, y, t)
-	// 对方能否有棋可翻转
-	if tb.CanPlace(-t) {
-		tb.TurnOperator()
-		mlog.Debugf("change operator to %d", tb.Operator)
-	} else {
-		mlog.Debugf("%d no piece can reverse", -t)
-	}
-	// 广播落子结果
-	msg := &game.PPlacePiece{
-		PieceType: int32(t), X: int32(x), Y: int32(y), OperatePiece: int32(tb.Operator),
-	}
-	NoticePlayer(msg, tb.OwnerPlayer, tb.OppoPlayer)
-	// 检查游戏是否达到结束条件
-	if tb.CheckEnd() {
-		var loser_piece_type PieceType
-		if tb.BlackCount > tb.WhiteCount {
-			loser_piece_type = PieceType_White
-		} else if tb.BlackCount < tb.WhiteCount {
-			loser_piece_type = PieceType_Black
-		} else {
-			loser_piece_type = PieceType_None
-		}
-		global.GameOver(tb, loser_piece_type, false)
-	}
-
-	return nil
 }
 
 func (tb *Table) Reset() {

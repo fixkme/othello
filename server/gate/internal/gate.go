@@ -8,13 +8,13 @@ import (
 	"github.com/fixkme/gokit/framework/app"
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
-	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/gokit/wsg"
+	"github.com/fixkme/othello/server/common"
 	"github.com/fixkme/othello/server/common/env"
 	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/pb/game"
+	"github.com/fixkme/othello/server/pb/hall"
 	"github.com/panjf2000/gnet/v2"
-	"google.golang.org/protobuf/proto"
 )
 
 type GateServer struct {
@@ -91,14 +91,19 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 	mlog.Infof("player ws closed, acc:%s, pid:%d, addr:%s, reason:%v", cli.Account, pid, conn.RemoteAddr().String(), err)
 	if pid > 0 {
 		ClientMgr.RemoveClient(pid)
+		meta := common.WarpMeta(cli.PlayerId, GateNodeId)
+		// 通知hall玩家下线
+		callErr := core.Rpc.AsyncCallWithoutResp(values.Service_Hall, &hall.CPlayerOffline{PlayerId: pid})
+		if callErr != nil {
+			mlog.Errorf("player %d call hall.PlayerOffline failed, %v", pid, callErr)
+		}
 		// 通知game玩家下线
 		gameServiceNode := getServiceNodeName(cli, values.Service_Game)
-		_, callErr := core.Rpc.Call(gameServiceNode, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
-			_err := rpc.AsyncCallWithoutResp(ctx, cc, &game.CPlayerOffline{PlayerId: pid})
-			return nil, _err
-		})
-		if callErr != nil {
-			mlog.Errorf("player %d call PlayerOffline failed, %v", pid, callErr)
+		if gameServiceNode != "" {
+			callErr = core.Rpc.AsyncCallWithoutResp(gameServiceNode, &game.CPlayerOffline{PlayerId: pid}, meta)
+			if callErr != nil {
+				mlog.Errorf("player %d call game.PlayerOffline failed, %v", pid, callErr)
+			}
 		}
 	}
 }

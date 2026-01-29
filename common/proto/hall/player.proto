@@ -1,0 +1,30 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/hall";
+package hall;
+
+import "models/player_model.proto";
+import "datas/player_data.proto";
+
+message CLogin {
+    string account = 1;
+}
+message SLogin {
+    models.PlayerModel player_data = 1;
+    int64 server_tz = 2;
+}
+
+message CEnterGame {
+    
+}
+message SEnterGame {
+    datas.TableInfo table_info = 1;
+}
+
+message PPlayerJoinGame {
+    datas.PlayerInfo player_info = 1;
+}
+
+message CLeaveGame {
+}
+message SLeaveGame {
+}

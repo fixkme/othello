@@ -31,8 +31,10 @@ type PBPlayerModel struct {
 	Account  string                 `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
 	// 玩家信息
 	ModelPlayerInfo *datas.PBPlayerInfo `protobuf:"bytes,3,opt,name=model_player_info,json=modelPlayerInfo,proto3" json:"model_player_info,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// 正在游戏的桌子 PlayType => TableLocation
+	InTables      map[int64]*datas.PBTableLocation `protobuf:"bytes,4,rep,name=in_tables,json=inTables,proto3" json:"in_tables,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PBPlayerModel) Reset() {
@@ -86,15 +88,26 @@ func (x *PBPlayerModel) GetModelPlayerInfo() *datas.PBPlayerInfo {
 	return nil
 }
 
+func (x *PBPlayerModel) GetInTables() map[int64]*datas.PBTableLocation {
+	if x != nil {
+		return x.InTables
+	}
+	return nil
+}
+
 var File_models_player_model_proto protoreflect.FileDescriptor
 
 const file_models_player_model_proto_rawDesc = "" +
 	"\n" +
-	"\x19models/player_model.proto\x12\x06models\x1a\x17pbext/options_ext.proto\x1a\x17datas/player_data.proto\"\x89\x01\n" +
+	"\x19models/player_model.proto\x12\x06models\x1a\x17pbext/options_ext.proto\x1a\x17datas/player_data.proto\"\x9c\x02\n" +
 	"\vPlayerModel\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\x03R\bplayerId\x12\x18\n" +
 	"\aaccount\x18\x02 \x01(\tR\aaccount\x12=\n" +
-	"\x11model_player_info\x18\x03 \x01(\v2\x11.datas.PlayerInfoR\x0fmodelPlayerInfo:\x04\x80\xb5\x18\x01B,Z*github.com/fixkme/othello/server/pb/modelsb\x06proto3"
+	"\x11model_player_info\x18\x03 \x01(\v2\x11.datas.PlayerInfoR\x0fmodelPlayerInfo\x12>\n" +
+	"\tin_tables\x18\x04 \x03(\v2!.models.PlayerModel.InTablesEntryR\binTables\x1aQ\n" +
+	"\rInTablesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\x03R\x03key\x12*\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.datas.TableLocationR\x05value:\x028\x01:\x04\x80\xb5\x18\x01B,Z*github.com/fixkme/othello/server/pb/modelsb\x06proto3"
 
 var (
 	file_models_player_model_proto_rawDescOnce sync.Once
@@ -108,18 +121,22 @@ func file_models_player_model_proto_rawDescGZIP() []byte {
 	return file_models_player_model_proto_rawDescData
 }
 
-var file_models_player_model_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_models_player_model_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_models_player_model_proto_goTypes = []any{
-	(*PBPlayerModel)(nil),      // 0: models.PlayerModel
-	(*datas.PBPlayerInfo)(nil), // 1: datas.PlayerInfo
+	(*PBPlayerModel)(nil),         // 0: models.PlayerModel
+	nil,                           // 1: models.PlayerModel.InTablesEntry
+	(*datas.PBPlayerInfo)(nil),    // 2: datas.PlayerInfo
+	(*datas.PBTableLocation)(nil), // 3: datas.TableLocation
 }
 var file_models_player_model_proto_depIdxs = []int32{
-	1, // 0: models.PlayerModel.model_player_info:type_name -> datas.PlayerInfo
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: models.PlayerModel.model_player_info:type_name -> datas.PlayerInfo
+	1, // 1: models.PlayerModel.in_tables:type_name -> models.PlayerModel.InTablesEntry
+	3, // 2: models.PlayerModel.InTablesEntry.value:type_name -> datas.TableLocation
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_models_player_model_proto_init() }
@@ -133,7 +150,7 @@ func file_models_player_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_models_player_model_proto_rawDesc), len(file_models_player_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

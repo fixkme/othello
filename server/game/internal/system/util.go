@@ -1,4 +1,4 @@
-package internal
+package system
 
 import (
 	"context"
@@ -6,12 +6,13 @@ import (
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
+	"github.com/fixkme/othello/server/game/internal/entity"
 	"github.com/fixkme/othello/server/pb/gate"
 	"github.com/fixkme/othello/server/pb/ws"
 	"google.golang.org/protobuf/proto"
 )
 
-func NoticePlayer(msg proto.Message, players ...*Player) error {
+func NoticePlayer(msg proto.Message, players ...*entity.Player) error {
 	if len(players) == 0 {
 		return nil
 	}
@@ -22,7 +23,7 @@ func NoticePlayer(msg proto.Message, players ...*Player) error {
 	}
 	for _, p := range players {
 		pmsg := &gate.CNoticePlayer{
-			PlayerId: p.Id(),
+			PlayerId: p.Id,
 			Notices:  []*ws.PBPackage{{MessageType: msgType, MessagePayload: msgData}},
 		}
 		_, err = core.Rpc.Call(p.GateId, func(ctx context.Context, cc *rpc.ClientConn) (proto.Message, error) {
@@ -32,7 +33,7 @@ func NoticePlayer(msg proto.Message, players ...*Player) error {
 			return nil, nil
 		})
 		if err != nil {
-			mlog.Errorf("NotifyPlayer %d error: %v", p.Id(), err)
+			mlog.Errorf("NotifyPlayer %d error: %v", p.Id, err)
 		}
 	}
 	return nil

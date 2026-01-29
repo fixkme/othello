@@ -12,6 +12,7 @@ import (
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common/env"
 )
 
@@ -30,6 +31,8 @@ func StartApp(ctx context.Context, wg *sync.WaitGroup, name string, rpcHandler r
 	}
 	fmt.Println("----------------- app config -----------------")
 	fmt.Println(config.Config.JsonFormat())
+	// time
+	util.SetTimezone(int64(config.Config.TimezoneOffset))
 	// log
 	logConf := &config.Config.LogConfig
 	if err := mlog.UseDefaultLogger(ctx, wg, logConf.LogPath, name, mlog.Level(logConf.LogLevel), logConf.LogStdOut); err != nil {

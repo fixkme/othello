@@ -1,0 +1,22 @@
+syntax = "proto3";
+option go_package = "github.com/fixkme/othello/server/pb/hall";
+package hall;
+
+import "datas/player_data.proto";
+
+message CPlayerOffline {
+    int64 player_id = 1;
+}
+message SPlayerOffline {
+}
+
+message CGameSettle {
+    datas.PlayerInfo owner_player = 1;
+    datas.PlayerInfo oppo_player = 2;
+    int64 table_id = 3;
+    int64 start_time = 4;
+    int64 end_time = 5;
+    int64 win_player = 6;
+}
+message SGameSettle {
+}

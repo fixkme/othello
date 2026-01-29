@@ -12,6 +12,9 @@
             "maxStructFields": -1
         }
     },
+    "gopls": {
+        "directoryFilters": ["-node_modules", "-logs", "-vendor", "-dist", "-bin"]
+    },
     "dotnet.preferCSharpExtension": true,
     "dotnet.server.useOmnisharp": true,
     "editor.tokenColorCustomizations": {

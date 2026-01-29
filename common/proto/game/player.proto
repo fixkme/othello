@@ -1,34 +1,20 @@
 syntax = "proto3";
 option go_package = "github.com/fixkme/othello/server/pb/game";
 package game;
-
-import "models/player_model.proto";
+ 
 import "datas/player_data.proto";
 
-message CLogin {
-    string account = 1;
-}
-
-message SLogin {
-    models.PlayerModel player_data = 1;
-    int64 server_tz = 2;
-    int64 table_id = 3; // >0表示在房间中
-}
-
-message CEnterGame {
-}
-message SEnterGame {
+message PReadyGame {
     datas.TableInfo table_info = 1;
 }
-message PPlayerEnterGame {
-    datas.PlayerInfo player_info = 1;
+
+message CReadyGame {
+}
+message SReadyGame {
 }
 
-message CLeaveGame {
+message PStartGame {
 }
-message SLeaveGame {
-}
-
 
 message CPlacePiece {
     int32 piece_type = 1;

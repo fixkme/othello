@@ -182,3 +182,187 @@ func (m *MPlayerInfo) AddPlayPieceType(add int64) int64 {
 	m.checkDirty(oldValue, m.playPieceType, m.fieldSyncIDs[4], true)
 	return m.playPieceType
 }
+
+type MTableLocation struct {
+	tableId  int64
+	gameId   int64
+	playType PlayType
+	player1  int64
+	player2  int64
+
+	// 自己本身的同步key,由父对象指定
+	selfSyncID string
+	// 本对象所有属性的同步key数组
+	fieldSyncIDs [5]string
+	// 收集字典,每帧清空同步
+	collector delta.ICollector
+	// 监测变化回调
+	changedCb func(string)
+}
+
+// 构造函数
+func NewMTableLocation() *MTableLocation {
+	m := &MTableLocation{}
+	m.fieldSyncIDs[0] = "table_id"
+	m.fieldSyncIDs[1] = "game_id"
+	m.fieldSyncIDs[2] = "play_type"
+	m.fieldSyncIDs[3] = "player1"
+	m.fieldSyncIDs[4] = "player2"
+	return m
+}
+
+// PB构造函数
+func NewPBTableLocation() *PBTableLocation {
+	pb := &PBTableLocation{}
+	return pb
+}
+
+// 设置collector函数
+func (m *MTableLocation) SetCollector(syncID string, collector delta.ICollector, cb func(string)) {
+	m.selfSyncID = syncID
+	m.collector = collector
+	m.changedCb = cb
+	if syncID != "" {
+		syncID = syncID + "."
+	}
+	m.fieldSyncIDs[0] = syncID + "table_id"
+	m.fieldSyncIDs[1] = syncID + "game_id"
+	m.fieldSyncIDs[2] = syncID + "play_type"
+	m.fieldSyncIDs[3] = syncID + "player1"
+	m.fieldSyncIDs[4] = syncID + "player2"
+}
+
+// 检查数值变化函数
+func (m *MTableLocation) checkDirty(valueOld any, valueNew any, key string, ntfClient bool) bool {
+	if reflect.DeepEqual(valueOld, valueNew) {
+		return false
+	}
+	if m.collector != nil {
+		m.collector.Collect(key, valueNew, ntfClient)
+	}
+	if m.changedCb != nil {
+		m.changedCb(key)
+	}
+	return true
+}
+
+// ToPB函数
+func (m *MTableLocation) ToPB() *PBTableLocation {
+	if m == nil {
+		return nil
+	}
+	pb := NewPBTableLocation()
+	pb.TableId = m.tableId
+	pb.GameId = m.gameId
+	pb.PlayType = m.playType
+	pb.Player1 = m.player1
+	pb.Player2 = m.player2
+	return pb
+}
+
+// InitFromPB函数
+func (m *MTableLocation) InitFromPB(pb *PBTableLocation) {
+	if pb == nil {
+		return
+	}
+	m.tableId = pb.TableId
+	m.gameId = pb.GameId
+	m.playType = pb.PlayType
+	m.player1 = pb.Player1
+	m.player2 = pb.Player2
+}
+
+// String 函数
+func (m *MTableLocation) String() string {
+	var strBuilder strings.Builder
+	strBuilder.WriteString("{")
+	strBuilder.WriteString("tableId:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.tableId))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("gameId:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.gameId))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("playType:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.playType))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("player1:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.player1))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("player2:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.player2))
+	strBuilder.WriteString("}")
+	return strBuilder.String()
+}
+
+func (m *MTableLocation) GetTableId() int64 {
+	return m.tableId
+}
+
+func (m *MTableLocation) SetTableId(value int64) {
+	m.checkDirty(m.tableId, value, m.fieldSyncIDs[0], true)
+	m.tableId = value
+}
+
+func (m *MTableLocation) AddTableId(add int64) int64 {
+	oldValue := m.tableId
+	m.tableId += add
+	m.checkDirty(oldValue, m.tableId, m.fieldSyncIDs[0], true)
+	return m.tableId
+}
+
+func (m *MTableLocation) GetGameId() int64 {
+	return m.gameId
+}
+
+func (m *MTableLocation) SetGameId(value int64) {
+	m.checkDirty(m.gameId, value, m.fieldSyncIDs[1], true)
+	m.gameId = value
+}
+
+func (m *MTableLocation) AddGameId(add int64) int64 {
+	oldValue := m.gameId
+	m.gameId += add
+	m.checkDirty(oldValue, m.gameId, m.fieldSyncIDs[1], true)
+	return m.gameId
+}
+
+func (m *MTableLocation) GetPlayType() PlayType {
+	return m.playType
+}
+
+func (m *MTableLocation) SetPlayType(value PlayType) {
+	m.checkDirty(m.playType, value, m.fieldSyncIDs[2], true)
+	m.playType = value
+}
+
+func (m *MTableLocation) GetPlayer1() int64 {
+	return m.player1
+}
+
+func (m *MTableLocation) SetPlayer1(value int64) {
+	m.checkDirty(m.player1, value, m.fieldSyncIDs[3], true)
+	m.player1 = value
+}
+
+func (m *MTableLocation) AddPlayer1(add int64) int64 {
+	oldValue := m.player1
+	m.player1 += add
+	m.checkDirty(oldValue, m.player1, m.fieldSyncIDs[3], true)
+	return m.player1
+}
+
+func (m *MTableLocation) GetPlayer2() int64 {
+	return m.player2
+}
+
+func (m *MTableLocation) SetPlayer2(value int64) {
+	m.checkDirty(m.player2, value, m.fieldSyncIDs[4], true)
+	m.player2 = value
+}
+
+func (m *MTableLocation) AddPlayer2(add int64) int64 {
+	oldValue := m.player2
+	m.player2 += add
+	m.checkDirty(oldValue, m.player2, m.fieldSyncIDs[4], true)
+	return m.player2
+}

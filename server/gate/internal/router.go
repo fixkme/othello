@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	cloginMsgName = "game.CLogin"
+	cloginMsgName     = "hall.CLogin"
+	centerGameMsgName = "hall.CEnterGame"
 )
 
 type RoutingTask struct {
@@ -81,7 +82,7 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 		md := &rpc.Meta{}
 		md.AddStr(values.Rpc_GateId, GateNodeId)
 		if client.PlayerId != 0 {
-			md.AddInt(values.Rpc_SessionId, client.PlayerId)
+			md.AddInt(values.Rpc_PlayerId, client.PlayerId)
 		}
 		callOpt := &rpc.CallOption{
 			Timeout:      time.Second * 10,
@@ -116,14 +117,8 @@ func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 	//respMsgName := strings.Replace(passData.ReqMsgName, ".C", ".S", 1)
 	respMsgName := passData.Service + ".S" + passData.Method
 	rpcErr := rpcReply.Err
-	if rpcErr == nil && passData.ReqMsgName == cloginMsgName {
-		cli := passData.Cli
-		cli.PlayerId = rpcReply.RspMd.GetInt(values.Rpc_SessionId)
-		if cli.PlayerId > 0 {
-			ClientMgr.AddClient(passData.Cli)
-		} else {
-			mlog.Errorf("ProcessRpcReply slogin no session id, acc:%s, rspMd:%v", cli.Account, rpcReply.RspMd)
-		}
+	if rpcErr == nil {
+		careMsg(rpcReply)
 	}
 	rspData, _ := rpcReply.Rsp.([]byte)
 	replyClientResponse(passData.Cli, passData.Uuid, respMsgName, rpcReply.RspMd, rspData, rpcErr)
@@ -179,9 +174,28 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 func getServiceNodeName(cli *WsClient, service string) string {
 	switch service {
 	case "game":
-		return fmt.Sprintf("game.%d", 1) //fmt.Sprintf("game%d", cli.ServerId)
+		if cli.GameId == 0 {
+			return ""
+		}
+		return fmt.Sprintf("game.%d", cli.GameId)
 	default:
 		return service
+	}
+}
+
+func careMsg(rpcReply *rpc.AsyncCallResult) {
+	passData := rpcReply.PassThrough.(*RoutingRpcPassThrough)
+	cli := passData.Cli
+	switch passData.ReqMsgName {
+	case cloginMsgName:
+		cli.PlayerId = rpcReply.RspMd.GetInt(values.Rpc_PlayerId)
+		if cli.PlayerId > 0 {
+			ClientMgr.AddClient(passData.Cli)
+		} else {
+			mlog.Errorf("careMsg slogin no session id, acc:%s, rspMd:%v", cli.Account, rpcReply.RspMd)
+		}
+	case centerGameMsgName:
+		cli.GameId = rpcReply.RspMd.GetInt(values.Rpc_GameId)
 	}
 }
 

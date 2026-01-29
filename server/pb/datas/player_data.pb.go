@@ -21,6 +21,107 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type PlayType int32
+
+const (
+	PlayType_PT_Unknown PlayType = 0
+	PlayType_PT_Common  PlayType = 1
+)
+
+// Enum value maps for PlayType.
+var (
+	PlayType_name = map[int32]string{
+		0: "PT_Unknown",
+		1: "PT_Common",
+	}
+	PlayType_value = map[string]int32{
+		"PT_Unknown": 0,
+		"PT_Common":  1,
+	}
+)
+
+func (x PlayType) Enum() *PlayType {
+	p := new(PlayType)
+	*p = x
+	return p
+}
+
+func (x PlayType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PlayType) Descriptor() protoreflect.EnumDescriptor {
+	return file_datas_player_data_proto_enumTypes[0].Descriptor()
+}
+
+func (PlayType) Type() protoreflect.EnumType {
+	return &file_datas_player_data_proto_enumTypes[0]
+}
+
+func (x PlayType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PlayType.Descriptor instead.
+func (PlayType) EnumDescriptor() ([]byte, []int) {
+	return file_datas_player_data_proto_rawDescGZIP(), []int{0}
+}
+
+type TableStatus int32
+
+const (
+	TableStatus_TS_New       TableStatus = 0
+	TableStatus_TS_Matching  TableStatus = 1
+	TableStatus_TS_WaitReady TableStatus = 2
+	TableStatus_TS_Playing   TableStatus = 3
+	TableStatus_TS_Over      TableStatus = 4
+)
+
+// Enum value maps for TableStatus.
+var (
+	TableStatus_name = map[int32]string{
+		0: "TS_New",
+		1: "TS_Matching",
+		2: "TS_WaitReady",
+		3: "TS_Playing",
+		4: "TS_Over",
+	}
+	TableStatus_value = map[string]int32{
+		"TS_New":       0,
+		"TS_Matching":  1,
+		"TS_WaitReady": 2,
+		"TS_Playing":   3,
+		"TS_Over":      4,
+	}
+)
+
+func (x TableStatus) Enum() *TableStatus {
+	p := new(TableStatus)
+	*p = x
+	return p
+}
+
+func (x TableStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TableStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_datas_player_data_proto_enumTypes[1].Descriptor()
+}
+
+func (TableStatus) Type() protoreflect.EnumType {
+	return &file_datas_player_data_proto_enumTypes[1]
+}
+
+func (x TableStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TableStatus.Descriptor instead.
+func (TableStatus) EnumDescriptor() ([]byte, []int) {
+	return file_datas_player_data_proto_rawDescGZIP(), []int{1}
+}
+
 type PBPlayerInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -162,12 +263,12 @@ type PBTableInfo struct {
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	OwnerPlayer   *PBPlayerInfo          `protobuf:"bytes,2,opt,name=owner_player,json=ownerPlayer,proto3" json:"owner_player,omitempty"` //房主
 	OppoPlayer    *PBPlayerInfo          `protobuf:"bytes,3,opt,name=oppo_player,json=oppoPlayer,proto3" json:"oppo_player,omitempty"`    //对手
-	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
+	Status        TableStatus            `protobuf:"varint,4,opt,name=status,proto3,enum=datas.TableStatus" json:"status,omitempty"`
 	Turn          int32                  `protobuf:"varint,5,opt,name=turn,proto3" json:"turn,omitempty"` //当前操作方
 	BlackCount    int32                  `protobuf:"varint,6,opt,name=black_count,json=blackCount,proto3" json:"black_count,omitempty"`
 	WhiteCount    int32                  `protobuf:"varint,7,opt,name=white_count,json=whiteCount,proto3" json:"white_count,omitempty"`
 	Pieces        []*PBPieceInfo         `protobuf:"bytes,8,rep,name=pieces,proto3" json:"pieces,omitempty"`
-	CreatedTime   int64                  `protobuf:"varint,10,opt,name=created_time,json=createdTime,proto3" json:"created_time,omitempty"`
+	CreateTime    int64                  `protobuf:"varint,9,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -223,11 +324,11 @@ func (x *PBTableInfo) GetOppoPlayer() *PBPlayerInfo {
 	return nil
 }
 
-func (x *PBTableInfo) GetStatus() int32 {
+func (x *PBTableInfo) GetStatus() TableStatus {
 	if x != nil {
 		return x.Status
 	}
-	return 0
+	return TableStatus_TS_New
 }
 
 func (x *PBTableInfo) GetTurn() int32 {
@@ -258,9 +359,85 @@ func (x *PBTableInfo) GetPieces() []*PBPieceInfo {
 	return nil
 }
 
-func (x *PBTableInfo) GetCreatedTime() int64 {
+func (x *PBTableInfo) GetCreateTime() int64 {
 	if x != nil {
-		return x.CreatedTime
+		return x.CreateTime
+	}
+	return 0
+}
+
+type PBTableLocation struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TableId       int64                  `protobuf:"varint,1,opt,name=table_id,json=tableId,proto3" json:"table_id,omitempty"`
+	GameId        int64                  `protobuf:"varint,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	PlayType      PlayType               `protobuf:"varint,3,opt,name=play_type,json=playType,proto3,enum=datas.PlayType" json:"play_type,omitempty"`
+	Player1       int64                  `protobuf:"varint,4,opt,name=player1,proto3" json:"player1,omitempty"`
+	Player2       int64                  `protobuf:"varint,5,opt,name=player2,proto3" json:"player2,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PBTableLocation) Reset() {
+	*x = PBTableLocation{}
+	mi := &file_datas_player_data_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PBTableLocation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PBTableLocation) ProtoMessage() {}
+
+func (x *PBTableLocation) ProtoReflect() protoreflect.Message {
+	mi := &file_datas_player_data_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PBTableLocation.ProtoReflect.Descriptor instead.
+func (*PBTableLocation) Descriptor() ([]byte, []int) {
+	return file_datas_player_data_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PBTableLocation) GetTableId() int64 {
+	if x != nil {
+		return x.TableId
+	}
+	return 0
+}
+
+func (x *PBTableLocation) GetGameId() int64 {
+	if x != nil {
+		return x.GameId
+	}
+	return 0
+}
+
+func (x *PBTableLocation) GetPlayType() PlayType {
+	if x != nil {
+		return x.PlayType
+	}
+	return PlayType_PT_Unknown
+}
+
+func (x *PBTableLocation) GetPlayer1() int64 {
+	if x != nil {
+		return x.Player1
+	}
+	return 0
+}
+
+func (x *PBTableLocation) GetPlayer2() int64 {
+	if x != nil {
+		return x.Player2
 	}
 	return 0
 }
@@ -280,21 +457,39 @@ const file_datas_player_data_proto_rawDesc = "" +
 	"\tPieceInfo\x12\f\n" +
 	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
 	"\x01y\x18\x02 \x01(\x05R\x01y\x12\x14\n" +
-	"\x05color\x18\x03 \x01(\x05R\x05color\"\xc0\x02\n" +
+	"\x05color\x18\x03 \x01(\x05R\x05color\"\xd2\x02\n" +
 	"\tTableInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x124\n" +
 	"\fowner_player\x18\x02 \x01(\v2\x11.datas.PlayerInfoR\vownerPlayer\x122\n" +
 	"\voppo_player\x18\x03 \x01(\v2\x11.datas.PlayerInfoR\n" +
-	"oppoPlayer\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x12\n" +
+	"oppoPlayer\x12*\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x12.datas.TableStatusR\x06status\x12\x12\n" +
 	"\x04turn\x18\x05 \x01(\x05R\x04turn\x12\x1f\n" +
 	"\vblack_count\x18\x06 \x01(\x05R\n" +
 	"blackCount\x12\x1f\n" +
 	"\vwhite_count\x18\a \x01(\x05R\n" +
 	"whiteCount\x12(\n" +
-	"\x06pieces\x18\b \x03(\v2\x10.datas.PieceInfoR\x06pieces\x12!\n" +
-	"\fcreated_time\x18\n" +
-	" \x01(\x03R\vcreatedTimeB+Z)github.com/fixkme/othello/server/pb/datasb\x06proto3"
+	"\x06pieces\x18\b \x03(\v2\x10.datas.PieceInfoR\x06pieces\x12\x1f\n" +
+	"\vcreate_time\x18\t \x01(\x03R\n" +
+	"createTime\"\xa5\x01\n" +
+	"\rTableLocation\x12\x19\n" +
+	"\btable_id\x18\x01 \x01(\x03R\atableId\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\x03R\x06gameId\x12,\n" +
+	"\tplay_type\x18\x03 \x01(\x0e2\x0f.datas.PlayTypeR\bplayType\x12\x18\n" +
+	"\aplayer1\x18\x04 \x01(\x03R\aplayer1\x12\x18\n" +
+	"\aplayer2\x18\x05 \x01(\x03R\aplayer2*)\n" +
+	"\bPlayType\x12\x0e\n" +
+	"\n" +
+	"PT_Unknown\x10\x00\x12\r\n" +
+	"\tPT_Common\x10\x01*Y\n" +
+	"\vTableStatus\x12\n" +
+	"\n" +
+	"\x06TS_New\x10\x00\x12\x0f\n" +
+	"\vTS_Matching\x10\x01\x12\x10\n" +
+	"\fTS_WaitReady\x10\x02\x12\x0e\n" +
+	"\n" +
+	"TS_Playing\x10\x03\x12\v\n" +
+	"\aTS_Over\x10\x04B+Z)github.com/fixkme/othello/server/pb/datasb\x06proto3"
 
 var (
 	file_datas_player_data_proto_rawDescOnce sync.Once
@@ -308,21 +503,27 @@ func file_datas_player_data_proto_rawDescGZIP() []byte {
 	return file_datas_player_data_proto_rawDescData
 }
 
-var file_datas_player_data_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_datas_player_data_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_datas_player_data_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_datas_player_data_proto_goTypes = []any{
-	(*PBPlayerInfo)(nil), // 0: datas.PlayerInfo
-	(*PBPieceInfo)(nil),  // 1: datas.PieceInfo
-	(*PBTableInfo)(nil),  // 2: datas.TableInfo
+	(PlayType)(0),           // 0: datas.PlayType
+	(TableStatus)(0),        // 1: datas.TableStatus
+	(*PBPlayerInfo)(nil),    // 2: datas.PlayerInfo
+	(*PBPieceInfo)(nil),     // 3: datas.PieceInfo
+	(*PBTableInfo)(nil),     // 4: datas.TableInfo
+	(*PBTableLocation)(nil), // 5: datas.TableLocation
 }
 var file_datas_player_data_proto_depIdxs = []int32{
-	0, // 0: datas.TableInfo.owner_player:type_name -> datas.PlayerInfo
-	0, // 1: datas.TableInfo.oppo_player:type_name -> datas.PlayerInfo
-	1, // 2: datas.TableInfo.pieces:type_name -> datas.PieceInfo
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: datas.TableInfo.owner_player:type_name -> datas.PlayerInfo
+	2, // 1: datas.TableInfo.oppo_player:type_name -> datas.PlayerInfo
+	1, // 2: datas.TableInfo.status:type_name -> datas.TableStatus
+	3, // 3: datas.TableInfo.pieces:type_name -> datas.PieceInfo
+	0, // 4: datas.TableLocation.play_type:type_name -> datas.PlayType
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_datas_player_data_proto_init() }
@@ -335,13 +536,14 @@ func file_datas_player_data_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_datas_player_data_proto_rawDesc), len(file_datas_player_data_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   3,
+			NumEnums:      2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_datas_player_data_proto_goTypes,
 		DependencyIndexes: file_datas_player_data_proto_depIdxs,
+		EnumInfos:         file_datas_player_data_proto_enumTypes,
 		MessageInfos:      file_datas_player_data_proto_msgTypes,
 	}.Build()
 	File_datas_player_data_proto = out.File

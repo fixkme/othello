@@ -12,15 +12,15 @@ import (
 	"time"
 
 	"github.com/fixkme/gokit/wsg"
-	"github.com/fixkme/othello/server/pb/game"
+	"github.com/fixkme/othello/server/pb/hall"
 	"github.com/fixkme/othello/server/pb/ws"
 	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 )
 
 func TestLogin(t *testing.T) {
-	req := &game.CLogin{Account: "acc_test"}
-	rsp := &game.SLogin{}
+	req := &hall.CLogin{Account: "acc_test"}
+	rsp := &hall.SLogin{}
 	for i := range 1 {
 		go client(i+1, req, rsp)
 	}

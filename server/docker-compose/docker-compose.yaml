@@ -3,8 +3,9 @@ version: '3.8'
 services:
   # gate
   gate:
-    image: golang:local
+    image: golang:1.23.9
     container_name: gate
+    working_dir: /app
     volumes:
       - ${APP_VOLUME}:/app
     ports:
@@ -19,16 +20,36 @@ services:
     command: ["./docker-compose/entrypoint.sh", "gate", "run"]
     depends_on:
       - etcd
-  # game
-  game:
-    image: golang:local
-    container_name: game
+  # hall
+  hall:
+    image: golang:1.23.9
+    container_name: hall
+    working_dir: /app
     volumes:
       - ${APP_VOLUME}:/app
     ports:
       - "5001:2333"
       - "2202:2345" # 调试端口
     environment:
+      - RPC_LISTEN_ADDR=:2333
+      - RPC_ADDR=hall:2333
+      - ETC_ENDPOINTS=etcd:2379
+      - MONGO_URL=mongodb://localhost:27017
+    command: ["./docker-compose/entrypoint.sh", "hall", "run"]
+    depends_on:
+      - etcd
+  # game
+  game:
+    image: golang:1.23.9
+    container_name: game
+    working_dir: /app
+    volumes:
+      - ${APP_VOLUME}:/app
+    ports:
+      - "5002:2333"
+      - "2203:2345" # 调试端口
+    environment:
+      - SERVER_ID=1
       - RPC_LISTEN_ADDR=:2333
       - RPC_ADDR=game:2333
       - ETC_ENDPOINTS=etcd:2379

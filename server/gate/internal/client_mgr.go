@@ -11,7 +11,7 @@ type WsClient struct {
 
 	Account  string
 	PlayerId int64
-	ServerId int64
+	GameId   int64
 }
 
 type ClientManager struct {

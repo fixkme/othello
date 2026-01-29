@@ -8,15 +8,24 @@ import (
 )
 
 type GameServer interface {
+	CreateRoom(context.Context, *CCreateRoom) (*SCreateRoom, error)
 	EnterGame(context.Context, *CEnterGame) (*SEnterGame, error)
 	LeaveGame(context.Context, *CLeaveGame) (*SLeaveGame, error)
-	Login(context.Context, *CLogin) (*SLogin, error)
 	PlacePiece(context.Context, *CPlacePiece) (*SPlacePiece, error)
 	PlayerOffline(context.Context, *CPlayerOffline) (*SPlayerOffline, error)
+	ReadyGame(context.Context, *CReadyGame) (*SReadyGame, error)
 }
 
 func RegisterGameServer(s rpc.ServiceRegistrar, srv GameServer) {
 	s.RegisterService(&Game_ServiceDesc, srv)
+}
+
+func _Game_CreateRoom_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CCreateRoom)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GameServer).CreateRoom(ctx, req.(*CCreateRoom))
+	}
+	return arg, h
 }
 
 func _Game_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
@@ -31,14 +40,6 @@ func _Game_LeaveGame_Materializer(srv any) (proto.Message, rpc.Handler) {
 	arg := new(CLeaveGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).LeaveGame(ctx, req.(*CLeaveGame))
-	}
-	return arg, h
-}
-
-func _Game_Login_Materializer(srv any) (proto.Message, rpc.Handler) {
-	arg := new(CLogin)
-	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
-		return srv.(GameServer).Login(ctx, req.(*CLogin))
 	}
 	return arg, h
 }
@@ -59,10 +60,22 @@ func _Game_PlayerOffline_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
+func _Game_ReadyGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+	arg := new(CReadyGame)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(GameServer).ReadyGame(ctx, req.(*CReadyGame))
+	}
+	return arg, h
+}
+
 var Game_ServiceDesc = rpc.ServiceDesc{
 	ServiceName: "game",
 	HandlerType: (*GameServer)(nil),
 	Methods: []rpc.MethodDesc{
+		{
+			MethodName: "CreateRoom",
+			Handler:    _Game_CreateRoom_Materializer,
+		},
 		{
 			MethodName: "EnterGame",
 			Handler:    _Game_EnterGame_Materializer,
@@ -72,16 +85,16 @@ var Game_ServiceDesc = rpc.ServiceDesc{
 			Handler:    _Game_LeaveGame_Materializer,
 		},
 		{
-			MethodName: "Login",
-			Handler:    _Game_Login_Materializer,
-		},
-		{
 			MethodName: "PlacePiece",
 			Handler:    _Game_PlacePiece_Materializer,
 		},
 		{
 			MethodName: "PlayerOffline",
 			Handler:    _Game_PlayerOffline_Materializer,
+		},
+		{
+			MethodName: "ReadyGame",
+			Handler:    _Game_ReadyGame_Materializer,
 		},
 	},
 }

@@ -16,7 +16,7 @@ rm -rf $OUT_DIR/*
 protoc -I $PROTO_DIR -I $PROTO_SS_DIR --gom_out=$OUT_DIR \
 --gom_opt=paths=source_relative,\
 data-pkgs=datas^models,\
-rpc-pkgs=game^gate \
-${PROTO_DIR}/pbext/*.proto \
-${PROTO_DIR}/ws/*.proto ${PROTO_DIR}/datas/*.proto ${PROTO_DIR}/models/*.proto ${PROTO_DIR}/game/*.proto \
-${PROTO_SS_DIR}/gate/*.proto  ${PROTO_SS_DIR}/game/*.proto
+rpc-pkgs=gate^hall^game \
+${PROTO_DIR}/pbext/*.proto ${PROTO_DIR}/ws/*.proto \
+${PROTO_DIR}/datas/*.proto ${PROTO_DIR}/models/*.proto ${PROTO_DIR}/hall/*.proto ${PROTO_DIR}/game/*.proto \
+${PROTO_SS_DIR}/gate/*.proto ${PROTO_SS_DIR}/hall/*.proto ${PROTO_SS_DIR}/game/*.proto

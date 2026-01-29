@@ -15,4 +15,6 @@ message PlayerModel
 	string account = 2;
 	// 玩家信息
 	datas.PlayerInfo model_player_info = 3;
+	// 正在游戏的桌子 PlayType => TableLocation
+	map<int64, datas.TableLocation> in_tables = 4;
 }

@@ -10,20 +10,41 @@ message PlayerInfo {
     int64 play_piece_type = 5;
 }
 
+enum PlayType {
+    PT_Unknown = 0;
+    PT_Common = 1;
+}
+
 message PieceInfo {
     int32 x = 1;
     int32 y = 2;
     int32 color = 3;
 }
 
+enum TableStatus {
+    TS_New = 0;
+    TS_Matching = 1;
+    TS_WaitReady = 2;
+    TS_Playing = 3;
+    TS_Over = 4;
+}
+
 message TableInfo {
     int64 id = 1;
     PlayerInfo owner_player = 2; //房主
     PlayerInfo oppo_player = 3; //对手
-    int32 status = 4;
+    TableStatus status = 4;
     int32 turn = 5; //当前操作方
     int32 black_count = 6; 
     int32 white_count = 7;
     repeated PieceInfo pieces = 8;
-    int64 created_time = 10;
+    int64 create_time = 9;
+}
+
+message TableLocation {
+    int64 table_id = 1;
+    int64 game_id = 2;
+    PlayType play_type = 3;
+    int64 player1 = 4;
+    int64 player2 = 5;
 }

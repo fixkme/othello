@@ -13,6 +13,7 @@ import (
 const (
 	APP_ConfigPath     = "CONFIG_PATH"
 	APP_ServerId       = "SERVER_ID"
+	APP_TimezoneOffset = "TIMEZONE_OFFSET"
 	APP_LogPath        = "LOG_PATH"
 	APP_LogLevel       = "LOG_LEVEL"
 	APP_GateListenAddr = "GATE_LISTEN_ADDR" //gate监听地址
@@ -42,6 +43,7 @@ func GetEnvStr(key string) string {
 
 func LoadConfigFromEnv(conf *config.AppConfig) error {
 	replaceInt(&conf.ServerId, APP_ServerId)
+	replaceInt(&conf.TimezoneOffset, APP_TimezoneOffset)
 	replaceString(&conf.LogPath, APP_LogPath)
 	replaceInt(&conf.LogLevel, APP_LogLevel)
 	replaceString(&conf.RpcAddr, APP_RpcAddr)
@@ -50,6 +52,7 @@ func LoadConfigFromEnv(conf *config.AppConfig) error {
 	replaceString(&conf.MongoUri, APP_MongoUri)
 	replaceString(&conf.RedisAddr, APP_RedisAddr)
 	// default
+	setDefault(&conf.TimezoneOffset, 28800)
 	setDefault(&conf.LogPath, "logs")
 	setDefault(&conf.LogLevel, int(mlog.DebugLevel))
 	setDefault(&conf.LogStdOut, true)

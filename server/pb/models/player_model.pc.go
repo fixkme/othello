@@ -21,11 +21,13 @@ type MPlayerModel struct {
 	account  string
 	// 玩家信息
 	modelPlayerInfo *datas.MPlayerInfo
+	// 正在游戏的桌子 PlayType => TableLocation
+	inTables map[int64]*datas.MTableLocation
 
 	// 自己本身的同步key,由父对象指定
 	selfSyncID string
 	// 本对象所有属性的同步key数组
-	fieldSyncIDs [3]string
+	fieldSyncIDs [4]string
 	// 收集字典,每帧清空同步
 	collector delta.ICollector
 	// 监测变化回调
@@ -36,9 +38,11 @@ type MPlayerModel struct {
 func NewMPlayerModel() *MPlayerModel {
 	m := &MPlayerModel{}
 	m.modelPlayerInfo = datas.NewMPlayerInfo()
+	m.inTables = make(map[int64]*datas.MTableLocation)
 	m.fieldSyncIDs[0] = "player_id"
 	m.fieldSyncIDs[1] = "account"
 	m.fieldSyncIDs[2] = "model_player_info"
+	m.fieldSyncIDs[3] = "in_tables"
 	return m
 }
 
@@ -46,6 +50,7 @@ func NewMPlayerModel() *MPlayerModel {
 func NewPBPlayerModel() *PBPlayerModel {
 	pb := &PBPlayerModel{}
 	pb.ModelPlayerInfo = datas.NewPBPlayerInfo()
+	pb.InTables = make(map[int64]*datas.PBTableLocation)
 	return pb
 }
 
@@ -60,7 +65,12 @@ func (m *MPlayerModel) SetCollector(syncID string, collector delta.ICollector, c
 	m.fieldSyncIDs[0] = syncID + "player_id"
 	m.fieldSyncIDs[1] = syncID + "account"
 	m.fieldSyncIDs[2] = syncID + "model_player_info"
+	m.fieldSyncIDs[3] = syncID + "in_tables"
 	m.modelPlayerInfo.SetCollector(m.fieldSyncIDs[2], collector, cb)
+	for key, value := range m.inTables {
+		syncKey := fmt.Sprintf("%s.%v", m.fieldSyncIDs[3], key)
+		value.SetCollector(syncKey, collector, cb)
+	}
 }
 
 // 检查数值变化函数
@@ -86,6 +96,9 @@ func (m *MPlayerModel) ToPB() *PBPlayerModel {
 	pb.PlayerId = m.playerId
 	pb.Account = m.account
 	pb.ModelPlayerInfo = m.modelPlayerInfo.ToPB()
+	for key, value := range m.inTables {
+		pb.InTables[key] = value.ToPB()
+	}
 	return pb
 }
 
@@ -97,6 +110,11 @@ func (m *MPlayerModel) InitFromPB(pb *PBPlayerModel) {
 	m.playerId = pb.PlayerId
 	m.account = pb.Account
 	m.modelPlayerInfo.InitFromPB(pb.ModelPlayerInfo)
+	for key, value := range pb.InTables {
+		v := datas.NewMTableLocation()
+		v.InitFromPB(value)
+		m.inTables[key] = v
+	}
 }
 
 // String 函数
@@ -111,6 +129,13 @@ func (m *MPlayerModel) String() string {
 	strBuilder.WriteString(", ")
 	strBuilder.WriteString("modelPlayerInfo:")
 	strBuilder.WriteString(m.modelPlayerInfo.String())
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("inTables:")
+	strBuilder.WriteString("{")
+	for key, value := range m.inTables {
+		strBuilder.WriteString(fmt.Sprintf("%v:%s ", key, value.String()))
+	}
+	strBuilder.WriteString("}")
 	strBuilder.WriteString("}")
 	return strBuilder.String()
 }
@@ -150,4 +175,49 @@ func (m *MPlayerModel) SetModelPlayerInfo(value *datas.MPlayerInfo) {
 		value.SetCollector(m.fieldSyncIDs[2], m.collector, m.changedCb)
 	}
 	m.modelPlayerInfo = value
+}
+
+// 正在游戏的桌子 PlayType => TableLocation
+func (m *MPlayerModel) GetInTables(key int64) (*datas.MTableLocation, bool) {
+	value, exists := m.inTables[key]
+	return value, exists
+}
+
+func (m *MPlayerModel) SetInTables(key int64, value *datas.MTableLocation) {
+	localSyncKey := fmt.Sprintf("%s.%v", m.fieldSyncIDs[3], key)
+	var oldValue any
+	if v, ok := m.inTables[key]; ok {
+		oldValue = v
+	} else {
+		oldValue = nil
+	}
+	if m.checkDirty(oldValue, value, localSyncKey, true) {
+		value.SetCollector(localSyncKey, m.collector, m.changedCb)
+	}
+	m.inTables[key] = value
+}
+
+func (m *MPlayerModel) RemoveInTables(key int64) {
+	localSyncKey := fmt.Sprintf("%s.%v", m.fieldSyncIDs[3], key)
+	m.checkDirty(m.inTables[key], "__DELETE__", localSyncKey, true)
+	delete(m.inTables, key)
+}
+
+func (m *MPlayerModel) ClearInTables() {
+	for k := range m.inTables {
+		m.RemoveInTables(k)
+	}
+}
+
+func (m *MPlayerModel) GetInTablesCount() int64 {
+	return int64(len(m.inTables))
+}
+
+// 正在游戏的桌子 PlayType => TableLocation
+func (m *MPlayerModel) RangeInTables(f func(key int64, value *datas.MTableLocation) bool) {
+	for k, v := range m.inTables {
+		if !f(k, v) {
+			return
+		}
+	}
 }

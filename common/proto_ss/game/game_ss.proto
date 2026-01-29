@@ -2,9 +2,33 @@ syntax = "proto3";
 option go_package = "github.com/fixkme/othello/server/pb/game";
 package game;
 
+import "datas/player_data.proto";
+
 message CPlayerOffline {
     int64 player_id = 1;
 }
-
 message SPlayerOffline {
+}
+
+message CCreateRoom {
+    int64 table_id = 1;
+    repeated datas.PlayerInfo players = 2; 
+    map<int64, string> gate_ids = 3;
+}
+message SCreateRoom {
+}
+
+message CEnterGame {
+    int64 player_id = 1;
+    int64 table_id = 2;
+}
+message SEnterGame {
+    datas.TableInfo table_info = 1;
+}
+
+message CLeaveGame {
+    int64 player_id = 1;
+}
+message SLeaveGame {
+    bool is_disband_table = 1;
 }
