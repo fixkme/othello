@@ -132,12 +132,18 @@ func (s *globalSystem) runTicker(ctx context.Context) {
 	metricsTicker := time.NewTicker(metricsDuration)
 	defer metricsTicker.Stop()
 
+	const savePlayerDuration = 15 * time.Second
+	savePlayeTicker := time.NewTicker(savePlayerDuration)
+	defer savePlayeTicker.Stop()
+
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-metricsTicker.C:
 			s.AsyncExec(s.MetricsCollect)
+		case <-savePlayeTicker.C:
+			s.AsyncExec(s.playerMonitor.SaveChangedDatas)
 		}
 	}
 }
