@@ -1,12 +1,9 @@
 module github.com/fixkme/othello/server
 
-go 1.24.0
-
-toolchain go1.24.12
+go 1.23.9
 
 require (
 	github.com/bytedance/gopkg v0.1.1
-	github.com/cloudwego/netpoll v0.7.0
 	github.com/emirpasic/gods v1.18.1
 	github.com/fixkme/gokit v0.0.0-20260126041518-9802b1dbfe26
 	github.com/panjf2000/gnet/v2 v2.9.1
@@ -19,6 +16,7 @@ replace github.com/fixkme/gokit => ../../gokit
 require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/cloudwego/gopkg v0.1.4 // indirect
+	github.com/cloudwego/netpoll v0.7.2 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible // indirect
@@ -44,7 +42,7 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250106144421-5f5ef82da422 // indirect
