@@ -184,16 +184,17 @@ func (m *MPlayerInfo) AddPlayPieceType(add int64) int64 {
 }
 
 type MTableLocation struct {
-	tableId  int64
-	gameId   int64
-	playType PlayType
-	player1  int64
-	player2  int64
+	tableId    int64
+	gameId     int64
+	playType   PlayType
+	player1    int64
+	player2    int64
+	createTime int64
 
 	// 自己本身的同步key,由父对象指定
 	selfSyncID string
 	// 本对象所有属性的同步key数组
-	fieldSyncIDs [5]string
+	fieldSyncIDs [6]string
 	// 收集字典,每帧清空同步
 	collector delta.ICollector
 	// 监测变化回调
@@ -208,6 +209,7 @@ func NewMTableLocation() *MTableLocation {
 	m.fieldSyncIDs[2] = "play_type"
 	m.fieldSyncIDs[3] = "player1"
 	m.fieldSyncIDs[4] = "player2"
+	m.fieldSyncIDs[5] = "create_time"
 	return m
 }
 
@@ -230,6 +232,7 @@ func (m *MTableLocation) SetCollector(syncID string, collector delta.ICollector,
 	m.fieldSyncIDs[2] = syncID + "play_type"
 	m.fieldSyncIDs[3] = syncID + "player1"
 	m.fieldSyncIDs[4] = syncID + "player2"
+	m.fieldSyncIDs[5] = syncID + "create_time"
 }
 
 // 检查数值变化函数
@@ -257,6 +260,7 @@ func (m *MTableLocation) ToPB() *PBTableLocation {
 	pb.PlayType = m.playType
 	pb.Player1 = m.player1
 	pb.Player2 = m.player2
+	pb.CreateTime = m.createTime
 	return pb
 }
 
@@ -270,6 +274,7 @@ func (m *MTableLocation) InitFromPB(pb *PBTableLocation) {
 	m.playType = pb.PlayType
 	m.player1 = pb.Player1
 	m.player2 = pb.Player2
+	m.createTime = pb.CreateTime
 }
 
 // String 函数
@@ -290,6 +295,9 @@ func (m *MTableLocation) String() string {
 	strBuilder.WriteString(", ")
 	strBuilder.WriteString("player2:")
 	strBuilder.WriteString(fmt.Sprintf("%v", m.player2))
+	strBuilder.WriteString(", ")
+	strBuilder.WriteString("createTime:")
+	strBuilder.WriteString(fmt.Sprintf("%v", m.createTime))
 	strBuilder.WriteString("}")
 	return strBuilder.String()
 }
@@ -365,4 +373,20 @@ func (m *MTableLocation) AddPlayer2(add int64) int64 {
 	m.player2 += add
 	m.checkDirty(oldValue, m.player2, m.fieldSyncIDs[4], true)
 	return m.player2
+}
+
+func (m *MTableLocation) GetCreateTime() int64 {
+	return m.createTime
+}
+
+func (m *MTableLocation) SetCreateTime(value int64) {
+	m.checkDirty(m.createTime, value, m.fieldSyncIDs[5], true)
+	m.createTime = value
+}
+
+func (m *MTableLocation) AddCreateTime(add int64) int64 {
+	oldValue := m.createTime
+	m.createTime += add
+	m.checkDirty(oldValue, m.createTime, m.fieldSyncIDs[5], true)
+	return m.createTime
 }

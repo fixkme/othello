@@ -47,4 +47,5 @@ message TableLocation {
     PlayType play_type = 3;
     int64 player1 = 4;
     int64 player2 = 5;
+    int64 create_time = 6;
 }

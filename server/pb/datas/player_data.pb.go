@@ -373,6 +373,7 @@ type PBTableLocation struct {
 	PlayType      PlayType               `protobuf:"varint,3,opt,name=play_type,json=playType,proto3,enum=datas.PlayType" json:"play_type,omitempty"`
 	Player1       int64                  `protobuf:"varint,4,opt,name=player1,proto3" json:"player1,omitempty"`
 	Player2       int64                  `protobuf:"varint,5,opt,name=player2,proto3" json:"player2,omitempty"`
+	CreateTime    int64                  `protobuf:"varint,6,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -442,6 +443,13 @@ func (x *PBTableLocation) GetPlayer2() int64 {
 	return 0
 }
 
+func (x *PBTableLocation) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
 var File_datas_player_data_proto protoreflect.FileDescriptor
 
 const file_datas_player_data_proto_rawDesc = "" +
@@ -471,13 +479,15 @@ const file_datas_player_data_proto_rawDesc = "" +
 	"whiteCount\x12(\n" +
 	"\x06pieces\x18\b \x03(\v2\x10.datas.PieceInfoR\x06pieces\x12\x1f\n" +
 	"\vcreate_time\x18\t \x01(\x03R\n" +
-	"createTime\"\xa5\x01\n" +
+	"createTime\"\xc6\x01\n" +
 	"\rTableLocation\x12\x19\n" +
 	"\btable_id\x18\x01 \x01(\x03R\atableId\x12\x17\n" +
 	"\agame_id\x18\x02 \x01(\x03R\x06gameId\x12,\n" +
 	"\tplay_type\x18\x03 \x01(\x0e2\x0f.datas.PlayTypeR\bplayType\x12\x18\n" +
 	"\aplayer1\x18\x04 \x01(\x03R\aplayer1\x12\x18\n" +
-	"\aplayer2\x18\x05 \x01(\x03R\aplayer2*)\n" +
+	"\aplayer2\x18\x05 \x01(\x03R\aplayer2\x12\x1f\n" +
+	"\vcreate_time\x18\x06 \x01(\x03R\n" +
+	"createTime*)\n" +
 	"\bPlayType\x12\x0e\n" +
 	"\n" +
 	"PT_Unknown\x10\x00\x12\r\n" +

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/fixkme/gokit/errs"
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
@@ -74,10 +75,16 @@ func (s *Service) EnterGame(ctx context.Context, in *hall.CEnterGame) (resp *hal
 		return nil, err
 	}
 
+	// 正在匹配
+	tb = system.Global.GetMatchingTable(p.Id())
+	if tb != nil {
+		return
+	}
+
 	pt := datas.PlayType_PT_Unknown
 	if mtb, _ := p.GetInTables(int64(pt)); mtb != nil {
 		tb = mtb.ToPB()
-		// 恢复
+		// 恢复局内
 		enterReq := &game.CEnterGame{
 			PlayerId: p.Id(),
 			TableId:  tb.GetTableId(),
@@ -87,10 +94,17 @@ func (s *Service) EnterGame(ctx context.Context, in *hall.CEnterGame) (resp *hal
 		meta := common.WarpMeta(p.Id(), p.GateId)
 		err = core.Rpc.SyncCall(gameService, enterReq, enterResp, 0, meta)
 		if err != nil {
-			return nil, err
+			if cerr, ok := err.(errs.CodeError); ok && cerr.Code() == errs.ErrCode_Unknown {
+				mlog.Errorf("EnterGame game node failed, pid:%d, err:%v", p.Id(), err)
+				// 不在game节点
+				p.RemoveInTables(int64(pt))
+			} else {
+				return nil, err
+			}
+		} else {
+			resp.TableInfo = enterResp.TableInfo
+			return resp, nil
 		}
-		resp.TableInfo = enterResp.TableInfo
-		return resp, nil
 	}
 
 	// 匹配成功
@@ -109,17 +123,16 @@ func (s *Service) EnterGame(ctx context.Context, in *hall.CEnterGame) (resp *hal
 		if err != nil {
 			return nil, err
 		}
-		system.Global.PlayerMatchSucceed(p, tb)
+		system.Global.PlayerMatchSucceed(p1, p2, tb)
 		//resp.TableInfo = enterResp.TableInfo
 		return resp, nil
 	}
 	// 创建
-	tb, err = system.Global.CreateTable()
+	tb, err = system.Global.CreateMatchTable(p)
 	if err != nil {
 		return nil, err
 	}
 
-	system.Global.PlayerCreateTable(p, tb)
 	//resp.TableInfo = enterResp.TableInfo
 	return resp, nil
 }
@@ -136,7 +149,7 @@ func (s *Service) LeaveGame(ctx context.Context, in *hall.CLeaveGame) (*hall.SLe
 func (s *Service) PlayerOffline(ctx context.Context, in *hall.CPlayerOffline) (*hall.SPlayerOffline, error) {
 	p := system.Global.GetPlayer(in.PlayerId)
 	if p != nil {
-		system.Global.PlayerOffline(p)
+		system.Global.RemoveMatchPlayer(p)
 	}
 	return nil, nil
 }

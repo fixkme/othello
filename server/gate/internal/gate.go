@@ -98,8 +98,8 @@ func (s *GateServer) OnClientClose(conn *wsg.Conn, err error) {
 			mlog.Errorf("player %d call hall.PlayerOffline failed, %v", pid, callErr)
 		}
 		// 通知game玩家下线
-		gameServiceNode := getServiceNodeName(cli, values.Service_Game)
-		if gameServiceNode != "" {
+		if cli.GameId != 0 {
+			gameServiceNode := getServiceNodeName(cli, values.Service_Game)
 			callErr = core.Rpc.AsyncCallWithoutResp(gameServiceNode, &game.CPlayerOffline{PlayerId: pid}, meta)
 			if callErr != nil {
 				mlog.Errorf("player %d call game.PlayerOffline failed, %v", pid, callErr)

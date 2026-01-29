@@ -174,9 +174,6 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 func getServiceNodeName(cli *WsClient, service string) string {
 	switch service {
 	case "game":
-		if cli.GameId == 0 {
-			return ""
-		}
 		return fmt.Sprintf("game.%d", cli.GameId)
 	default:
 		return service

@@ -11,6 +11,7 @@ import (
 	"github.com/fixkme/gokit/framework/core"
 	g "github.com/fixkme/gokit/framework/go"
 	"github.com/fixkme/gokit/mlog"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common"
 	"github.com/fixkme/othello/server/hall/internal/conf"
 	"github.com/fixkme/othello/server/hall/internal/entity"
@@ -28,10 +29,11 @@ type globalSystem struct {
 	defaultModule
 	logicRoutine *g.RoutineAgent
 
-	accPlayers map[string]int64
-	players    map[int64]*entity.Player // playerId -> Player
-	tables     map[int64]int64          // tableId -> gameId
-	matching   *redblacktree.Tree       // 等待匹配
+	accPlayers   map[string]int64
+	players      map[int64]*entity.Player // playerId -> Player
+	tables       map[int64]int64          // tableId -> gameId
+	matchPlayers map[int64]int64          // pid => tableId
+	matching     *redblacktree.Tree       // 等待匹配
 
 	timerGenId     atomic.Int64
 	timerCallbacks map[string]globalTimerCallback
@@ -60,6 +62,7 @@ func (s *globalSystem) onInit() {
 	s.accPlayers = make(map[string]int64)
 	s.players = make(map[int64]*entity.Player)
 	s.tables = make(map[int64]int64)
+	s.matchPlayers = make(map[int64]int64)
 	s.matching = redblacktree.NewWith(utils.Int64Comparator)
 	s.playerMonitor = delta.NewDeltaMonitor[int64](core.Mongo.Client(), conf.DBName, conf.CollPlayer)
 	s.rootCtx, s.rootCancel = context.WithCancel(context.Background())
@@ -240,7 +243,15 @@ func (s *globalSystem) RemovePlayer(playerId int64) {
 	delete(s.players, playerId)
 }
 
-func (s *globalSystem) CreateTable() (*datas.PBTableLocation, error) {
+func (s *globalSystem) RemoveTable(tid int64) {
+	_, ok := s.tables[tid]
+	if !ok {
+		return
+	}
+	delete(s.tables, tid)
+}
+
+func (s *globalSystem) CreateMatchTable(p *entity.Player) (*datas.PBTableLocation, error) {
 	tid, err := s.GeneId(conf.IdName_Table)
 	if err != nil {
 		return nil, err
@@ -252,15 +263,23 @@ func (s *globalSystem) CreateTable() (*datas.PBTableLocation, error) {
 	// TODO  负载均衡选择game节点，现在默认game节点为1
 	s.tables[tid] = tb.GameId
 
+	tb.Player1 = p.Id()
+	s.matching.Put(tb.GetTableId(), tb)
+	s.matchPlayers[p.Id()] = tid
 	return tb, nil
 }
 
-func (s *globalSystem) RemoveTable(tid int64) {
-	_, ok := s.tables[tid]
-	if !ok {
-		return
+func (s *globalSystem) GetMatchingTable(pid int64) *datas.PBTableLocation {
+	tid := s.matchPlayers[pid]
+	if tid == 0 {
+		return nil
 	}
-	delete(s.tables, tid)
+	v, ok := s.matching.Get(tid)
+	if !ok {
+		return nil
+	}
+	tb := v.(*datas.PBTableLocation)
+	return tb
 }
 
 func (s *globalSystem) GetMatchTable() *datas.PBTableLocation {
@@ -272,37 +291,26 @@ func (s *globalSystem) GetMatchTable() *datas.PBTableLocation {
 	return tb
 }
 
-func (s *globalSystem) PlayerMatchSucceed(p *entity.Player, tb *datas.PBTableLocation) {
-	tb.Player2 = p.Id()
+func (s *globalSystem) PlayerMatchSucceed(p1, p2 *entity.Player, tb *datas.PBTableLocation) {
+	tb.Player2 = p2.Id()
+	tb.CreateTime = util.NowMs()
 	s.matching.Remove(tb.GetTableId())
-	loc := datas.NewMTableLocation()
-	loc.InitFromPB(tb)
-	p.SetInTables(int64(tb.GetPlayType()), loc)
-}
+	delete(s.matchPlayers, p1.Id())
+	delete(s.matchPlayers, p2.Id())
 
-func (s *globalSystem) PlayerCreateTable(p *entity.Player, tb *datas.PBTableLocation) {
-	tb.Player1 = p.Id()
-	s.matching.Put(tb.GetTableId(), tb)
 	loc := datas.NewMTableLocation()
 	loc.InitFromPB(tb)
-	p.SetInTables(int64(tb.GetPlayType()), loc)
+	p1.SetInTables(int64(tb.GetPlayType()), loc)
+
+	loc = datas.NewMTableLocation()
+	loc.InitFromPB(tb)
+	p2.SetInTables(int64(tb.GetPlayType()), loc)
 }
 
 func (s *globalSystem) PlayerLeaveGame(p *entity.Player) error {
-	mtb, _ := p.GetInTables(int64(datas.PlayType_PT_Common))
-	if mtb == nil {
-		return nil
-	}
-	tid := mtb.GetTableId()
-	// 移除匹配
-	if v, ok := s.matching.Get(tid); ok && v != nil {
-		p.RemoveInTables(int64(datas.PlayType_PT_Common))
-		s.matching.Remove(tid)
-		s.RemoveTable(tid)
-		return nil
-	}
+	s.RemoveMatchPlayer(p)
 
-	if mtb.GetPlayer1() != 0 && mtb.GetPlayer2() != 0 { //已开局
+	if mtb, _ := p.GetInTables(int64(datas.PlayType_PT_Common)); mtb != nil { //已开局
 		gameService := GameService(mtb.GetGameId())
 		req := &game.CLeaveGame{PlayerId: p.Id()}
 		resp := &game.SLeaveGame{}
@@ -315,18 +323,17 @@ func (s *globalSystem) PlayerLeaveGame(p *entity.Player) error {
 	return nil
 }
 
-func (s *globalSystem) PlayerOffline(p *entity.Player) {
-	mtb, _ := p.GetInTables(int64(datas.PlayType_PT_Common))
-	if mtb == nil {
-		return
+func (s *globalSystem) RemoveMatchPlayer(p *entity.Player) bool {
+	if tid := s.matchPlayers[p.Id()]; tid > 0 {
+		delete(s.matchPlayers, p.Id())
+		// 移除匹配
+		if v, ok := s.matching.Get(tid); ok && v != nil {
+			s.matching.Remove(tid)
+			s.RemoveTable(tid)
+			return true
+		}
 	}
-	tid := mtb.GetTableId()
-	// 移除匹配
-	if v, ok := s.matching.Get(tid); ok && v != nil {
-		p.RemoveInTables(int64(datas.PlayType_PT_Common))
-		s.matching.Remove(tid)
-		s.RemoveTable(tid)
-	}
+	return false
 }
 
 func (s *globalSystem) GameSettle(in *hall.CGameSettle) {
@@ -339,6 +346,6 @@ func (s *globalSystem) GameSettle(in *hall.CGameSettle) {
 	}
 
 	tid := in.TableId
-	s.matching.Remove(tid)
+	s.matching.Remove(tid) //保险起见
 	s.RemoveTable(tid)
 }
