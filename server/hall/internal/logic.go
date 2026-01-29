@@ -64,6 +64,7 @@ func (m *LogicModule) Destroy() {
 		mlog.Errorf("Rpc.UnregisterService failed, %v", err)
 	}
 	m.RoutineAgent.Close()
+	close(m.quit)
 }
 
 func (m *LogicModule) Name() string {

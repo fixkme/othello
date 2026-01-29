@@ -65,7 +65,7 @@ func StartApp(ctx context.Context, wg *sync.WaitGroup, name string, rpcHandler r
 	}
 	// rpc
 	rpcConf := &config.Config.RpcConfig
-	if err = core.InitRpcModule(name, rpcHandler, rpcConf); err != nil {
+	if err = core.InitRpcModule(fmt.Sprintf("%s_rpc", name), rpcHandler, rpcConf); err != nil {
 		logger.Fatalf("init rpc failed: %v", err)
 	}
 }

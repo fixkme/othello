@@ -75,6 +75,7 @@ func (m *LogicModule) Destroy() {
 	if err := core.Rpc.UnregisterService(serviceNodeName); err != nil {
 		mlog.Errorf("Rpc.UnregisterService failed, %s, %v", serviceNodeName, err)
 	}
+	m.RoutineAgent.Close()
 	close(m.quit)
 }
 
