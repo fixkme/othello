@@ -12,13 +12,12 @@ import (
 	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/game/internal/entity"
 	"github.com/fixkme/othello/server/game/internal/system"
-	"google.golang.org/protobuf/proto"
 )
 
 func RpcHandler(rc *rpc.RpcContext) {
 	ctx, agent := prepareContext(rc)
 	argMsg, logicHandler := rc.Method(rc.SrvImpl)
-	if err := proto.Unmarshal(rc.Req.Payload, argMsg); err != nil {
+	if err := core.MsgUnmarshaler.Unmarshal(rc.Req.Payload, argMsg); err != nil {
 		rc.ReplyErr = err
 		rc.SerializeResponse(nil)
 		return

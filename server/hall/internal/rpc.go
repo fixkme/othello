@@ -10,13 +10,12 @@ import (
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/hall/internal/logic"
-	"google.golang.org/protobuf/proto"
 )
 
 func RpcHandler(rc *rpc.RpcContext) {
 	ctx := prepareContext(rc)
 	argMsg, logicHandler := rc.Method(rc.SrvImpl)
-	if err := proto.Unmarshal(rc.Req.Payload, argMsg); err != nil {
+	if err := core.MsgUnmarshaler.Unmarshal(rc.Req.Payload, argMsg); err != nil {
 		rc.ReplyErr = err
 		rc.SerializeResponse(nil)
 		return
