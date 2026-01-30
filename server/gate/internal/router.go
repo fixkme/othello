@@ -67,6 +67,9 @@ func (r *RoutingWorkerImp) RoutingMsg(task *RoutingTask) {
 			mlog.Errorf("routing player %s,%d error: %v", client.Account, client.PlayerId, err)
 			respMsgName := strings.Replace(wsMessage.MsgName, ".C", ".S", 1)
 			replyClientResponse(client, wsMessage.Uuid, respMsgName, nil, nil, err)
+			if wsMessage.MsgName == cloginMsgName {
+				client.conn.Close()
+			}
 		}
 	}()
 

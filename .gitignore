@@ -26,4 +26,7 @@ node_modules/
 .env
 bin/
 logs/
+mlog/
+*.log
 *__debug*
+prototest
