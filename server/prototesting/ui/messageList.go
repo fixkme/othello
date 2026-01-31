@@ -126,25 +126,23 @@ func (w *MessageWidget) acceptMsg() {
 	}()
 	lastReqIndex := 0
 	for {
-		select {
-		case msgItem, ok := <-w.msgChan:
-			if !ok {
-				return
-			}
-			str := msgItem.FormatString()
-			if len(str) > 100 {
-				str = str[:100]
-			}
-			if msgItem.MsgType == net.MsgType_Request {
-				lastReqIndex = w.MsgList.Length()
-				w.AppendMessage(str)
-			} else if msgItem.MsgType == net.MsgType_Response || msgItem.MsgType == net.MsgType_Error {
-				w.dataList.SetValue(lastReqIndex, str)
-			} else {
-				w.AppendMessage(str)
-			}
-			w.msgMap[msgItem.Id] = append(w.msgMap[msgItem.Id], msgItem)
+		msgItem, ok := <-w.msgChan
+		if !ok {
+			return
 		}
+		str := msgItem.FormatString()
+		if len(str) > 100 {
+			str = str[:100]
+		}
+		if msgItem.MsgType == net.MsgType_Request {
+			lastReqIndex = w.MsgList.Length()
+			w.AppendMessage(str)
+		} else if msgItem.MsgType == net.MsgType_Response || msgItem.MsgType == net.MsgType_Error {
+			w.dataList.SetValue(lastReqIndex, str)
+		} else {
+			w.AppendMessage(str)
+		}
+		w.msgMap[msgItem.Id] = append(w.msgMap[msgItem.Id], msgItem)
 	}
 }
 
