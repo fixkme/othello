@@ -27,9 +27,9 @@ func RpcHandler(rc *rpc.RpcContext) {
 		rc.Reply, rc.ReplyErr = logicHandler(ctx, argMsg)
 
 		if rc.ReplyErr == nil {
-			mlog.Infof("handler msg succeed, method:%s, req_data:%v, rsp_data:%v", rc.MethodName, argMsg, rc.Reply)
+			mlog.Infof("handler msg succeed, method:%s, req_data:{%v}, rsp_data:{%v}", rc.MethodName, argMsg, rc.Reply)
 		} else {
-			mlog.Errorf("handler msg failed, method:%s, req_data:%v, err:%v", rc.MethodName, argMsg, rc.ReplyErr)
+			mlog.Errorf("handler msg failed, method:%s, req_data:{%v}, err:%v", rc.MethodName, argMsg, rc.ReplyErr)
 		}
 	}
 	//mlog.Debugf("game push handler method:%s", rc.Req.MethodName)
