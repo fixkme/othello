@@ -23,7 +23,7 @@ func (s *Service) Login(ctx context.Context, in *hall.CLogin) (*hall.SLogin, err
 	if err != nil {
 		return nil, err
 	}
-	md := rc.Req.Md
+	md := rc.ReqMd
 
 	acct := in.Account
 	if acct == "" {

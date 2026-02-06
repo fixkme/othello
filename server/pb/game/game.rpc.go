@@ -20,7 +20,7 @@ func RegisterGameServer(s rpc.ServiceRegistrar, srv GameServer) {
 	s.RegisterService(&Game_ServiceDesc, srv)
 }
 
-func _Game_CreateRoom_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Game_CreateRoom_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CCreateRoom)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).CreateRoom(ctx, req.(*CCreateRoom))
@@ -28,7 +28,7 @@ func _Game_CreateRoom_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Game_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Game_EnterGame_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CEnterGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).EnterGame(ctx, req.(*CEnterGame))
@@ -36,7 +36,7 @@ func _Game_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Game_LeaveGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Game_LeaveGame_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CLeaveGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).LeaveGame(ctx, req.(*CLeaveGame))
@@ -44,7 +44,7 @@ func _Game_LeaveGame_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Game_PlacePiece_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Game_PlacePiece_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CPlacePiece)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).PlacePiece(ctx, req.(*CPlacePiece))
@@ -52,7 +52,7 @@ func _Game_PlacePiece_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Game_PlayerOffline_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Game_PlayerOffline_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CPlayerOffline)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).PlayerOffline(ctx, req.(*CPlayerOffline))
@@ -60,7 +60,7 @@ func _Game_PlayerOffline_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Game_ReadyGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Game_ReadyGame_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CReadyGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(GameServer).ReadyGame(ctx, req.(*CReadyGame))

@@ -6,7 +6,7 @@ require (
 	fyne.io/fyne/v2 v2.7.2
 	github.com/bytedance/gopkg v0.1.1
 	github.com/emirpasic/gods v1.18.1
-	github.com/fixkme/gokit v0.0.0-20260130064131-9b282633998e
+	github.com/fixkme/gokit v0.0.0-20260206062759-8e4e9a4ba38a
 	github.com/gorilla/websocket v1.5.3
 	github.com/panjf2000/gnet/v2 v2.9.7
 	github.com/rs/xid v1.6.0
@@ -42,7 +42,6 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/hack-pad/go-indexeddb v0.3.2 // indirect
 	github.com/hack-pad/safejs v0.1.0 // indirect
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect

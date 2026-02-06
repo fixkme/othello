@@ -19,7 +19,7 @@ func RegisterHallServer(s rpc.ServiceRegistrar, srv HallServer) {
 	s.RegisterService(&Hall_ServiceDesc, srv)
 }
 
-func _Hall_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Hall_EnterGame_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CEnterGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(HallServer).EnterGame(ctx, req.(*CEnterGame))
@@ -27,7 +27,7 @@ func _Hall_EnterGame_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Hall_GameSettle_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Hall_GameSettle_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CGameSettle)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(HallServer).GameSettle(ctx, req.(*CGameSettle))
@@ -35,7 +35,7 @@ func _Hall_GameSettle_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Hall_LeaveGame_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Hall_LeaveGame_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CLeaveGame)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(HallServer).LeaveGame(ctx, req.(*CLeaveGame))
@@ -43,7 +43,7 @@ func _Hall_LeaveGame_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Hall_Login_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Hall_Login_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CLogin)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(HallServer).Login(ctx, req.(*CLogin))
@@ -51,7 +51,7 @@ func _Hall_Login_Materializer(srv any) (proto.Message, rpc.Handler) {
 	return arg, h
 }
 
-func _Hall_PlayerOffline_Materializer(srv any) (proto.Message, rpc.Handler) {
+func _Hall_PlayerOffline_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
 	arg := new(CPlayerOffline)
 	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
 		return srv.(HallServer).PlayerOffline(ctx, req.(*CPlayerOffline))
