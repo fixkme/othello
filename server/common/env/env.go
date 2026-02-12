@@ -58,7 +58,7 @@ func LoadConfigFromEnv(conf *config.AppConfig) error {
 	setDefault(&conf.LogStdOut, true)
 	setDefault(&conf.EtcdEndpoints, "127.0.0.1:2379")
 	setDefault(&conf.RpcGroup, "gbs")
-	setDefault(&conf.RpcPollerNum, runtime.NumCPU())
+	setDefault(&conf.RpcPollerNum, max(runtime.NumCPU()/2, 1))
 	setDefault(&conf.RpcReadTimeout, 5*1e3)
 	setDefault(&conf.RpcWriteTimeout, 5*1e3)
 	return nil

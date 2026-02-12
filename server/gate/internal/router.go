@@ -136,7 +136,7 @@ func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, r
 			wsRsp.ErrorCode = codeErr.Code()
 			wsRsp.ErrorDesc = codeErr.Error()
 		} else {
-			wsRsp.ErrorCode = 1
+			wsRsp.ErrorCode = errs.ErrCode_Unknown
 			wsRsp.ErrorDesc = callErr.Error()
 		}
 	} else {

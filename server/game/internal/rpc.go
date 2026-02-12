@@ -5,7 +5,6 @@ import (
 	"errors"
 	"runtime/debug"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
 	"github.com/fixkme/othello/server/common/values"
@@ -37,14 +36,14 @@ func RpcHandler(rc *rpc.RpcContext) {
 	//mlog.Debugf("game push handler method:%s", rc.Req.MethodName)
 	if agent != nil {
 		if err := agent.TryRunFunc(fn); err != nil {
-			logger.Errorf("rpc handler push agent func failed, %v", err)
+			mlog.Errorf("rpc handler push agent func failed, %v", err)
 			rc.ReplyErr = errors.New("rpc handler push agent func failed")
 			rc.SerializeResponse()
 		}
 		return
 	}
 	if err := system.Global.AsyncExec(fn); err != nil {
-		logger.Errorf("rpc handler push logic func failed, err:%v", err)
+		mlog.Errorf("rpc handler push logic func failed, err:%v", err)
 		rc.ReplyErr = errors.New("rpc handler push logic func failed")
 		rc.SerializeResponse()
 		return

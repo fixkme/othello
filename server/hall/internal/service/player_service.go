@@ -65,6 +65,9 @@ func (s *Service) EnterGame(ctx context.Context, in *hall.CEnterGame) (resp *hal
 			if _err != nil {
 				mlog.Errorf("EnterGame getRpcContext error %v", _err)
 			} else {
+				if rc.ReplyMd == nil {
+					rc.ReplyMd = &rpc.Meta{}
+				}
 				rc.ReplyMd.SetInt(values.Rpc_GameId, tb.GetGameId())
 			}
 		}

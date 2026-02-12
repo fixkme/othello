@@ -7,7 +7,6 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/fixkme/gokit/framework/config"
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
@@ -43,10 +42,10 @@ func StartApp(ctx context.Context, wg *sync.WaitGroup, name string, rpcHandler r
 	if port := config.Config.PprofPort; port != 0 {
 		runtime.SetBlockProfileRate(1)
 		go func() {
-			logger.Infof("pprof listen on: %d", port)
+			mlog.Infof("pprof listen on: %d", port)
 			addr := fmt.Sprintf(":%d", port)
 			if err := http.ListenAndServe(addr, nil); err != nil {
-				logger.Fatalf("pprof listen failed: %v", err)
+				mlog.Fatalf("pprof listen failed: %v", err)
 			}
 		}()
 	}
@@ -54,18 +53,18 @@ func StartApp(ctx context.Context, wg *sync.WaitGroup, name string, rpcHandler r
 	redisConf := &config.Config.RedisConfig
 	if redisConf.RedisAddr != "" {
 		if err = core.InitRedis(redisConf); err != nil {
-			logger.Fatalf("init redis failed: %v", err)
+			mlog.Fatalf("init redis failed: %v", err)
 		}
 	}
 	// mongodb ?
 	if uri := config.Config.MongoUri; uri != "" {
 		if err = core.InitMongo(uri); err != nil {
-			logger.Fatalf("init mongodb failed: %v", err)
+			mlog.Fatalf("init mongodb failed: %v", err)
 		}
 	}
 	// rpc
 	rpcConf := &config.Config.RpcConfig
 	if err = core.InitRpcModule(fmt.Sprintf("%s_rpc", name), rpcHandler, rpcConf); err != nil {
-		logger.Fatalf("init rpc failed: %v", err)
+		mlog.Fatalf("init rpc failed: %v", err)
 	}
 }
