@@ -5,7 +5,7 @@ go 1.23.9
 require (
 	fyne.io/fyne/v2 v2.7.2
 	github.com/emirpasic/gods v1.18.1
-	github.com/fixkme/gokit v0.0.0-20260211103307-f8c6d439c6fe
+	github.com/fixkme/gokit v0.0.0-20260225043827-d436d93383a9
 	github.com/gorilla/websocket v1.5.3
 	github.com/panjf2000/gnet/v2 v2.9.7
 	github.com/rs/xid v1.6.0
