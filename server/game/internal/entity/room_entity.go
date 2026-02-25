@@ -21,6 +21,7 @@ func NewRoom(tid int64) *Room {
 	tb := &Room{
 		Desk:    NewTable(tid),
 		Players: make(map[int64]*Player),
+		Readys:  make(map[int64]bool),
 	}
 	return tb
 }

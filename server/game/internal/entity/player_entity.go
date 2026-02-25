@@ -23,7 +23,7 @@ func (p *Player) GetId() int64 {
 }
 
 func (p *Player) GetPlayPieceType() PieceType {
-	return PieceType(p.GetPlayPieceType())
+	return PieceType(p.PBPlayerInfo.GetPlayPieceType())
 }
 
 func (p *Player) SetPlayPieceType(t int64) {

@@ -128,7 +128,7 @@ func (r *RoutingWorkerImp) ProcessRpcReply(rpcReply *rpc.AsyncCallResult) {
 }
 
 func replyClientResponse(cli *WsClient, uuid, msgName string, rspMd *rpc.Meta, rspData []byte, callErr error) {
-	mlog.Debugf("ProcessRpcReply replyClientResponse:%s, msg:%s, callErr:%v, rspDataSize:%d", cli.Account, msgName, callErr, len(rspData))
+	mlog.Debugf("ProcessRpcReply replyClientResponse %s, uuid:%s, msgName:%s, callErr:%v, rspDataSize:%d", cli.Account, uuid, msgName, callErr, len(rspData))
 	wsRsp := &ws.WsResponseMessage{Uuid: uuid, MsgName: msgName}
 	if callErr != nil {
 		codeErr, ok := callErr.(errs.CodeError)
@@ -267,8 +267,9 @@ func (p *_LoadBalanceImp) GetOne(cli *WsClient) wsg.RoutingWorker {
 
 func (p *_LoadBalanceImp) OnHandshake(conn *wsg.Conn, req *http.Request) error {
 	params := req.URL.Query()
+	header := req.Header
 	mlog.Debugf("OnHandshake http.Request params: %v", params)
-
+	mlog.Debugf("OnHandshake http.Request header: %v", header)
 	cli := &WsClient{
 		conn:    conn,
 		Account: params.Get("x-account"),

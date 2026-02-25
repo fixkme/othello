@@ -8,6 +8,7 @@ import (
 )
 
 type HallServer interface {
+	CheckTime(context.Context, *CCheckTime) (*SCheckTime, error)
 	EnterGame(context.Context, *CEnterGame) (*SEnterGame, error)
 	GameSettle(context.Context, *CGameSettle) (*SGameSettle, error)
 	LeaveGame(context.Context, *CLeaveGame) (*SLeaveGame, error)
@@ -17,6 +18,14 @@ type HallServer interface {
 
 func RegisterHallServer(s rpc.ServiceRegistrar, srv HallServer) {
 	s.RegisterService(&Hall_ServiceDesc, srv)
+}
+
+func _Hall_CheckTime_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
+	arg := new(CCheckTime)
+	h := func(ctx context.Context, req proto.Message) (proto.Message, error) {
+		return srv.(HallServer).CheckTime(ctx, req.(*CCheckTime))
+	}
+	return arg, h
 }
 
 func _Hall_EnterGame_Materializer(srv any) (proto.Message, rpc.MsgHandler) {
@@ -63,6 +72,10 @@ var Hall_ServiceDesc = rpc.ServiceDesc{
 	ServiceName: "hall",
 	HandlerType: (*HallServer)(nil),
 	Methods: []rpc.MethodDesc{
+		{
+			MethodName: "CheckTime",
+			Handler:    _Hall_CheckTime_Materializer,
+		},
 		{
 			MethodName: "EnterGame",
 			Handler:    _Hall_EnterGame_Materializer,

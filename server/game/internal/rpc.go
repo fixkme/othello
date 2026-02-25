@@ -42,12 +42,8 @@ func RpcHandler(rc *rpc.RpcContext) {
 		}
 		return
 	}
-	if err := system.Global.AsyncExec(fn); err != nil {
-		mlog.Errorf("rpc handler push logic func failed, err:%v", err)
-		rc.ReplyErr = errors.New("rpc handler push logic func failed")
-		rc.SerializeResponse()
-		return
-	}
+
+	fn()
 }
 
 func prepareContext(rc *rpc.RpcContext) (ctx context.Context, agent *entity.RoomAgent) {
@@ -55,9 +51,12 @@ func prepareContext(rc *rpc.RpcContext) (ctx context.Context, agent *entity.Room
 	if md := rc.ReqMd; md != nil {
 		ctx = context.WithValue(ctx, values.RpcContext_Meta, md)
 		if playerId := md.GetInt(values.Rpc_PlayerId); playerId != 0 {
-			agent, _ = system.Global.SyncGetTargetRoomByPlayer(ctx, playerId)
+			var err error
+			agent, err = system.Global.SyncGetTargetRoomByPlayer(ctx, playerId)
 			if agent != nil {
 				ctx = context.WithValue(ctx, values.RpcContext_RoomAgent, agent)
+			} else {
+				mlog.Warnf("rpc handler prepare context failed, get room agent failed, err:%v", err)
 			}
 		}
 	}

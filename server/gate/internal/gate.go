@@ -34,8 +34,9 @@ func NewGateModule() app.Module {
 func (s *GateServer) OnInit() error {
 	gnetOpt := gnet.Options{
 		NumEventLoop: 4,
-		LockOSThread: true,
+		LockOSThread: false,
 		ReuseAddr:    true,
+		TCPNoDelay:   gnet.TCPNoDelay,
 	}
 	listenAddr := env.GetEnvStr(env.APP_GateListenAddr)
 	opt := &wsg.ServerOptions{

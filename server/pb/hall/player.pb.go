@@ -315,6 +315,86 @@ func (*SLeaveGame) Descriptor() ([]byte, []int) {
 	return file_hall_player_proto_rawDescGZIP(), []int{6}
 }
 
+type CCheckTime struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CCheckTime) Reset() {
+	*x = CCheckTime{}
+	mi := &file_hall_player_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CCheckTime) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CCheckTime) ProtoMessage() {}
+
+func (x *CCheckTime) ProtoReflect() protoreflect.Message {
+	mi := &file_hall_player_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CCheckTime.ProtoReflect.Descriptor instead.
+func (*CCheckTime) Descriptor() ([]byte, []int) {
+	return file_hall_player_proto_rawDescGZIP(), []int{7}
+}
+
+type SCheckTime struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ts            int64                  `protobuf:"varint,1,opt,name=ts,proto3" json:"ts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SCheckTime) Reset() {
+	*x = SCheckTime{}
+	mi := &file_hall_player_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SCheckTime) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SCheckTime) ProtoMessage() {}
+
+func (x *SCheckTime) ProtoReflect() protoreflect.Message {
+	mi := &file_hall_player_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SCheckTime.ProtoReflect.Descriptor instead.
+func (*SCheckTime) Descriptor() ([]byte, []int) {
+	return file_hall_player_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SCheckTime) GetTs() int64 {
+	if x != nil {
+		return x.Ts
+	}
+	return 0
+}
+
 var File_hall_player_proto protoreflect.FileDescriptor
 
 const file_hall_player_proto_rawDesc = "" +
@@ -338,7 +418,12 @@ const file_hall_player_proto_rawDesc = "" +
 	"\n" +
 	"CLeaveGame\"\f\n" +
 	"\n" +
-	"SLeaveGameB*Z(github.com/fixkme/othello/server/pb/hallb\x06proto3"
+	"SLeaveGame\"\f\n" +
+	"\n" +
+	"CCheckTime\"\x1c\n" +
+	"\n" +
+	"SCheckTime\x12\x0e\n" +
+	"\x02ts\x18\x01 \x01(\x03R\x02tsB*Z(github.com/fixkme/othello/server/pb/hallb\x06proto3"
 
 var (
 	file_hall_player_proto_rawDescOnce sync.Once
@@ -352,7 +437,7 @@ func file_hall_player_proto_rawDescGZIP() []byte {
 	return file_hall_player_proto_rawDescData
 }
 
-var file_hall_player_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_hall_player_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_hall_player_proto_goTypes = []any{
 	(*CLogin)(nil),               // 0: hall.CLogin
 	(*SLogin)(nil),               // 1: hall.SLogin
@@ -361,19 +446,21 @@ var file_hall_player_proto_goTypes = []any{
 	(*PPlayerJoinGame)(nil),      // 4: hall.PPlayerJoinGame
 	(*CLeaveGame)(nil),           // 5: hall.CLeaveGame
 	(*SLeaveGame)(nil),           // 6: hall.SLeaveGame
-	(*models.PBPlayerModel)(nil), // 7: models.PlayerModel
-	(*datas.PBTableInfo)(nil),    // 8: datas.TableInfo
-	(*datas.PBPlayerInfo)(nil),   // 9: datas.PlayerInfo
+	(*CCheckTime)(nil),           // 7: hall.CCheckTime
+	(*SCheckTime)(nil),           // 8: hall.SCheckTime
+	(*models.PBPlayerModel)(nil), // 9: models.PlayerModel
+	(*datas.PBTableInfo)(nil),    // 10: datas.TableInfo
+	(*datas.PBPlayerInfo)(nil),   // 11: datas.PlayerInfo
 }
 var file_hall_player_proto_depIdxs = []int32{
-	7, // 0: hall.SLogin.player_data:type_name -> models.PlayerModel
-	8, // 1: hall.SEnterGame.table_info:type_name -> datas.TableInfo
-	9, // 2: hall.PPlayerJoinGame.player_info:type_name -> datas.PlayerInfo
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	9,  // 0: hall.SLogin.player_data:type_name -> models.PlayerModel
+	10, // 1: hall.SEnterGame.table_info:type_name -> datas.TableInfo
+	11, // 2: hall.PPlayerJoinGame.player_info:type_name -> datas.PlayerInfo
+	3,  // [3:3] is the sub-list for method output_type
+	3,  // [3:3] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_hall_player_proto_init() }
@@ -387,7 +474,7 @@ func file_hall_player_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hall_player_proto_rawDesc), len(file_hall_player_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

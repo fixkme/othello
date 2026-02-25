@@ -1,8 +1,9 @@
 import { _decorator, Component, director } from 'cc';
 import { GlobalWebSocket } from './WebSocket';
-import { CEnterGame, CLogin, SLogin } from '../pb/game/player';
+import { CEnterGame, CLogin, SLogin } from '../pb/hall/player';
 import { PlayerInfo } from '../pb/datas/player_data';
 import { SecneName } from './ConstValue';
+import { getBrowserTabId, getRandomAccount } from './Util';
 const { ccclass } = _decorator;
 
 @ccclass('NetworkManager')
@@ -27,14 +28,12 @@ export class NetworkManager extends Component {
 
         NetworkManager._instance = this;
 
-        // 测试代码，随机生成账号
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        let acc_len = 16;
-        for (let i = 0; i < acc_len; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        // 测试代码，生成账号
+        let acc = getBrowserTabId()
+        if (acc.length == 0) {
+            acc = getRandomAccount()
         }
-        this.account = "acc_"  + result
+        this.account = "acc_"  + acc;
 
         // 设置为常驻节点
         if (!this.node._persistNode) {
@@ -106,7 +105,8 @@ export class NetworkManager extends Component {
         const msg = data as SLogin
         this.playerInfo = msg.playerData.modelPlayerInfo
         this.isLogined = true
-        if (msg.tableId > 0) {
+        const len = Object.keys(msg.playerData.inTables).length;
+        if (len > 0) {
             const currentSceneName = director.getScene().name
             console.info(`[Network] login in ${currentSceneName} scene`)
             if ( currentSceneName == SecneName.GameOnline) {

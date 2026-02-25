@@ -9,6 +9,7 @@ var RequestMsgNames = []string{
 	"hall.CLogin",
 	"hall.CEnterGame",
 	"hall.CLeaveGame",
+	"hall.CCheckTime",
 	"game.CReadyGame",
 	"game.CPlacePiece",
 }
@@ -17,6 +18,7 @@ var ResponseMsgNames = []string{
 	"hall.SLogin",
 	"hall.SEnterGame",
 	"hall.SLeaveGame",
+	"hall.SCheckTime",
 	"game.SReadyGame",
 	"game.SPlacePiece",
 }

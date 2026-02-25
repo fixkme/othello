@@ -8,6 +8,7 @@ import (
 	"github.com/fixkme/gokit/framework/core"
 	"github.com/fixkme/gokit/mlog"
 	"github.com/fixkme/gokit/rpc"
+	"github.com/fixkme/gokit/util"
 	"github.com/fixkme/othello/server/common"
 	"github.com/fixkme/othello/server/common/values"
 	"github.com/fixkme/othello/server/hall/internal/system"
@@ -115,6 +116,12 @@ func (s *Service) EnterGame(ctx context.Context, in *hall.CEnterGame) (resp *hal
 	if tb != nil {
 		p1 := system.Global.GetPlayer(tb.Player1)
 		p2 := p
+		p1.GetModelPlayerInfo().SetPlayPieceType(-1)
+		p2.GetModelPlayerInfo().SetPlayPieceType(1)
+		mlog.Debugf("player match ok ------ %d, %d", p1.Id(), p2.Id())
+		system.NoticePlayer(&hall.PPlayerJoinGame{PlayerInfo: p2.GetModelPlayerInfo().ToPB()}, p1)
+		system.NoticePlayer(&hall.PPlayerJoinGame{PlayerInfo: p1.GetModelPlayerInfo().ToPB()}, p2)
+
 		enterReq := &game.CCreateRoom{
 			TableId: tb.GetTableId(),
 			Players: []*datas.PBPlayerInfo{p1.GetModelPlayerInfo().ToPB(), p2.GetModelPlayerInfo().ToPB()},
@@ -124,6 +131,7 @@ func (s *Service) EnterGame(ctx context.Context, in *hall.CEnterGame) (resp *hal
 		gameService := system.GameService(tb.GetGameId())
 		err = core.Rpc.SyncCall(gameService, enterReq, enterResp, 0)
 		if err != nil {
+			mlog.Errorf("CCreateRoom falied, %v", err)
 			return nil, err
 		}
 		system.Global.PlayerMatchSucceed(p1, p2, tb)
@@ -155,4 +163,8 @@ func (s *Service) PlayerOffline(ctx context.Context, in *hall.CPlayerOffline) (*
 		system.Global.RemoveMatchPlayer(p)
 	}
 	return nil, nil
+}
+
+func (s *Service) CheckTime(ctx context.Context, in *hall.CCheckTime) (*hall.SCheckTime, error) {
+	return &hall.SCheckTime{Ts: util.NowMs()}, nil
 }

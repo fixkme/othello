@@ -2,6 +2,7 @@ import { _decorator, EventTarget } from 'cc';
 import { BinaryWriter, BinaryReader } from "@bufbuild/protobuf/wire"; 
 import { WsRequestMessage, WsResponseMessage } from '../pb/ws/ws';
 import { MessageType, messageTypeRegistry } from '../pb/typeRegistry';
+import { CCheckTime } from '../pb/hall/player';
 const { ccclass } = _decorator;
 
 /**
@@ -135,7 +136,7 @@ export class GlobalWebSocket {
                     const respMsgType = messageTypeRegistry.get(wsMsg.msgName)
                     if (respMsgType != null) {
                         const response = respMsgType.decode(wsMsg.payload)
-                        console.log(`[WebSocket] recv message: ${wsMsg.msgName},`, respMsgType.toJSON(response))
+                        console.log(`[WebSocket] recv response message: ${wsMsg.msgName},`, respMsgType.toJSON(response))
                         this._eventTarget.emit(wsMsg.msgName, response)
                     } else {
                         console.warn(`[WebSocket] unknown message type: ${wsMsg.msgName}`)
@@ -149,7 +150,7 @@ export class GlobalWebSocket {
                     const pushMsgType = messageTypeRegistry.get(notice.messageType)
                     if (pushMsgType != null) {
                         const pmsg = pushMsgType.decode(notice.messagePayload)
-                        console.log(`[WebSocket] recv message: ${wsMsg.msgName},`, pushMsgType.toJSON(pmsg))
+                        console.log(`[WebSocket] recv push message: ${notice.messageType},`, pushMsgType.toJSON(pmsg))
                         this._eventTarget.emit(notice.messageType, pmsg)
                     } else {
                         console.warn(`[WebSocket] unknown message type: ${notice.messageType}`)
@@ -193,6 +194,8 @@ export class GlobalWebSocket {
         
         if (this._heartbeatInterval > 0) {
             this._heartbeatTimer = setInterval(() => {
+                const msg = CCheckTime.create()
+                this.sendMessage(CCheckTime, msg);
                 // 检查心跳超时
                 if (Date.now() - this._lastPongTime > this._heartbeatTimeout) {
                     // console.warn('[WebSocket] Heartbeat timeout, reconnecting...');

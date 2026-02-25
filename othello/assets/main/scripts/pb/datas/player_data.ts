@@ -10,6 +10,90 @@ import { messageTypeRegistry } from "../typeRegistry";
 
 export const protobufPackage = "datas";
 
+export enum PlayType {
+  PT_Unknown = 0,
+  PT_Common = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function playTypeFromJSON(object: any): PlayType {
+  switch (object) {
+    case 0:
+    case "PT_Unknown":
+      return PlayType.PT_Unknown;
+    case 1:
+    case "PT_Common":
+      return PlayType.PT_Common;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return PlayType.UNRECOGNIZED;
+  }
+}
+
+export function playTypeToJSON(object: PlayType): string {
+  switch (object) {
+    case PlayType.PT_Unknown:
+      return "PT_Unknown";
+    case PlayType.PT_Common:
+      return "PT_Common";
+    case PlayType.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export enum TableStatus {
+  TS_New = 0,
+  TS_Matching = 1,
+  TS_WaitReady = 2,
+  TS_Playing = 3,
+  TS_Over = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function tableStatusFromJSON(object: any): TableStatus {
+  switch (object) {
+    case 0:
+    case "TS_New":
+      return TableStatus.TS_New;
+    case 1:
+    case "TS_Matching":
+      return TableStatus.TS_Matching;
+    case 2:
+    case "TS_WaitReady":
+      return TableStatus.TS_WaitReady;
+    case 3:
+    case "TS_Playing":
+      return TableStatus.TS_Playing;
+    case 4:
+    case "TS_Over":
+      return TableStatus.TS_Over;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return TableStatus.UNRECOGNIZED;
+  }
+}
+
+export function tableStatusToJSON(object: TableStatus): string {
+  switch (object) {
+    case TableStatus.TS_New:
+      return "TS_New";
+    case TableStatus.TS_Matching:
+      return "TS_Matching";
+    case TableStatus.TS_WaitReady:
+      return "TS_WaitReady";
+    case TableStatus.TS_Playing:
+      return "TS_Playing";
+    case TableStatus.TS_Over:
+      return "TS_Over";
+    case TableStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface PlayerInfo {
   $type: "datas.PlayerInfo";
   id: number;
@@ -35,13 +119,23 @@ export interface TableInfo {
     | undefined;
   /** 对手 */
   oppoPlayer: PlayerInfo | undefined;
-  status: number;
+  status: TableStatus;
   /** 当前操作方 */
   turn: number;
   blackCount: number;
   whiteCount: number;
   pieces: PieceInfo[];
-  createdTime: number;
+  createTime: number;
+}
+
+export interface TableLocation {
+  $type: "datas.TableLocation";
+  tableId: number;
+  gameId: number;
+  playType: PlayType;
+  player1: number;
+  player2: number;
+  createTime: number;
 }
 
 function createBasePlayerInfo(): PlayerInfo {
@@ -281,7 +375,7 @@ function createBaseTableInfo(): TableInfo {
     blackCount: 0,
     whiteCount: 0,
     pieces: [],
-    createdTime: 0,
+    createTime: 0,
   };
 }
 
@@ -313,8 +407,8 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     for (const v of message.pieces) {
       PieceInfo.encode(v!, writer.uint32(66).fork()).join();
     }
-    if (message.createdTime !== 0) {
-      writer.uint32(80).int64(message.createdTime);
+    if (message.createTime !== 0) {
+      writer.uint32(72).int64(message.createTime);
     }
     return writer;
   },
@@ -355,7 +449,7 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
             break;
           }
 
-          message.status = reader.int32();
+          message.status = reader.int32() as any;
           continue;
         }
         case 5: {
@@ -390,12 +484,12 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
           message.pieces.push(PieceInfo.decode(reader, reader.uint32()));
           continue;
         }
-        case 10: {
-          if (tag !== 80) {
+        case 9: {
+          if (tag !== 72) {
             break;
           }
 
-          message.createdTime = longToNumber(reader.int64());
+          message.createTime = longToNumber(reader.int64());
           continue;
         }
       }
@@ -413,12 +507,12 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       ownerPlayer: isSet(object.ownerPlayer) ? PlayerInfo.fromJSON(object.ownerPlayer) : undefined,
       oppoPlayer: isSet(object.oppoPlayer) ? PlayerInfo.fromJSON(object.oppoPlayer) : undefined,
-      status: isSet(object.status) ? globalThis.Number(object.status) : 0,
+      status: isSet(object.status) ? tableStatusFromJSON(object.status) : 0,
       turn: isSet(object.turn) ? globalThis.Number(object.turn) : 0,
       blackCount: isSet(object.blackCount) ? globalThis.Number(object.blackCount) : 0,
       whiteCount: isSet(object.whiteCount) ? globalThis.Number(object.whiteCount) : 0,
       pieces: globalThis.Array.isArray(object?.pieces) ? object.pieces.map((e: any) => PieceInfo.fromJSON(e)) : [],
-      createdTime: isSet(object.createdTime) ? globalThis.Number(object.createdTime) : 0,
+      createTime: isSet(object.createTime) ? globalThis.Number(object.createTime) : 0,
     };
   },
 
@@ -434,7 +528,7 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
       obj.oppoPlayer = PlayerInfo.toJSON(message.oppoPlayer);
     }
     if (message.status !== 0) {
-      obj.status = Math.round(message.status);
+      obj.status = tableStatusToJSON(message.status);
     }
     if (message.turn !== 0) {
       obj.turn = Math.round(message.turn);
@@ -448,8 +542,8 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     if (message.pieces?.length) {
       obj.pieces = message.pieces.map((e) => PieceInfo.toJSON(e));
     }
-    if (message.createdTime !== 0) {
-      obj.createdTime = Math.round(message.createdTime);
+    if (message.createTime !== 0) {
+      obj.createTime = Math.round(message.createTime);
     }
     return obj;
   },
@@ -471,12 +565,157 @@ export const TableInfo: MessageFns<TableInfo, "datas.TableInfo"> = {
     message.blackCount = object.blackCount ?? 0;
     message.whiteCount = object.whiteCount ?? 0;
     message.pieces = object.pieces?.map((e) => PieceInfo.fromPartial(e)) || [];
-    message.createdTime = object.createdTime ?? 0;
+    message.createTime = object.createTime ?? 0;
     return message;
   },
 };
 
 messageTypeRegistry.set(TableInfo.$type, TableInfo);
+
+function createBaseTableLocation(): TableLocation {
+  return { $type: "datas.TableLocation", tableId: 0, gameId: 0, playType: 0, player1: 0, player2: 0, createTime: 0 };
+}
+
+export const TableLocation: MessageFns<TableLocation, "datas.TableLocation"> = {
+  $type: "datas.TableLocation" as const,
+
+  encode(message: TableLocation, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.tableId !== 0) {
+      writer.uint32(8).int64(message.tableId);
+    }
+    if (message.gameId !== 0) {
+      writer.uint32(16).int64(message.gameId);
+    }
+    if (message.playType !== 0) {
+      writer.uint32(24).int32(message.playType);
+    }
+    if (message.player1 !== 0) {
+      writer.uint32(32).int64(message.player1);
+    }
+    if (message.player2 !== 0) {
+      writer.uint32(40).int64(message.player2);
+    }
+    if (message.createTime !== 0) {
+      writer.uint32(48).int64(message.createTime);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): TableLocation {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTableLocation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.tableId = longToNumber(reader.int64());
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.gameId = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.playType = reader.int32() as any;
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.player1 = longToNumber(reader.int64());
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.player2 = longToNumber(reader.int64());
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.createTime = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TableLocation {
+    return {
+      $type: TableLocation.$type,
+      tableId: isSet(object.tableId) ? globalThis.Number(object.tableId) : 0,
+      gameId: isSet(object.gameId) ? globalThis.Number(object.gameId) : 0,
+      playType: isSet(object.playType) ? playTypeFromJSON(object.playType) : 0,
+      player1: isSet(object.player1) ? globalThis.Number(object.player1) : 0,
+      player2: isSet(object.player2) ? globalThis.Number(object.player2) : 0,
+      createTime: isSet(object.createTime) ? globalThis.Number(object.createTime) : 0,
+    };
+  },
+
+  toJSON(message: TableLocation): unknown {
+    const obj: any = {};
+    if (message.tableId !== 0) {
+      obj.tableId = Math.round(message.tableId);
+    }
+    if (message.gameId !== 0) {
+      obj.gameId = Math.round(message.gameId);
+    }
+    if (message.playType !== 0) {
+      obj.playType = playTypeToJSON(message.playType);
+    }
+    if (message.player1 !== 0) {
+      obj.player1 = Math.round(message.player1);
+    }
+    if (message.player2 !== 0) {
+      obj.player2 = Math.round(message.player2);
+    }
+    if (message.createTime !== 0) {
+      obj.createTime = Math.round(message.createTime);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<TableLocation>, I>>(base?: I): TableLocation {
+    return TableLocation.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<TableLocation>, I>>(object: I): TableLocation {
+    const message = createBaseTableLocation();
+    message.tableId = object.tableId ?? 0;
+    message.gameId = object.gameId ?? 0;
+    message.playType = object.playType ?? 0;
+    message.player1 = object.player1 ?? 0;
+    message.player2 = object.player2 ?? 0;
+    message.createTime = object.createTime ?? 0;
+    return message;
+  },
+};
+
+messageTypeRegistry.set(TableLocation.$type, TableLocation);
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 

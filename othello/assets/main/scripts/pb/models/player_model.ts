@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import { PlayerInfo } from "../datas/player_data";
+import { PlayerInfo, TableLocation } from "../datas/player_data";
 import { messageTypeRegistry } from "../typeRegistry";
 
 export const protobufPackage = "models";
@@ -20,11 +20,21 @@ export interface PlayerModel {
   playerId: number;
   account: string;
   /** 玩家信息 */
-  modelPlayerInfo: PlayerInfo | undefined;
+  modelPlayerInfo:
+    | PlayerInfo
+    | undefined;
+  /** 正在游戏的桌子 PlayType => TableLocation */
+  inTables: { [key: number]: TableLocation };
+}
+
+export interface PlayerModel_InTablesEntry {
+  $type: "models.PlayerModel.InTablesEntry";
+  key: number;
+  value: TableLocation | undefined;
 }
 
 function createBasePlayerModel(): PlayerModel {
-  return { $type: "models.PlayerModel", playerId: 0, account: "", modelPlayerInfo: undefined };
+  return { $type: "models.PlayerModel", playerId: 0, account: "", modelPlayerInfo: undefined, inTables: {} };
 }
 
 export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
@@ -40,6 +50,12 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
     if (message.modelPlayerInfo !== undefined) {
       PlayerInfo.encode(message.modelPlayerInfo, writer.uint32(26).fork()).join();
     }
+    Object.entries(message.inTables).forEach(([key, value]) => {
+      PlayerModel_InTablesEntry.encode(
+        { $type: "models.PlayerModel.InTablesEntry", key: key as any, value },
+        writer.uint32(34).fork(),
+      ).join();
+    });
     return writer;
   },
 
@@ -74,6 +90,17 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
           message.modelPlayerInfo = PlayerInfo.decode(reader, reader.uint32());
           continue;
         }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          const entry4 = PlayerModel_InTablesEntry.decode(reader, reader.uint32());
+          if (entry4.value !== undefined) {
+            message.inTables[entry4.key] = entry4.value;
+          }
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -89,6 +116,12 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
       playerId: isSet(object.playerId) ? globalThis.Number(object.playerId) : 0,
       account: isSet(object.account) ? globalThis.String(object.account) : "",
       modelPlayerInfo: isSet(object.modelPlayerInfo) ? PlayerInfo.fromJSON(object.modelPlayerInfo) : undefined,
+      inTables: isObject(object.inTables)
+        ? Object.entries(object.inTables).reduce<{ [key: number]: TableLocation }>((acc, [key, value]) => {
+          acc[globalThis.Number(key)] = TableLocation.fromJSON(value);
+          return acc;
+        }, {})
+        : {},
     };
   },
 
@@ -103,6 +136,15 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
     if (message.modelPlayerInfo !== undefined) {
       obj.modelPlayerInfo = PlayerInfo.toJSON(message.modelPlayerInfo);
     }
+    if (message.inTables) {
+      const entries = Object.entries(message.inTables);
+      if (entries.length > 0) {
+        obj.inTables = {};
+        entries.forEach(([k, v]) => {
+          obj.inTables[k] = TableLocation.toJSON(v);
+        });
+      }
+    }
     return obj;
   },
 
@@ -116,11 +158,103 @@ export const PlayerModel: MessageFns<PlayerModel, "models.PlayerModel"> = {
     message.modelPlayerInfo = (object.modelPlayerInfo !== undefined && object.modelPlayerInfo !== null)
       ? PlayerInfo.fromPartial(object.modelPlayerInfo)
       : undefined;
+    message.inTables = Object.entries(object.inTables ?? {}).reduce<{ [key: number]: TableLocation }>(
+      (acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[globalThis.Number(key)] = TableLocation.fromPartial(value);
+        }
+        return acc;
+      },
+      {},
+    );
     return message;
   },
 };
 
 messageTypeRegistry.set(PlayerModel.$type, PlayerModel);
+
+function createBasePlayerModel_InTablesEntry(): PlayerModel_InTablesEntry {
+  return { $type: "models.PlayerModel.InTablesEntry", key: 0, value: undefined };
+}
+
+export const PlayerModel_InTablesEntry: MessageFns<PlayerModel_InTablesEntry, "models.PlayerModel.InTablesEntry"> = {
+  $type: "models.PlayerModel.InTablesEntry" as const,
+
+  encode(message: PlayerModel_InTablesEntry, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.key !== 0) {
+      writer.uint32(8).int64(message.key);
+    }
+    if (message.value !== undefined) {
+      TableLocation.encode(message.value, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PlayerModel_InTablesEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePlayerModel_InTablesEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.key = longToNumber(reader.int64());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = TableLocation.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PlayerModel_InTablesEntry {
+    return {
+      $type: PlayerModel_InTablesEntry.$type,
+      key: isSet(object.key) ? globalThis.Number(object.key) : 0,
+      value: isSet(object.value) ? TableLocation.fromJSON(object.value) : undefined,
+    };
+  },
+
+  toJSON(message: PlayerModel_InTablesEntry): unknown {
+    const obj: any = {};
+    if (message.key !== 0) {
+      obj.key = Math.round(message.key);
+    }
+    if (message.value !== undefined) {
+      obj.value = TableLocation.toJSON(message.value);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PlayerModel_InTablesEntry>, I>>(base?: I): PlayerModel_InTablesEntry {
+    return PlayerModel_InTablesEntry.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PlayerModel_InTablesEntry>, I>>(object: I): PlayerModel_InTablesEntry {
+    const message = createBasePlayerModel_InTablesEntry();
+    message.key = object.key ?? 0;
+    message.value = (object.value !== undefined && object.value !== null)
+      ? TableLocation.fromPartial(object.value)
+      : undefined;
+    return message;
+  },
+};
+
+messageTypeRegistry.set(PlayerModel_InTablesEntry.$type, PlayerModel_InTablesEntry);
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
@@ -143,6 +277,10 @@ function longToNumber(int64: { toString(): string }): number {
     throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
   }
   return num;
+}
+
+function isObject(value: any): boolean {
+  return typeof value === "object" && value !== null;
 }
 
 function isSet(value: any): boolean {

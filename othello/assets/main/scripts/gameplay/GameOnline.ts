@@ -3,8 +3,8 @@ import { _decorator, Component, Sprite, SpriteFrame, Graphics,
     Prefab, instantiate, view, Animation, AudioSource, assetManager, director} from 'cc';
 import { Logic, PiecesType, Pieces } from './Logic';
 import { GlobalWebSocket } from '../common/WebSocket';
-import { CEnterGame, CLeaveGame, CPlacePiece, PGameResult, PPlacePiece,
-    PPlayerEnterGame, SEnterGame } from '../pb/game/player';
+import { CEnterGame, SEnterGame, CLeaveGame, PPlayerJoinGame} from '../pb/hall/player';
+import {CPlacePiece, PGameResult, PPlacePiece, CReadyGame, PReadyGame} from '../pb/game/player';
 import { PlayerInfo, TableInfo } from '../pb/datas/player_data';
 import { NetworkManager } from '../common/NetworkManager';
 import { PkgNames, SecneName } from '../common/ConstValue';
@@ -78,7 +78,9 @@ export class GameOnline extends Component {
         // 自己进入房间
         this._ws.on(SEnterGame.$type, this.onSelfEnterGame, this)
         // 其他玩家进入
-        this._ws.on(PPlayerEnterGame.$type, this.onOtherEnterGame, this)
+        this._ws.on(PPlayerJoinGame.$type, this.onOtherEnterGame, this)
+        // 匹配开局
+        this._ws.on(PReadyGame.$type, this.onReadyGame, this)
         // 棋子落下
         this._ws.on(PPlacePiece.$type, this.onPlacePieceMsg, this)
         // 游戏结束
@@ -102,7 +104,8 @@ export class GameOnline extends Component {
 
     onDestroy() {
         this._ws.off(SEnterGame.$type, this.onSelfEnterGame, this)
-        this._ws.off(PPlayerEnterGame.$type, this.onOtherEnterGame, this)
+        this._ws.off(PPlayerJoinGame.$type, this.onOtherEnterGame, this)
+        this._ws.off(PReadyGame.$type, this.onReadyGame, this)
         this._ws.off(PPlacePiece.$type, this.onPlacePieceMsg, this)
         this._ws.off(PGameResult.$type, this.onGameResult, this)
     }
@@ -115,7 +118,7 @@ export class GameOnline extends Component {
         
     }
     
-    initGame(tb: TableInfo) {
+    initGame(tb: TableInfo, recover: boolean) {
         if (!tb) {
             console.log("initGame: table info is null");
             return;
@@ -143,6 +146,12 @@ export class GameOnline extends Component {
         tb.pieces.forEach(p => {
             this.placePiece(p.x, p.y, p.color, false);
         });
+
+        if (!recover) {
+            // 准备好了
+            const cReadyGame = CReadyGame.create();
+            this._ws.sendMessage(CReadyGame, cReadyGame);
+        }
     }
 
     showPlayerInfo() {
@@ -240,14 +249,23 @@ export class GameOnline extends Component {
 
     onSelfEnterGame(data: any) {
         const senterGame = data as SEnterGame
-        this.initGame(senterGame.tableInfo); 
+        if (senterGame.tableInfo != null) {
+            // 恢复局内
+            this.initGame(senterGame.tableInfo, true);
+        }
     }
 
     onOtherEnterGame(data: any) {
-        const pmsg = data as PPlayerEnterGame;
+        const pmsg = data as PPlayerJoinGame;
         this.oppoPlayer = pmsg.playerInfo;
         this.opponentPieceType = pmsg.playerInfo.playPieceType;
+        this.selfPieceType = - pmsg.playerInfo.playPieceType;
         this.showPlayerInfo();
+    }
+
+    onReadyGame(data: any) {
+        const pmsg = data as PReadyGame;
+        this.initGame(pmsg.tableInfo, false);
     }
 
     onPlacePieceMsg(data: any) {
@@ -390,6 +408,8 @@ export class GameOnline extends Component {
     // 返回
     onButtonReturnClick() {
         this.returnStartScene()
+        const cLeaveGame = CLeaveGame.create();
+        this._ws.sendMessage(CLeaveGame, cLeaveGame)
     }
 
     returnStartScene() {

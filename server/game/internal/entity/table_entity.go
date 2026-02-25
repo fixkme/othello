@@ -114,11 +114,6 @@ func (tb *Table) PackPB() *datas.PBTableInfo {
 	return info
 }
 
-func (tb *Table) MatchPlayer(p *Player) {
-	p.SetPlayPieceType(int64(PieceType_White))
-	tb.OppoPlayer = p
-}
-
 func (tb *Table) Reset() {
 	for i := 0; i < rowSize; i++ {
 		for j := 0; j < colSize; j++ {

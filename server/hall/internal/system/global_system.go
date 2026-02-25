@@ -229,11 +229,15 @@ func (s *globalSystem) CreatePlayer(acc string, pinfo *datas.PBPlayerInfo) (*ent
 		pid = id
 	}
 
+	pinfo.Id = pid
+	mpinfo := datas.NewMPlayerInfo()
+	mpinfo.InitFromPB(pinfo)
+
 	p := entity.NewPlayer(pid, nil)
 	p.BindMonitor(s.playerMonitor, p)
 	p.SetPlayerId(pid)
 	p.SetAccount(acc)
-	p.GetModelPlayerInfo().InitFromPB(pinfo)
+	p.SetModelPlayerInfo(mpinfo)
 	Player.InitModels(p)
 	s.players[pid] = p
 	s.accPlayers[acc] = pid
@@ -311,6 +315,8 @@ func (s *globalSystem) PlayerMatchSucceed(p1, p2 *entity.Player, tb *datas.PBTab
 	loc = datas.NewMTableLocation()
 	loc.InitFromPB(tb)
 	p2.SetInTables(int64(tb.GetPlayType()), loc)
+
+	mlog.Debugf("player match succeed ------ %d, %d", p1.Id(), p2.Id())
 }
 
 func (s *globalSystem) PlayerLeaveGame(p *entity.Player) error {
@@ -323,6 +329,13 @@ func (s *globalSystem) PlayerLeaveGame(p *entity.Player) error {
 		err := core.Rpc.SyncCall(gameService, req, resp, 0, common.WarpMeta(p.Id(), p.GateId))
 		if err != nil {
 			return err
+		}
+
+		if p1 := s.GetPlayer(mtb.GetPlayer1()); p1 != nil {
+			p1.GetModelPlayerInfo().SetPlayPieceType(0)
+		}
+		if p2 := s.GetPlayer(mtb.GetPlayer2()); p2 != nil {
+			p2.GetModelPlayerInfo().SetPlayPieceType(0)
 		}
 	}
 
@@ -346,9 +359,11 @@ func (s *globalSystem) GameSettle(in *hall.CGameSettle) {
 	pt := int64(datas.PlayType_PT_Common)
 	if p := s.GetPlayer(in.OwnerPlayer.Id); p != nil {
 		p.RemoveInTables(pt)
+		p.GetModelPlayerInfo().SetPlayPieceType(0)
 	}
 	if p := s.GetPlayer(in.OppoPlayer.Id); p != nil {
 		p.RemoveInTables(pt)
+		p.GetModelPlayerInfo().SetPlayPieceType(0)
 	}
 
 	tid := in.TableId

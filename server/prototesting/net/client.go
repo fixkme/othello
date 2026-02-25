@@ -92,8 +92,7 @@ func (cli *Client) ConnectHost(hostName string) error {
 	header.Set("x-character-id", strconv.Itoa(int(cli.playerId)))
 
 	svr := conf.ServerList[hostName]
-	u := url.URL{Scheme: svr.Scheme, Host: svr.Host, Path: svr.Path}
-	u.Path += fmt.Sprintf("?x-account=%s", cli.account)
+	u := url.URL{Scheme: svr.Scheme, Host: svr.Host, Path: svr.Path, RawQuery: fmt.Sprintf("x-account=%s", cli.account)}
 	dialer := &websocket.Dialer{
 		Proxy:            http.ProxyFromEnvironment,
 		HandshakeTimeout: 10 * time.Second,
@@ -219,6 +218,16 @@ func (cli *Client) send(req proto.Message) error {
 }
 
 func (cli *Client) recv() error {
+	// wsh, err := wsg.ReadWsHeader(cli.conn.NetConn())
+	// if err != nil {
+	// 	return err
+	// }
+	// messageType := wsh.OpCode
+	// bytes := make([]byte, wsh.Length)
+	// n, err := io.ReadFull(cli.conn.NetConn(), bytes)
+	// if err != nil {
+	// 	return err
+	// }
 	messageType, bytes, err := cli.conn.ReadMessage()
 	if err != nil {
 		return err

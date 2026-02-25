@@ -6,45 +6,26 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import { PlayerInfo, TableInfo } from "../datas/player_data";
-import { PlayerModel } from "../models/player_model";
+import { TableInfo } from "../datas/player_data";
 import { messageTypeRegistry } from "../typeRegistry";
 
 export const protobufPackage = "game";
 
-export interface CLogin {
-  $type: "game.CLogin";
-  account: string;
-}
-
-export interface SLogin {
-  $type: "game.SLogin";
-  playerData: PlayerModel | undefined;
-  serverTz: number;
-  /** >0表示在房间中 */
-  tableId: number;
-}
-
-export interface CEnterGame {
-  $type: "game.CEnterGame";
-}
-
-export interface SEnterGame {
-  $type: "game.SEnterGame";
+export interface PReadyGame {
+  $type: "game.PReadyGame";
   tableInfo: TableInfo | undefined;
 }
 
-export interface PPlayerEnterGame {
-  $type: "game.PPlayerEnterGame";
-  playerInfo: PlayerInfo | undefined;
+export interface CReadyGame {
+  $type: "game.CReadyGame";
 }
 
-export interface CLeaveGame {
-  $type: "game.CLeaveGame";
+export interface SReadyGame {
+  $type: "game.SReadyGame";
 }
 
-export interface SLeaveGame {
-  $type: "game.SLeaveGame";
+export interface PStartGame {
+  $type: "game.PStartGame";
 }
 
 export interface CPlacePiece {
@@ -74,232 +55,24 @@ export interface PGameResult {
   isGiveUp: boolean;
 }
 
-function createBaseCLogin(): CLogin {
-  return { $type: "game.CLogin", account: "" };
+function createBasePReadyGame(): PReadyGame {
+  return { $type: "game.PReadyGame", tableInfo: undefined };
 }
 
-export const CLogin: MessageFns<CLogin, "game.CLogin"> = {
-  $type: "game.CLogin" as const,
+export const PReadyGame: MessageFns<PReadyGame, "game.PReadyGame"> = {
+  $type: "game.PReadyGame" as const,
 
-  encode(message: CLogin, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.account !== "") {
-      writer.uint32(10).string(message.account);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): CLogin {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCLogin();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.account = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): CLogin {
-    return { $type: CLogin.$type, account: isSet(object.account) ? globalThis.String(object.account) : "" };
-  },
-
-  toJSON(message: CLogin): unknown {
-    const obj: any = {};
-    if (message.account !== "") {
-      obj.account = message.account;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CLogin>, I>>(base?: I): CLogin {
-    return CLogin.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<CLogin>, I>>(object: I): CLogin {
-    const message = createBaseCLogin();
-    message.account = object.account ?? "";
-    return message;
-  },
-};
-
-messageTypeRegistry.set(CLogin.$type, CLogin);
-
-function createBaseSLogin(): SLogin {
-  return { $type: "game.SLogin", playerData: undefined, serverTz: 0, tableId: 0 };
-}
-
-export const SLogin: MessageFns<SLogin, "game.SLogin"> = {
-  $type: "game.SLogin" as const,
-
-  encode(message: SLogin, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.playerData !== undefined) {
-      PlayerModel.encode(message.playerData, writer.uint32(10).fork()).join();
-    }
-    if (message.serverTz !== 0) {
-      writer.uint32(16).int64(message.serverTz);
-    }
-    if (message.tableId !== 0) {
-      writer.uint32(24).int64(message.tableId);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): SLogin {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSLogin();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.playerData = PlayerModel.decode(reader, reader.uint32());
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
-
-          message.serverTz = longToNumber(reader.int64());
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.tableId = longToNumber(reader.int64());
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SLogin {
-    return {
-      $type: SLogin.$type,
-      playerData: isSet(object.playerData) ? PlayerModel.fromJSON(object.playerData) : undefined,
-      serverTz: isSet(object.serverTz) ? globalThis.Number(object.serverTz) : 0,
-      tableId: isSet(object.tableId) ? globalThis.Number(object.tableId) : 0,
-    };
-  },
-
-  toJSON(message: SLogin): unknown {
-    const obj: any = {};
-    if (message.playerData !== undefined) {
-      obj.playerData = PlayerModel.toJSON(message.playerData);
-    }
-    if (message.serverTz !== 0) {
-      obj.serverTz = Math.round(message.serverTz);
-    }
-    if (message.tableId !== 0) {
-      obj.tableId = Math.round(message.tableId);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SLogin>, I>>(base?: I): SLogin {
-    return SLogin.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<SLogin>, I>>(object: I): SLogin {
-    const message = createBaseSLogin();
-    message.playerData = (object.playerData !== undefined && object.playerData !== null)
-      ? PlayerModel.fromPartial(object.playerData)
-      : undefined;
-    message.serverTz = object.serverTz ?? 0;
-    message.tableId = object.tableId ?? 0;
-    return message;
-  },
-};
-
-messageTypeRegistry.set(SLogin.$type, SLogin);
-
-function createBaseCEnterGame(): CEnterGame {
-  return { $type: "game.CEnterGame" };
-}
-
-export const CEnterGame: MessageFns<CEnterGame, "game.CEnterGame"> = {
-  $type: "game.CEnterGame" as const,
-
-  encode(_: CEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): CEnterGame {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCEnterGame();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): CEnterGame {
-    return { $type: CEnterGame.$type };
-  },
-
-  toJSON(_: CEnterGame): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<CEnterGame>, I>>(base?: I): CEnterGame {
-    return CEnterGame.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<CEnterGame>, I>>(_: I): CEnterGame {
-    const message = createBaseCEnterGame();
-    return message;
-  },
-};
-
-messageTypeRegistry.set(CEnterGame.$type, CEnterGame);
-
-function createBaseSEnterGame(): SEnterGame {
-  return { $type: "game.SEnterGame", tableInfo: undefined };
-}
-
-export const SEnterGame: MessageFns<SEnterGame, "game.SEnterGame"> = {
-  $type: "game.SEnterGame" as const,
-
-  encode(message: SEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(message: PReadyGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.tableInfo !== undefined) {
       TableInfo.encode(message.tableInfo, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): SEnterGame {
+  decode(input: BinaryReader | Uint8Array, length?: number): PReadyGame {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSEnterGame();
+    const message = createBasePReadyGame();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -320,14 +93,14 @@ export const SEnterGame: MessageFns<SEnterGame, "game.SEnterGame"> = {
     return message;
   },
 
-  fromJSON(object: any): SEnterGame {
+  fromJSON(object: any): PReadyGame {
     return {
-      $type: SEnterGame.$type,
+      $type: PReadyGame.$type,
       tableInfo: isSet(object.tableInfo) ? TableInfo.fromJSON(object.tableInfo) : undefined,
     };
   },
 
-  toJSON(message: SEnterGame): unknown {
+  toJSON(message: PReadyGame): unknown {
     const obj: any = {};
     if (message.tableInfo !== undefined) {
       obj.tableInfo = TableInfo.toJSON(message.tableInfo);
@@ -335,11 +108,11 @@ export const SEnterGame: MessageFns<SEnterGame, "game.SEnterGame"> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<SEnterGame>, I>>(base?: I): SEnterGame {
-    return SEnterGame.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<PReadyGame>, I>>(base?: I): PReadyGame {
+    return PReadyGame.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<SEnterGame>, I>>(object: I): SEnterGame {
-    const message = createBaseSEnterGame();
+  fromPartial<I extends Exact<DeepPartial<PReadyGame>, I>>(object: I): PReadyGame {
+    const message = createBasePReadyGame();
     message.tableInfo = (object.tableInfo !== undefined && object.tableInfo !== null)
       ? TableInfo.fromPartial(object.tableInfo)
       : undefined;
@@ -347,90 +120,23 @@ export const SEnterGame: MessageFns<SEnterGame, "game.SEnterGame"> = {
   },
 };
 
-messageTypeRegistry.set(SEnterGame.$type, SEnterGame);
+messageTypeRegistry.set(PReadyGame.$type, PReadyGame);
 
-function createBasePPlayerEnterGame(): PPlayerEnterGame {
-  return { $type: "game.PPlayerEnterGame", playerInfo: undefined };
+function createBaseCReadyGame(): CReadyGame {
+  return { $type: "game.CReadyGame" };
 }
 
-export const PPlayerEnterGame: MessageFns<PPlayerEnterGame, "game.PPlayerEnterGame"> = {
-  $type: "game.PPlayerEnterGame" as const,
+export const CReadyGame: MessageFns<CReadyGame, "game.CReadyGame"> = {
+  $type: "game.CReadyGame" as const,
 
-  encode(message: PPlayerEnterGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.playerInfo !== undefined) {
-      PlayerInfo.encode(message.playerInfo, writer.uint32(10).fork()).join();
-    }
+  encode(_: CReadyGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): PPlayerEnterGame {
+  decode(input: BinaryReader | Uint8Array, length?: number): CReadyGame {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePPlayerEnterGame();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.playerInfo = PlayerInfo.decode(reader, reader.uint32());
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): PPlayerEnterGame {
-    return {
-      $type: PPlayerEnterGame.$type,
-      playerInfo: isSet(object.playerInfo) ? PlayerInfo.fromJSON(object.playerInfo) : undefined,
-    };
-  },
-
-  toJSON(message: PPlayerEnterGame): unknown {
-    const obj: any = {};
-    if (message.playerInfo !== undefined) {
-      obj.playerInfo = PlayerInfo.toJSON(message.playerInfo);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<PPlayerEnterGame>, I>>(base?: I): PPlayerEnterGame {
-    return PPlayerEnterGame.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<PPlayerEnterGame>, I>>(object: I): PPlayerEnterGame {
-    const message = createBasePPlayerEnterGame();
-    message.playerInfo = (object.playerInfo !== undefined && object.playerInfo !== null)
-      ? PlayerInfo.fromPartial(object.playerInfo)
-      : undefined;
-    return message;
-  },
-};
-
-messageTypeRegistry.set(PPlayerEnterGame.$type, PPlayerEnterGame);
-
-function createBaseCLeaveGame(): CLeaveGame {
-  return { $type: "game.CLeaveGame" };
-}
-
-export const CLeaveGame: MessageFns<CLeaveGame, "game.CLeaveGame"> = {
-  $type: "game.CLeaveGame" as const,
-
-  encode(_: CLeaveGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): CLeaveGame {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCLeaveGame();
+    const message = createBaseCReadyGame();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -443,41 +149,41 @@ export const CLeaveGame: MessageFns<CLeaveGame, "game.CLeaveGame"> = {
     return message;
   },
 
-  fromJSON(_: any): CLeaveGame {
-    return { $type: CLeaveGame.$type };
+  fromJSON(_: any): CReadyGame {
+    return { $type: CReadyGame.$type };
   },
 
-  toJSON(_: CLeaveGame): unknown {
+  toJSON(_: CReadyGame): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<CLeaveGame>, I>>(base?: I): CLeaveGame {
-    return CLeaveGame.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<CReadyGame>, I>>(base?: I): CReadyGame {
+    return CReadyGame.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<CLeaveGame>, I>>(_: I): CLeaveGame {
-    const message = createBaseCLeaveGame();
+  fromPartial<I extends Exact<DeepPartial<CReadyGame>, I>>(_: I): CReadyGame {
+    const message = createBaseCReadyGame();
     return message;
   },
 };
 
-messageTypeRegistry.set(CLeaveGame.$type, CLeaveGame);
+messageTypeRegistry.set(CReadyGame.$type, CReadyGame);
 
-function createBaseSLeaveGame(): SLeaveGame {
-  return { $type: "game.SLeaveGame" };
+function createBaseSReadyGame(): SReadyGame {
+  return { $type: "game.SReadyGame" };
 }
 
-export const SLeaveGame: MessageFns<SLeaveGame, "game.SLeaveGame"> = {
-  $type: "game.SLeaveGame" as const,
+export const SReadyGame: MessageFns<SReadyGame, "game.SReadyGame"> = {
+  $type: "game.SReadyGame" as const,
 
-  encode(_: SLeaveGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(_: SReadyGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): SLeaveGame {
+  decode(input: BinaryReader | Uint8Array, length?: number): SReadyGame {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSLeaveGame();
+    const message = createBaseSReadyGame();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -490,25 +196,72 @@ export const SLeaveGame: MessageFns<SLeaveGame, "game.SLeaveGame"> = {
     return message;
   },
 
-  fromJSON(_: any): SLeaveGame {
-    return { $type: SLeaveGame.$type };
+  fromJSON(_: any): SReadyGame {
+    return { $type: SReadyGame.$type };
   },
 
-  toJSON(_: SLeaveGame): unknown {
+  toJSON(_: SReadyGame): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<SLeaveGame>, I>>(base?: I): SLeaveGame {
-    return SLeaveGame.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<SReadyGame>, I>>(base?: I): SReadyGame {
+    return SReadyGame.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<SLeaveGame>, I>>(_: I): SLeaveGame {
-    const message = createBaseSLeaveGame();
+  fromPartial<I extends Exact<DeepPartial<SReadyGame>, I>>(_: I): SReadyGame {
+    const message = createBaseSReadyGame();
     return message;
   },
 };
 
-messageTypeRegistry.set(SLeaveGame.$type, SLeaveGame);
+messageTypeRegistry.set(SReadyGame.$type, SReadyGame);
+
+function createBasePStartGame(): PStartGame {
+  return { $type: "game.PStartGame" };
+}
+
+export const PStartGame: MessageFns<PStartGame, "game.PStartGame"> = {
+  $type: "game.PStartGame" as const,
+
+  encode(_: PStartGame, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PStartGame {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePStartGame();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): PStartGame {
+    return { $type: PStartGame.$type };
+  },
+
+  toJSON(_: PStartGame): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PStartGame>, I>>(base?: I): PStartGame {
+    return PStartGame.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PStartGame>, I>>(_: I): PStartGame {
+    const message = createBasePStartGame();
+    return message;
+  },
+};
+
+messageTypeRegistry.set(PStartGame.$type, PStartGame);
 
 function createBaseCPlacePiece(): CPlacePiece {
   return { $type: "game.CPlacePiece", pieceType: 0, x: 0, y: 0 };

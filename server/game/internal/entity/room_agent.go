@@ -11,6 +11,7 @@ type RoomAgent struct {
 
 func NewRoomAgent(desk *Room, tcb g.TimerCb) *RoomAgent {
 	a := &RoomAgent{
+		Room:         desk,
 		RoutineAgent: g.NewRoutineAgent(1024, 1024),
 	}
 	a.RoutineAgent.Init(tcb, a.onClose)

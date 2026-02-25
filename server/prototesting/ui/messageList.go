@@ -135,10 +135,22 @@ func (w *MessageWidget) acceptMsg() {
 			str = str[:100]
 		}
 		if msgItem.MsgType == net.MsgType_Request {
-			lastReqIndex = w.MsgList.Length()
 			w.AppendMessage(str)
 		} else if msgItem.MsgType == net.MsgType_Response || msgItem.MsgType == net.MsgType_Error {
-			w.dataList.SetValue(lastReqIndex, str)
+			lastReqIndex = -1
+			for i := w.dataList.Length() - 1; i >= 0; i-- {
+				ss, err := w.dataList.GetValue(i)
+				if err != nil {
+					log.Printf("find lastReqIndex failed, %v\n%s", err, ss)
+					continue
+				}
+				if strings.HasPrefix(ss, msgItem.Id) {
+					lastReqIndex = i
+					w.dataList.SetValue(lastReqIndex, str)
+					//log.Printf("find lastReqIndex ok, %v, %s", msgItem.Id, msgItem.Name)
+					break
+				}
+			}
 		} else {
 			w.AppendMessage(str)
 		}
