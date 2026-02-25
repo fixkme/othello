@@ -1,5 +1,15 @@
 import { director, Node } from "cc";
 
+// 从index.html的域获得ws地址，端口和nginx部署端口可以不一样
+export function getWsUrl(port = 7070, path = "/ws") {
+  if ((typeof window == "undefined") || !window.location) {
+    return
+  }
+  const loc = window.location;
+  const proto = (loc.protocol === "https:") ? "wss:" : "ws:";
+  return `${proto}//${loc.hostname}:${port}${path}`;
+}
+
 export function createPopup(content: Node) {
     const scene = director.getScene();
     const canvas = scene.getChildByName('Canvas');

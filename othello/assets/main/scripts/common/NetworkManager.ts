@@ -3,7 +3,7 @@ import { GlobalWebSocket } from './WebSocket';
 import { CEnterGame, CLogin, SLogin } from '../pb/hall/player';
 import { PlayerInfo } from '../pb/datas/player_data';
 import { SecneName } from './ConstValue';
-import { getBrowserTabId, getRandomAccount } from './Util';
+import { getBrowserTabId, getRandomAccount, getWsUrl } from './Util';
 const { ccclass } = _decorator;
 
 @ccclass('NetworkManager')
@@ -11,7 +11,7 @@ export class NetworkManager extends Component {
     private static _instance: NetworkManager;
     private _ws: GlobalWebSocket = GlobalWebSocket.getInstance();
 
-    private readonly WS_URL = "ws://10.8.9.1:7070/ws";
+    private WS_URL: string = "ws://localhost:7070/ws";
     private account: string = "";
     public playerInfo: PlayerInfo = null;
     public isLogined: boolean = false;
@@ -25,6 +25,12 @@ export class NetworkManager extends Component {
             this.destroy();
             return;
         }
+
+        const wsUrl = getWsUrl();
+        if (wsUrl) {
+            this.WS_URL = wsUrl
+        }
+        console.info("[Network] wsUrl: ", this.WS_URL)
 
         NetworkManager._instance = this;
 
