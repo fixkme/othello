@@ -7,7 +7,7 @@ temp/
 local/
 build/
 profiles/
-native
+native/
 #//////////////////////////
 # NPM
 #//////////////////////////
@@ -22,6 +22,12 @@ node_modules/
 # WebStorm
 #//////////////////////////
 .idea/
+
+# 操作系统
+.DS_Store
+Thumbs.db
+*.swp
+*~
 
 .env
 bin/
